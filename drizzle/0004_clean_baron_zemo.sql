@@ -1,0 +1,1 @@
+ALTER TABLE "zodiac_results" ADD COLUMN "ai_analysis" text;

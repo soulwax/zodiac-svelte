@@ -71,6 +71,7 @@
 		"vite-plugin-devtools-json": "^1.0.0"
 	},
 	"dependencies": {
+		"openai": "^6.10.0",
 		"postgres": "^3.4.7"
 	}
 }

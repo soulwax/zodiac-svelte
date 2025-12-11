@@ -2,14 +2,23 @@
 	import { resolve } from '$app/paths';
 	import { page } from '$app/state';
 	import github from '$lib/images/github.svg';
-	import logo from '$lib/images/svelte-logo.svg';
 </script>
 
 <header>
 	<div class="corner">
-		<a href="https://battlecry.tech">
-			<img src={logo} alt="Battlecry Tech" />
-		</a>
+		<div class="logo-container relative flex items-center justify-center" style="width: 120px; height: 120px;">
+			<div class="absolute inset-0 w-full h-full rounded-full border-2 animate-spin-slow" style="border-color: transparent; border-top-color: rgb(20, 184, 166); border-right-color: rgba(20, 184, 166, 0.3);"></div>
+			<div class="relative z-10">
+				<svg xmlns="http://www.w3.org/2000/svg" width="66" height="66" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="text-teal-400">
+					<path d="M 50 10 L 80 30 L 80 70 L 50 90 L 20 70 L 20 30 Z"></path>
+					<line x1="50" y1="20" x2="50" y2="80"></line>
+					<circle cx="50" cy="50" r="10"></circle>
+					<circle cx="50" cy="10" r="3" fill="currentColor"></circle>
+					<circle cx="50" cy="90" r="3" fill="currentColor"></circle>
+				</svg>
+			</div>
+			<div class="absolute -top-0.5 -right-0.5 text-teal-400 pointer-events-none opacity-60" style="font-size: 18px;">✨</div>
+		</div>
 	</div>
 
 	<nav>
@@ -51,6 +60,9 @@
 	.corner {
 		width: 3em;
 		height: 3em;
+		display: flex;
+		align-items: center;
+		justify-content: center;
 	}
 
 	.corner a {
@@ -65,6 +77,24 @@
 		width: 2em;
 		height: 2em;
 		object-fit: contain;
+	}
+
+	.logo-container {
+		transform: scale(0.25);
+		transform-origin: center;
+	}
+
+	@keyframes spin-slow {
+		from {
+			transform: rotate(0deg);
+		}
+		to {
+			transform: rotate(360deg);
+		}
+	}
+
+	.animate-spin-slow {
+		animation: spin-slow 3s linear infinite;
 	}
 
 	nav {
