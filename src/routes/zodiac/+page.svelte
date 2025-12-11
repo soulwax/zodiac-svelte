@@ -473,6 +473,8 @@
 				{#if showSuggestions && suggestions.length > 0}
 					<ul class="suggestions">
 						{#each suggestions as suggestion}
+							<!-- svelte-ignore a11y_click_events_have_key_events -->
+							<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
 							<li onclick={() => selectPlace(suggestion)} class="suggestion-item">
 								{suggestion.display_name}
 							</li>
