@@ -275,3 +275,272 @@ export function calculateHouses(
 	return houses;
 }
 
+/**
+ * Gets the sign index (0-11) for a zodiac sign
+ */
+function getSignIndex(sign: ZodiacSign): number {
+	const signs: ZodiacSign[] = [
+		'Aries',
+		'Taurus',
+		'Gemini',
+		'Cancer',
+		'Leo',
+		'Virgo',
+		'Libra',
+		'Scorpio',
+		'Sagittarius',
+		'Capricorn',
+		'Aquarius',
+		'Pisces'
+	];
+	return signs.indexOf(sign);
+}
+
+/**
+ * Gets the zodiac sign from an index (0-11)
+ */
+function getSignFromIndex(index: number): ZodiacSign {
+	const signs: ZodiacSign[] = [
+		'Aries',
+		'Taurus',
+		'Gemini',
+		'Cancer',
+		'Leo',
+		'Virgo',
+		'Libra',
+		'Scorpio',
+		'Sagittarius',
+		'Capricorn',
+		'Aquarius',
+		'Pisces'
+	];
+	return signs[index % 12];
+}
+
+/**
+ * Calculates Mercury sign
+ * Mercury stays within ~28 degrees of the Sun, so we approximate based on Sun position
+ */
+export function calculateMercurySign(
+	year: number,
+	month: number,
+	day: number,
+	sunSign: ZodiacSign
+): ZodiacSign {
+	// Mercury can be in the same sign as Sun, or one sign before/after
+	// Simplified: use a pattern based on the day of year
+	const daysInYear = new Date(year, month - 1, day).getTime() - new Date(year, 0, 1).getTime();
+	const dayOfYear = Math.floor(daysInYear / (1000 * 60 * 60 * 24));
+	
+	// Mercury's approximate cycle: can be same, previous, or next sign from Sun
+	const sunIndex = getSignIndex(sunSign);
+	const offset = (dayOfYear % 3) - 1; // -1, 0, or 1
+	return getSignFromIndex(sunIndex + offset);
+}
+
+/**
+ * Calculates Venus sign
+ * Venus stays within ~48 degrees of the Sun, so we approximate based on Sun position
+ */
+export function calculateVenusSign(
+	year: number,
+	month: number,
+	day: number,
+	sunSign: ZodiacSign
+): ZodiacSign {
+	// Venus can be up to 2 signs away from Sun
+	// Simplified: use a pattern based on the day of year
+	const daysInYear = new Date(year, month - 1, day).getTime() - new Date(year, 0, 1).getTime();
+	const dayOfYear = Math.floor(daysInYear / (1000 * 60 * 60 * 24));
+	
+	const sunIndex = getSignIndex(sunSign);
+	const offset = ((dayOfYear * 7) % 5) - 2; // -2 to 2
+	return getSignFromIndex(sunIndex + offset);
+}
+
+/**
+ * Calculates Mars sign
+ * Mars has an orbital period of ~687 days (about 1.88 years)
+ */
+export function calculateMarsSign(
+	year: number,
+	month: number,
+	day: number
+): ZodiacSign {
+	// Reference date: Jan 1, 2000, Mars was approximately in Aries
+	const referenceDate = new Date(2000, 0, 1, 0, 0, 0);
+	const birthDate = new Date(year, month - 1, day, 0, 0, 0);
+	const daysSinceReference = (birthDate.getTime() - referenceDate.getTime()) / (1000 * 60 * 60 * 24);
+	
+	// Mars orbital period: ~687 days
+	const marsCycle = 686.98;
+	const degreesPerDay = 360 / marsCycle; // Approximately 0.524 degrees per day
+	
+	// Reference: Mars was in Aries (0 degrees) at reference date (approximation)
+	let marsLongitude = (daysSinceReference * degreesPerDay) % 360;
+	if (marsLongitude < 0) marsLongitude += 360;
+	
+	return longitudeToSign(marsLongitude);
+}
+
+/**
+ * Calculates Jupiter sign
+ * Jupiter has an orbital period of ~12 years
+ */
+export function calculateJupiterSign(
+	year: number,
+	month: number,
+	day: number
+): ZodiacSign {
+	// Reference date: Jan 1, 2000, Jupiter was approximately in Aries
+	const referenceDate = new Date(2000, 0, 1, 0, 0, 0);
+	const birthDate = new Date(year, month - 1, day, 0, 0, 0);
+	const daysSinceReference = (birthDate.getTime() - referenceDate.getTime()) / (1000 * 60 * 60 * 24);
+	
+	// Jupiter orbital period: ~4332.59 days (11.86 years)
+	const jupiterCycle = 4332.59;
+	const degreesPerDay = 360 / jupiterCycle; // Approximately 0.083 degrees per day
+	
+	let jupiterLongitude = (daysSinceReference * degreesPerDay) % 360;
+	if (jupiterLongitude < 0) jupiterLongitude += 360;
+	
+	return longitudeToSign(jupiterLongitude);
+}
+
+/**
+ * Calculates Saturn sign
+ * Saturn has an orbital period of ~29.5 years
+ */
+export function calculateSaturnSign(
+	year: number,
+	month: number,
+	day: number
+): ZodiacSign {
+	// Reference date: Jan 1, 2000, Saturn was approximately in Taurus
+	const referenceDate = new Date(2000, 0, 1, 0, 0, 0);
+	const birthDate = new Date(year, month - 1, day, 0, 0, 0);
+	const daysSinceReference = (birthDate.getTime() - referenceDate.getTime()) / (1000 * 60 * 60 * 24);
+	
+	// Saturn orbital period: ~10759 days (29.46 years)
+	const saturnCycle = 10759;
+	const degreesPerDay = 360 / saturnCycle; // Approximately 0.033 degrees per day
+	
+	// Reference: Saturn was in Taurus (30 degrees) at reference date (approximation)
+	let saturnLongitude = (30 + daysSinceReference * degreesPerDay) % 360;
+	if (saturnLongitude < 0) saturnLongitude += 360;
+	
+	return longitudeToSign(saturnLongitude);
+}
+
+/**
+ * Calculates Uranus sign (generational planet, ~84 years)
+ */
+export function calculateUranusSign(
+	year: number,
+	month: number,
+	day: number
+): ZodiacSign {
+	// Reference date: Jan 1, 2000, Uranus was approximately in Aquarius
+	const referenceDate = new Date(2000, 0, 1, 0, 0, 0);
+	const birthDate = new Date(year, month - 1, day, 0, 0, 0);
+	const daysSinceReference = (birthDate.getTime() - referenceDate.getTime()) / (1000 * 60 * 60 * 24);
+	
+	// Uranus orbital period: ~30688 days (84.01 years)
+	const uranusCycle = 30688;
+	const degreesPerDay = 360 / uranusCycle;
+	
+	// Reference: Uranus was in Aquarius (300 degrees) at reference date (approximation)
+	let uranusLongitude = (300 + daysSinceReference * degreesPerDay) % 360;
+	if (uranusLongitude < 0) uranusLongitude += 360;
+	
+	return longitudeToSign(uranusLongitude);
+}
+
+/**
+ * Calculates Neptune sign (generational planet, ~165 years)
+ */
+export function calculateNeptuneSign(
+	year: number,
+	month: number,
+	day: number
+): ZodiacSign {
+	// Reference date: Jan 1, 2000, Neptune was approximately in Aquarius
+	const referenceDate = new Date(2000, 0, 1, 0, 0, 0);
+	const birthDate = new Date(year, month - 1, day, 0, 0, 0);
+	const daysSinceReference = (birthDate.getTime() - referenceDate.getTime()) / (1000 * 60 * 60 * 24);
+	
+	// Neptune orbital period: ~60182 days (164.79 years)
+	const neptuneCycle = 60182;
+	const degreesPerDay = 360 / neptuneCycle;
+	
+	// Reference: Neptune was in Aquarius (330 degrees) at reference date (approximation)
+	let neptuneLongitude = (330 + daysSinceReference * degreesPerDay) % 360;
+	if (neptuneLongitude < 0) neptuneLongitude += 360;
+	
+	return longitudeToSign(neptuneLongitude);
+}
+
+/**
+ * Calculates Pluto sign (generational planet, ~248 years)
+ */
+export function calculatePlutoSign(
+	year: number,
+	month: number,
+	day: number
+): ZodiacSign {
+	// Reference date: Jan 1, 2000, Pluto was approximately in Sagittarius
+	const referenceDate = new Date(2000, 0, 1, 0, 0, 0);
+	const birthDate = new Date(year, month - 1, day, 0, 0, 0);
+	const daysSinceReference = (birthDate.getTime() - referenceDate.getTime()) / (1000 * 60 * 60 * 24);
+	
+	// Pluto orbital period: ~90553 days (247.94 years)
+	const plutoCycle = 90553;
+	const degreesPerDay = 360 / plutoCycle;
+	
+	// Reference: Pluto was in Sagittarius (240 degrees) at reference date (approximation)
+	let plutoLongitude = (240 + daysSinceReference * degreesPerDay) % 360;
+	if (plutoLongitude < 0) plutoLongitude += 360;
+	
+	return longitudeToSign(plutoLongitude);
+}
+
+/**
+ * Calculates all planet positions
+ */
+export interface PlanetPositions {
+	mercury: ZodiacSign;
+	venus: ZodiacSign;
+	mars: ZodiacSign;
+	jupiter: ZodiacSign;
+	saturn: ZodiacSign;
+	uranus: ZodiacSign;
+	neptune: ZodiacSign;
+	pluto: ZodiacSign;
+}
+
+export function calculateAllPlanets(
+	year: number,
+	month: number,
+	day: number,
+	sunSign: ZodiacSign
+): PlanetPositions {
+	return {
+		mercury: calculateMercurySign(year, month, day, sunSign),
+		venus: calculateVenusSign(year, month, day, sunSign),
+		mars: calculateMarsSign(year, month, day),
+		jupiter: calculateJupiterSign(year, month, day),
+		saturn: calculateSaturnSign(year, month, day),
+		uranus: calculateUranusSign(year, month, day),
+		neptune: calculateNeptuneSign(year, month, day),
+		pluto: calculatePlutoSign(year, month, day)
+	};
+}
+
+/**
+ * Determines which house a planet is in based on its sign and the house system
+ */
+export function getPlanetHouse(planetSign: ZodiacSign, houses: House[]): number | undefined {
+	const house = houses.find((h) => h.sign === planetSign);
+	return house?.number;
+}
+

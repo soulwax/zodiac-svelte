@@ -18,6 +18,7 @@ export const actions = {
 			const ascendant = data.get('ascendant') as string;
 			const moonSign = data.get('moonSign') as string;
 			const housesJson = data.get('houses') as string;
+			const planetsJson = data.get('planets') as string;
 			const utcYear = parseInt(data.get('utcYear') as string);
 			const utcMonth = parseInt(data.get('utcMonth') as string);
 			const utcDay = parseInt(data.get('utcDay') as string);
@@ -26,6 +27,9 @@ export const actions = {
 
 			// Parse houses JSON
 			const houses = JSON.parse(housesJson);
+			
+			// Parse planets JSON (with default empty object if not provided)
+			const planets = planetsJson ? JSON.parse(planetsJson) : {};
 
 			// Get session ID from cookies (or generate one)
 			const sessionId = cookies.get('sessionId') || crypto.randomUUID();
@@ -44,6 +48,7 @@ export const actions = {
 				sunSign,
 				ascendant,
 				moonSign,
+				planets,
 				houses,
 				utcYear,
 				utcMonth,

@@ -46,6 +46,8 @@ export const zodiacResults = pgTable('zodiac_results', {
 	sunSign: text('sun_sign').notNull(), // Calculated sun sign
 	ascendant: text('ascendant').notNull(), // Calculated ascendant/rising sign
 	moonSign: text('moon_sign').notNull(), // Calculated moon sign
+	// Planet positions (stored as JSON object)
+	planets: jsonb('planets').$type<Record<string, { sign: string; house?: number }>>(),
 	// Houses (stored as JSON array)
 	houses: jsonb('houses').$type<Array<{ number: number; sign: string }>>().notNull(),
 	// UTC time components used for calculations
