@@ -34,6 +34,9 @@ export const sverdleResults = pgTable('sverdle_results', {
 // Zodiac calculation results table
 export const zodiacResults = pgTable('zodiac_results', {
 	id: serial('id').primaryKey(),
+	// Optional user information
+	fullName: text('full_name'), // Full name (optional)
+	lifeTrajectory: text('life_trajectory'), // Life trajectory assessment (optional)
 	// Birth information
 	birthDate: text('birth_date').notNull(), // Date string (YYYY-MM-DD)
 	birthTime: text('birth_time').notNull(), // Time string (HH:MM)

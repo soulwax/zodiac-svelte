@@ -68,6 +68,8 @@
 		return generalData.info.houses[houseKey as keyof typeof generalData.info.houses];
 	}
 
+	let fullName = $state('');
+	let lifeTrajectory = $state<'down' | 'slightly down' | 'neutral' | 'slightly up' | 'up' | ''>('');
 	let birthDate = $state('');
 	let birthTime = $state('');
 	let placeQuery = $state('');
@@ -321,6 +323,8 @@
 			// Save results to database
 			try {
 				const formData = new FormData();
+				if (fullName) formData.append('fullName', fullName);
+				if (lifeTrajectory) formData.append('lifeTrajectory', lifeTrajectory);
 				formData.append('birthDate', birthDate);
 				formData.append('birthTime', birthTime);
 				formData.append('placeName', selectedPlace.display_name);
@@ -427,6 +431,23 @@
 			}}
 			class="form"
 		>
+			<div class="form-group">
+				<label for="fullname">Full Name (optional)</label>
+				<input type="text" id="fullname" bind:value={fullName} class="input" placeholder="Enter your full name" />
+			</div>
+
+			<div class="form-group">
+				<label for="lifetrajectory">Life trajectory assessment (optional)</label>
+				<select id="lifetrajectory" bind:value={lifeTrajectory} class="input">
+					<option value="">Select trajectory...</option>
+					<option value="down">Down</option>
+					<option value="slightly down">Slightly down</option>
+					<option value="neutral">Neutral</option>
+					<option value="slightly up">Slightly up</option>
+					<option value="up">Up</option>
+				</select>
+			</div>
+
 			<div class="form-group">
 				<label for="birthdate">Birth Date</label>
 				<input type="date" id="birthdate" bind:value={birthDate} required class="input" />

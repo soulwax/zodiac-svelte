@@ -8,6 +8,8 @@ export const actions = {
 			const data = await request.formData();
 
 			// Get all the form data
+			const fullName = data.get('fullName') as string | null;
+			const lifeTrajectory = data.get('lifeTrajectory') as string | null;
 			const birthDate = data.get('birthDate') as string;
 			const birthTime = data.get('birthTime') as string;
 			const placeName = data.get('placeName') as string;
@@ -39,6 +41,8 @@ export const actions = {
 
 			// Save to database
 			await db.insert(zodiacResults).values({
+				fullName: fullName || null,
+				lifeTrajectory: lifeTrajectory || null,
 				birthDate,
 				birthTime,
 				placeName,
