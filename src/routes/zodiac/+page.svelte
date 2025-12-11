@@ -217,9 +217,11 @@
 			}
 
 			// Interpret the user's input as local time in the birth place's timezone
-			// For sun sign calculation, we need the date (month/day) in that timezone
-			let signMonth: number = month;
-			let signDay: number = day;
+			// For sun sign calculation, we use the date (month/day) that the user entered,
+			// which is already in the birth location's timezone
+			// The timezone conversion only affects the UTC time for ascendant, moon sign, houses, etc.
+			const signMonth: number = month;
+			const signDay: number = day;
 			let utcYear: number = year;
 			let utcMonth: number = month;
 			let utcDay: number = day;
@@ -263,10 +265,8 @@
 						const minuteDiff = Math.abs(tzMinute - minutes);
 						
 						if (hourDiff === 0 && minuteDiff <= 1) {
-							// Perfect match - use this date
-							signMonth = tzMonth;
-							signDay = tzDay;
-							// Extract UTC components
+							// Perfect match - extract UTC components
+							// Note: signMonth and signDay remain as the user entered them
 							utcYear = testDate.getUTCFullYear();
 							utcMonth = testDate.getUTCMonth() + 1;
 							utcDay = testDate.getUTCDate();
@@ -284,11 +284,9 @@
 						testDate = new Date(testDate.getTime() + dayDiff * 24 * 60 * 60 * 1000);
 					}
 					
-					// Safety check - use the date components from the timezone
+					// Safety check - extract UTC components
+					// Note: signMonth and signDay remain as the user entered them
 					if (i === 19) {
-						const finalParts = formatter.formatToParts(testDate);
-						signMonth = parseInt(finalParts.find(p => p.type === 'month')?.value || String(month));
-						signDay = parseInt(finalParts.find(p => p.type === 'day')?.value || String(day));
 						utcYear = testDate.getUTCFullYear();
 						utcMonth = testDate.getUTCMonth() + 1;
 						utcDay = testDate.getUTCDate();
@@ -298,8 +296,7 @@
 				}
 			} else {
 				// Fallback: use the date as-is (assuming user entered local time)
-				signMonth = month;
-				signDay = day;
+				// Note: signMonth and signDay are already set to the user's input
 				// For houses, we'll use the local time as UTC (not ideal, but better than nothing)
 				utcYear = year;
 				utcMonth = month;
