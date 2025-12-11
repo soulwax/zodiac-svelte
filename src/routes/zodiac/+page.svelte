@@ -14,6 +14,9 @@
 	import generalData from '../../data/general.json';
 	import planetsData from '../../data/planets.json';
 	import Chart from './Chart.svelte';
+	import type { PageData } from './$types';
+
+	let { data }: { data: PageData } = $props();
 
 	// Helper function to convert ZodiacSign to lowercase key
 	function getSignKey(sign: ZodiacSign | null): string {
