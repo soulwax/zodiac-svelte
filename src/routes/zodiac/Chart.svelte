@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { astrologicalSymbols, getPlanetarySymbol, getZodiacSymbol, Planet } from '$lib/symbols';
 	import type { House, ZodiacSign } from '$lib/zodiac';
 
 	interface Props {
@@ -24,21 +25,6 @@
 		'Aquarius',
 		'Pisces'
 	];
-
-	const zodiacSymbols: Record<ZodiacSign, string> = {
-		Aries: '♈',
-		Taurus: '♉',
-		Gemini: '♊',
-		Cancer: '♋',
-		Leo: '♌',
-		Virgo: '♍',
-		Libra: '♎',
-		Scorpio: '♏',
-		Sagittarius: '♐',
-		Capricorn: '♑',
-		Aquarius: '♒',
-		Pisces: '♓'
-	};
 
 	// Calculate the angle for each sign (starting from Aries at 0°)
 	function getSignAngle(sign: ZodiacSign): number {
