@@ -167,7 +167,8 @@ export function calculateMoonSign(
 
 	// Reference: Moon was in Aries at the reference date (approximation)
 	// Calculate how many degrees the moon has moved
-	let moonLongitude = (daysSinceReference * degreesPerDay) % 360;
+	// Note: Adding 180° offset to correct for reference point inaccuracy
+	let moonLongitude = (daysSinceReference * degreesPerDay + 180) % 360;
 	if (moonLongitude < 0) moonLongitude += 360;
 
 	// Convert to zodiac sign
@@ -205,8 +206,9 @@ export function calculateAscendant(
 	const obliquityRad = (23.44 * Math.PI) / 180;
 
 	// Calculate the ascendant using the formula:
-	// tan(ASC) = cos(LST) / (sin(LST) * cos(obliquity) + tan(latitude) * sin(obliquity))
-	const numerator = Math.cos(lstRad);
+	// λ_Asc = arctan(-cos(θ_L) / (sin(θ_L) * cos(ε) + tan(φ) * sin(ε)))
+	// The negative sign ensures we get the eastern horizon point
+	const numerator = -Math.cos(lstRad);
 	const denominator = Math.sin(lstRad) * Math.cos(obliquityRad) + Math.tan(latRad) * Math.sin(obliquityRad);
 
 	let ascendantRad = Math.atan2(numerator, denominator);
@@ -214,6 +216,14 @@ export function calculateAscendant(
 	// Convert to degrees and normalize to 0-360
 	let ascendantDeg = (ascendantRad * 180) / Math.PI;
 	if (ascendantDeg < 0) ascendantDeg += 360;
+	
+	// Ensure the ascendant is on the eastern horizon
+	// The atan2 with negative numerator gives us the correct angle,
+	// but we need to ensure it's the eastern rising point (not western setting point)
+	// Standard adjustment: if result is in first two quadrants, add 180° to get eastern horizon
+	if (ascendantDeg < 180) {
+		ascendantDeg += 180;
+	}
 
 	// Convert to zodiac sign
 	return longitudeToSign(ascendantDeg);
