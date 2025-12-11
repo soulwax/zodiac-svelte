@@ -1,6 +1,6 @@
-import type { Page } from './$types';
+import type { PageLoadEvent } from './$types';
 
-export const load = async ({ url }: Page) => {
+export const load = async ({ url }: PageLoadEvent) => {
 	const siteUrl = url.origin;
 	const pageUrl = url.href;
 	
