@@ -8,6 +8,20 @@
       "when": 1765460936272,
       "tag": "0000_heavy_leo",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1765464306710,
+      "tag": "0001_dapper_wallow",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1765464398069,
+      "tag": "0002_swift_otto_octavius",
+      "breakpoints": true
     }
   ]
 }

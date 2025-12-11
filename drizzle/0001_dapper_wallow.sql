@@ -1,0 +1,1 @@
+ALTER TABLE "zodiac_results" ADD COLUMN "planets" jsonb NOT NULL;

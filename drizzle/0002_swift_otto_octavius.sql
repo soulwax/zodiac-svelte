@@ -1,0 +1,1 @@
+ALTER TABLE "zodiac_results" ALTER COLUMN "planets" DROP NOT NULL;

@@ -1,14 +1,18 @@
 <script lang="ts">
 	import { getTimezoneFromCoords, searchPlaces, type Place } from '$lib/geocoding';
 	import {
+		calculateAllPlanets,
 		calculateAscendant,
 		calculateHouses,
 		calculateMoonSign,
 		calculateSunSign,
+		getPlanetHouse,
 		type House,
+		type PlanetPositions,
 		type ZodiacSign
 	} from '$lib/zodiac';
 	import generalData from '../../data/general.json';
+	import planetsData from '../../data/planets.json';
 	import Chart from './Chart.svelte';
 
 	// Helper function to convert ZodiacSign to lowercase key
@@ -71,6 +75,7 @@
 	let ascendant = $state<ZodiacSign | null>(null);
 	let moonSign = $state<ZodiacSign | null>(null);
 	let houses = $state<House[]>([]);
+	let planets = $state<PlanetPositions | null>(null);
 	let isLoading = $state(false);
 	let error = $state<string | null>(null);
 
@@ -81,6 +86,63 @@
 	const moonSignData = $derived(moonSign ? getSignData(moonSign) : null);
 	const ascendantSignData = $derived(ascendant ? getSignData(ascendant) : null);
 
+	// Get planet description from planets.json
+	function getPlanetDescription(planet: string, sign: ZodiacSign | null): { keywords: string[]; description: string } | null {
+		if (!sign) return null;
+		const signKey = getSignKey(sign);
+		const planetData = planetsData.planetary_sign_details[planet as keyof typeof planetsData.planetary_sign_details];
+		if (!planetData || typeof planetData !== 'object') return null;
+		
+		// Handle different planet structures
+		if ('entries' in planetData) {
+			// Jupiter/Saturn format
+			const entry = planetData.entries[signKey as keyof typeof planetData.entries];
+			if (entry) {
+				return {
+					keywords: [],
+					description: `${planetData.generic_formula.replace('[Sign Quality]', entry)}`
+				};
+			}
+		} else {
+			// Mercury/Venus/Mars format
+			const signData = planetData[signKey as keyof typeof planetData];
+			if (
+				signData &&
+				typeof signData === 'object' &&
+				signData !== null &&
+				'description' in signData &&
+				Array.isArray((signData as any).keywords)
+			) {
+				return {
+					keywords: (signData as { keywords: string[] }).keywords,
+					description: (signData as { description: string }).description
+				};
+			} else if (
+				signData &&
+				typeof signData === 'object' &&
+				signData !== null &&
+				'description' in signData
+			) {
+				return {
+					keywords: [],
+					description: (signData as { description: string }).description
+				};
+			}
+		}
+		return null;
+	}
+
+	// Get house placement description
+	function getHousePlacementDescription(planet: 'sun' | 'moon' | 'saturn', houseNumber: number): string {
+		const houseKey = String(houseNumber);
+		const placementKey = `${planet}_in_house` as keyof typeof planetsData.house_placement_descriptions;
+		const placementData = planetsData.house_placement_descriptions[placementKey];
+		if (placementData && typeof placementData === 'object') {
+			return (placementData as Record<string, string>)[houseKey] || '';
+		}
+		return '';
+	}
+
 	async function handlePlaceInput(value: string) {
 		placeQuery = value;
 		selectedPlace = null;
@@ -88,6 +150,7 @@
 		ascendant = null;
 		moonSign = null;
 		houses = [];
+		planets = null;
 
 		if (debounceTimer) {
 			clearTimeout(debounceTimer);
@@ -119,6 +182,7 @@
 		ascendant = null;
 		moonSign = null;
 		houses = [];
+		planets = null;
 
 		if (!birthDate || !birthTime || !selectedPlace) {
 			error = 'Please fill in all fields and select a place from the suggestions.';
@@ -247,6 +311,9 @@
 			
 			// Calculate houses using UTC time and location coordinates
 			houses = calculateHouses(utcYear, utcMonth, utcDay, utcHour, utcMinute, lat, lon);
+			
+			// Calculate all planet positions
+			planets = calculateAllPlanets(utcYear, utcMonth, utcDay, sunSign);
 
 			// Save results to database
 			try {
@@ -261,6 +328,18 @@
 				formData.append('ascendant', ascendant);
 				formData.append('moonSign', moonSign);
 				formData.append('houses', JSON.stringify(houses));
+				// Add planet positions with house numbers
+				if (planets) {
+					const planetsWithHouses: Record<string, { sign: string; house?: number }> = {};
+					for (const [planetName, planetSign] of Object.entries(planets)) {
+						const houseNumber = getPlanetHouse(planetSign, houses);
+						planetsWithHouses[planetName] = {
+							sign: planetSign,
+							house: houseNumber
+						};
+					}
+					formData.append('planets', JSON.stringify(planetsWithHouses));
+				}
 				formData.append('utcYear', String(utcYear));
 				formData.append('utcMonth', String(utcMonth));
 				formData.append('utcDay', String(utcDay));
@@ -306,13 +385,18 @@
 
 <svelte:head>
 	<title>Zodiac Calculator</title>
-	<meta name="description" content="Calculate your zodiac sun sign based on your birth date, time, and location" />
+	<meta
+		name="description"
+		content="Calculate your zodiac sun sign based on your birth date, time, and location"
+	/>
 </svelte:head>
 
 <div class="container">
 	<div class="card">
 		<h1>Zodiac Calculator</h1>
-		<p class="subtitle">Enter your birth details to discover your sun sign and astrological houses</p>
+		<p class="subtitle">
+			Enter your birth details to discover your sun sign and astrological houses
+		</p>
 
 		<form
 			onsubmit={(e) => {
@@ -323,24 +407,12 @@
 		>
 			<div class="form-group">
 				<label for="birthdate">Birth Date</label>
-				<input
-					type="date"
-					id="birthdate"
-					bind:value={birthDate}
-					required
-					class="input"
-				/>
+				<input type="date" id="birthdate" bind:value={birthDate} required class="input" />
 			</div>
 
 			<div class="form-group">
 				<label for="birthtime">Birth Time</label>
-				<input
-					type="time"
-					id="birthtime"
-					bind:value={birthTime}
-					required
-					class="input"
-				/>
+				<input type="time" id="birthtime" bind:value={birthTime} required class="input" />
 			</div>
 
 			<div class="form-group autocomplete-container">
@@ -358,10 +430,7 @@
 				{#if showSuggestions && suggestions.length > 0}
 					<ul class="suggestions">
 						{#each suggestions as suggestion}
-							<li
-								onclick={() => selectPlace(suggestion)}
-								class="suggestion-item"
-							>
+							<li onclick={() => selectPlace(suggestion)} class="suggestion-item">
 								{suggestion.display_name}
 							</li>
 						{/each}
@@ -394,35 +463,47 @@
 									<span class="badge badge-ruler">Ruled by {sunSignData.ruler}</span>
 								</div>
 							</div>
-						<div class="sign-content">
-							<div class="core-point-info">
-								<div class="core-point-role">{getCorePointRole('sun')}</div>
-								<div class="core-point-description">{getCorePointDescription('sun')}</div>
-								{#if getCorePointKeywords('sun').length > 0}
-									<div class="keywords">
-										<span class="keywords-label">Keywords:</span>
-										{#each getCorePointKeywords('sun') as keyword}
-											<span class="keyword">{keyword}</span>
-										{/each}
-									</div>
-								{/if}
-							</div>
-							<div class="placement-info">
-								<div class="placement-title">Sun in {sunSign}</div>
-								<div class="placement-description">
-									{getSignDescription(sunSign, 'sun')}
+							<div class="sign-content">
+								<div class="core-point-info">
+									<div class="core-point-role">{getCorePointRole('sun')}</div>
+									<div class="core-point-description">{getCorePointDescription('sun')}</div>
+									{#if getCorePointKeywords('sun').length > 0}
+										<div class="keywords">
+											<span class="keywords-label">Keywords:</span>
+											{#each getCorePointKeywords('sun') as keyword}
+												<span class="keyword">{keyword}</span>
+											{/each}
+										</div>
+									{/if}
 								</div>
-								{#if getSignKeywords(sunSign, 'sun').length > 0}
-									<div class="keywords">
-										<span class="keywords-label">Keywords:</span>
-										{#each getSignKeywords(sunSign, 'sun') as keyword}
-											<span class="keyword">{keyword}</span>
-										{/each}
+								<div class="placement-info">
+									<div class="placement-title">Sun in {sunSign}</div>
+									<div class="placement-description">
+										{getSignDescription(sunSign, 'sun')}
 									</div>
-								{/if}
+									{#if getSignKeywords(sunSign, 'sun').length > 0}
+										<div class="keywords">
+											<span class="keywords-label">Keywords:</span>
+											{#each getSignKeywords(sunSign, 'sun') as keyword}
+												<span class="keyword">{keyword}</span>
+											{/each}
+										</div>
+									{/if}
+									{#if houses.length > 0}
+										{@const sunHouse = getPlanetHouse(sunSign, houses)}
+										{#if sunHouse}
+											{@const housePlacement = getHousePlacementDescription('sun', sunHouse)}
+											{#if housePlacement}
+												<div class="house-placement">
+													<div class="house-placement-title">Sun in House {sunHouse}</div>
+													<div class="house-placement-description">{housePlacement}</div>
+												</div>
+											{/if}
+										{/if}
+									{/if}
+								</div>
 							</div>
 						</div>
-					</div>
 					{/if}
 
 					<!-- Moon Sign -->
@@ -437,35 +518,47 @@
 									<span class="badge badge-ruler">Ruled by {moonSignData.ruler}</span>
 								</div>
 							</div>
-						<div class="sign-content">
-							<div class="core-point-info">
-								<div class="core-point-role">{getCorePointRole('moon')}</div>
-								<div class="core-point-description">{getCorePointDescription('moon')}</div>
-								{#if getCorePointKeywords('moon').length > 0}
-									<div class="keywords">
-										<span class="keywords-label">Keywords:</span>
-										{#each getCorePointKeywords('moon') as keyword}
-											<span class="keyword">{keyword}</span>
-										{/each}
-									</div>
-								{/if}
-							</div>
-							<div class="placement-info">
-								<div class="placement-title">Moon in {moonSign}</div>
-								<div class="placement-description">
-									{getSignDescription(moonSign, 'moon')}
+							<div class="sign-content">
+								<div class="core-point-info">
+									<div class="core-point-role">{getCorePointRole('moon')}</div>
+									<div class="core-point-description">{getCorePointDescription('moon')}</div>
+									{#if getCorePointKeywords('moon').length > 0}
+										<div class="keywords">
+											<span class="keywords-label">Keywords:</span>
+											{#each getCorePointKeywords('moon') as keyword}
+												<span class="keyword">{keyword}</span>
+											{/each}
+										</div>
+									{/if}
 								</div>
-								{#if getSignKeywords(moonSign, 'moon').length > 0}
-									<div class="keywords">
-										<span class="keywords-label">Keywords:</span>
-										{#each getSignKeywords(moonSign, 'moon') as keyword}
-											<span class="keyword">{keyword}</span>
-										{/each}
+								<div class="placement-info">
+									<div class="placement-title">Moon in {moonSign}</div>
+									<div class="placement-description">
+										{getSignDescription(moonSign, 'moon')}
 									</div>
-								{/if}
+									{#if getSignKeywords(moonSign, 'moon').length > 0}
+										<div class="keywords">
+											<span class="keywords-label">Keywords:</span>
+											{#each getSignKeywords(moonSign, 'moon') as keyword}
+												<span class="keyword">{keyword}</span>
+											{/each}
+										</div>
+									{/if}
+									{#if houses.length > 0}
+										{@const moonHouse = getPlanetHouse(moonSign, houses)}
+										{#if moonHouse}
+											{@const housePlacement = getHousePlacementDescription('moon', moonHouse)}
+											{#if housePlacement}
+												<div class="house-placement">
+													<div class="house-placement-title">Moon in House {moonHouse}</div>
+													<div class="house-placement-description">{housePlacement}</div>
+												</div>
+											{/if}
+										{/if}
+									{/if}
+								</div>
 							</div>
 						</div>
-					</div>
 					{/if}
 
 					<!-- Ascendant Sign -->
@@ -475,40 +568,42 @@
 								<div class="sign-label">Ascendant (Rising Sign)</div>
 								<div class="sign-name">{ascendant}</div>
 								<div class="sign-metadata">
-									<span class="badge badge-{ascendantSignData.element}">{ascendantSignData.element}</span>
+									<span class="badge badge-{ascendantSignData.element}"
+										>{ascendantSignData.element}</span
+									>
 									<span class="badge badge-modality">{ascendantSignData.modality}</span>
 									<span class="badge badge-ruler">Ruled by {ascendantSignData.ruler}</span>
 								</div>
 							</div>
-						<div class="sign-content">
-							<div class="core-point-info">
-								<div class="core-point-role">{getCorePointRole('ascendant')}</div>
-								<div class="core-point-description">{getCorePointDescription('ascendant')}</div>
-								{#if getCorePointKeywords('ascendant').length > 0}
-									<div class="keywords">
-										<span class="keywords-label">Keywords:</span>
-										{#each getCorePointKeywords('ascendant') as keyword}
-											<span class="keyword">{keyword}</span>
-										{/each}
-									</div>
-								{/if}
-							</div>
-							<div class="placement-info">
-								<div class="placement-title">{ascendant} Rising</div>
-								<div class="placement-description">
-									{getSignDescription(ascendant, 'ascendant')}
+							<div class="sign-content">
+								<div class="core-point-info">
+									<div class="core-point-role">{getCorePointRole('ascendant')}</div>
+									<div class="core-point-description">{getCorePointDescription('ascendant')}</div>
+									{#if getCorePointKeywords('ascendant').length > 0}
+										<div class="keywords">
+											<span class="keywords-label">Keywords:</span>
+											{#each getCorePointKeywords('ascendant') as keyword}
+												<span class="keyword">{keyword}</span>
+											{/each}
+										</div>
+									{/if}
 								</div>
-								{#if getSignKeywords(ascendant, 'ascendant').length > 0}
-									<div class="keywords">
-										<span class="keywords-label">Keywords:</span>
-										{#each getSignKeywords(ascendant, 'ascendant') as keyword}
-											<span class="keyword">{keyword}</span>
-										{/each}
+								<div class="placement-info">
+									<div class="placement-title">{ascendant} Rising</div>
+									<div class="placement-description">
+										{getSignDescription(ascendant, 'ascendant')}
 									</div>
-								{/if}
+									{#if getSignKeywords(ascendant, 'ascendant').length > 0}
+										<div class="keywords">
+											<span class="keywords-label">Keywords:</span>
+											{#each getSignKeywords(ascendant, 'ascendant') as keyword}
+												<span class="keyword">{keyword}</span>
+											{/each}
+										</div>
+									{/if}
+								</div>
 							</div>
 						</div>
-					</div>
 					{/if}
 				</div>
 			</div>
@@ -543,6 +638,192 @@
 							{/if}
 						</div>
 					{/each}
+				</div>
+			</div>
+		{/if}
+
+		{#if planets}
+			<div class="planets-result">
+				<h2>Planetary Positions</h2>
+				<div class="planets-grid">
+					<!-- Personal Planets -->
+					<div class="planet-category">
+						<h3>Personal Planets</h3>
+						<div class="planets-list">
+							{#if planets.mercury}
+								{@const planetDesc = getPlanetDescription('mercury', planets.mercury)}
+								{@const planetHouse = getPlanetHouse(planets.mercury, houses)}
+								<div class="planet-item">
+									<div class="planet-header">
+										<div class="planet-name">Mercury</div>
+										<div class="planet-sign">{planets.mercury}</div>
+										{#if planetHouse}
+											<div class="planet-house">House {planetHouse}</div>
+										{/if}
+									</div>
+									{#if planetDesc}
+										<div class="planet-description">{planetDesc.description}</div>
+										{#if planetDesc.keywords && planetDesc.keywords.length > 0}
+											<div class="keywords">
+												<span class="keywords-label">Keywords:</span>
+												{#each planetDesc.keywords as keyword}
+													<span class="keyword">{keyword}</span>
+												{/each}
+											</div>
+										{/if}
+									{/if}
+								</div>
+							{/if}
+							{#if planets.venus}
+								{@const planetDesc = getPlanetDescription('venus', planets.venus)}
+								{@const planetHouse = getPlanetHouse(planets.venus, houses)}
+								<div class="planet-item">
+									<div class="planet-header">
+										<div class="planet-name">Venus</div>
+										<div class="planet-sign">{planets.venus}</div>
+										{#if planetHouse}
+											<div class="planet-house">House {planetHouse}</div>
+										{/if}
+									</div>
+									{#if planetDesc}
+										<div class="planet-description">{planetDesc.description}</div>
+										{#if planetDesc.keywords && planetDesc.keywords.length > 0}
+											<div class="keywords">
+												<span class="keywords-label">Keywords:</span>
+												{#each planetDesc.keywords as keyword}
+													<span class="keyword">{keyword}</span>
+												{/each}
+											</div>
+										{/if}
+									{/if}
+								</div>
+							{/if}
+							{#if planets.mars}
+								{@const planetDesc = getPlanetDescription('mars', planets.mars)}
+								{@const planetHouse = getPlanetHouse(planets.mars, houses)}
+								<div class="planet-item">
+									<div class="planet-header">
+										<div class="planet-name">Mars</div>
+										<div class="planet-sign">{planets.mars}</div>
+										{#if planetHouse}
+											<div class="planet-house">House {planetHouse}</div>
+										{/if}
+									</div>
+									{#if planetDesc}
+										<div class="planet-description">{planetDesc.description}</div>
+										{#if planetDesc.keywords && planetDesc.keywords.length > 0}
+											<div class="keywords">
+												<span class="keywords-label">Keywords:</span>
+												{#each planetDesc.keywords as keyword}
+													<span class="keyword">{keyword}</span>
+												{/each}
+											</div>
+										{/if}
+									{/if}
+								</div>
+							{/if}
+						</div>
+					</div>
+
+					<!-- Social Planets -->
+					<div class="planet-category">
+						<h3>Social Planets</h3>
+						<div class="planets-list">
+							{#if planets.jupiter}
+								{@const planetDesc = getPlanetDescription('jupiter', planets.jupiter)}
+								{@const planetHouse = getPlanetHouse(planets.jupiter, houses)}
+								<div class="planet-item">
+									<div class="planet-header">
+										<div class="planet-name">Jupiter</div>
+										<div class="planet-sign">{planets.jupiter}</div>
+										{#if planetHouse}
+											<div class="planet-house">House {planetHouse}</div>
+										{/if}
+									</div>
+									{#if planetDesc}
+										<div class="planet-description">{planetDesc.description}</div>
+									{/if}
+								</div>
+							{/if}
+							{#if planets.saturn}
+								{@const planetDesc = getPlanetDescription('saturn', planets.saturn)}
+								{@const planetHouse = getPlanetHouse(planets.saturn, houses)}
+								<div class="planet-item">
+									<div class="planet-header">
+										<div class="planet-name">Saturn</div>
+										<div class="planet-sign">{planets.saturn}</div>
+										{#if planetHouse}
+											<div class="planet-house">House {planetHouse}</div>
+										{/if}
+									</div>
+									{#if planetDesc}
+										<div class="planet-description">{planetDesc.description}</div>
+									{/if}
+									{#if planetHouse}
+										{@const housePlacement = getHousePlacementDescription('saturn', planetHouse)}
+										{#if housePlacement}
+											<div class="house-placement">
+												<div class="house-placement-title">Saturn in House {planetHouse}</div>
+												<div class="house-placement-description">{housePlacement}</div>
+											</div>
+										{/if}
+									{/if}
+								</div>
+							{/if}
+						</div>
+					</div>
+
+					<!-- Outer Planets -->
+					<div class="planet-category">
+						<h3>Generational Planets</h3>
+						<div class="planets-list">
+							{#if planets.uranus}
+								{@const planetHouse = getPlanetHouse(planets.uranus, houses)}
+								<div class="planet-item">
+									<div class="planet-header">
+										<div class="planet-name">Uranus</div>
+										<div class="planet-sign">{planets.uranus}</div>
+										{#if planetHouse}
+											<div class="planet-house">House {planetHouse}</div>
+										{/if}
+									</div>
+									<div class="planet-description">
+										{planetsData.planetary_sign_details.outer_planets.uranus.description}
+									</div>
+								</div>
+							{/if}
+							{#if planets.neptune}
+								{@const planetHouse = getPlanetHouse(planets.neptune, houses)}
+								<div class="planet-item">
+									<div class="planet-header">
+										<div class="planet-name">Neptune</div>
+										<div class="planet-sign">{planets.neptune}</div>
+										{#if planetHouse}
+											<div class="planet-house">House {planetHouse}</div>
+										{/if}
+									</div>
+									<div class="planet-description">
+										{planetsData.planetary_sign_details.outer_planets.neptune.description}
+									</div>
+								</div>
+							{/if}
+							{#if planets.pluto}
+								{@const planetHouse = getPlanetHouse(planets.pluto, houses)}
+								<div class="planet-item">
+									<div class="planet-header">
+										<div class="planet-name">Pluto</div>
+										<div class="planet-sign">{planets.pluto}</div>
+										{#if planetHouse}
+											<div class="planet-house">House {planetHouse}</div>
+										{/if}
+									</div>
+									<div class="planet-description">
+										{planetsData.planetary_sign_details.outer_planets.pluto.description}
+									</div>
+								</div>
+							{/if}
+						</div>
+					</div>
 				</div>
 			</div>
 		{/if}
@@ -720,7 +1001,9 @@
 		border: 1px solid var(--color-border);
 		border-radius: 8px;
 		padding: 2rem;
-		transition: transform 0.2s, box-shadow 0.2s;
+		transition:
+			transform 0.2s,
+			box-shadow 0.2s;
 	}
 
 	.sign-item:hover {
@@ -907,7 +1190,9 @@
 		border-radius: 6px;
 		padding: 1.5rem;
 		text-align: left;
-		transition: transform 0.2s, box-shadow 0.2s;
+		transition:
+			transform 0.2s,
+			box-shadow 0.2s;
 		display: flex;
 		flex-direction: column;
 		gap: 0.75rem;
@@ -956,6 +1241,127 @@
 		color: var(--color-text-muted);
 	}
 
+	.planets-result {
+		margin-top: 2rem;
+		padding: 2rem;
+		background: var(--color-bg-1);
+		border: 1px solid var(--color-border);
+		border-radius: 8px;
+	}
+
+	.planets-result h2 {
+		font-size: 1.5rem;
+		font-weight: 600;
+		margin: 0 0 2rem 0;
+		color: var(--color-text);
+		text-align: center;
+	}
+
+	.planets-grid {
+		display: flex;
+		flex-direction: column;
+		gap: 2rem;
+	}
+
+	.planet-category {
+		background: var(--color-bg-2);
+		border: 1px solid var(--color-border);
+		border-radius: 8px;
+		padding: 1.5rem;
+	}
+
+	.planet-category h3 {
+		font-size: 1.1rem;
+		font-weight: 600;
+		margin: 0 0 1.5rem 0;
+		color: var(--color-text);
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+	}
+
+	.planets-list {
+		display: flex;
+		flex-direction: column;
+		gap: 1.5rem;
+	}
+
+	.planet-item {
+		background: var(--color-bg-1);
+		border: 1px solid var(--color-border);
+		border-radius: 6px;
+		padding: 1.25rem;
+		transition:
+			transform 0.2s,
+			box-shadow 0.2s;
+	}
+
+	.planet-item:hover {
+		transform: translateY(-2px);
+		box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+	}
+
+	.planet-header {
+		display: flex;
+		align-items: center;
+		gap: 1rem;
+		margin-bottom: 0.75rem;
+		padding-bottom: 0.75rem;
+		border-bottom: 1px solid var(--color-border);
+		flex-wrap: wrap;
+	}
+
+	.planet-name {
+		font-size: 1.1rem;
+		font-weight: 600;
+		color: var(--color-text);
+	}
+
+	.planet-sign {
+		font-size: 0.9rem;
+		font-weight: 500;
+		color: var(--color-theme-1);
+		padding: 0.25rem 0.6rem;
+		background: var(--color-bg-2);
+		border: 1px solid var(--color-border);
+		border-radius: 4px;
+	}
+
+	.planet-house {
+		font-size: 0.85rem;
+		font-weight: 500;
+		color: var(--color-text-muted);
+		padding: 0.25rem 0.6rem;
+		background: var(--color-bg-2);
+		border: 1px solid var(--color-border);
+		border-radius: 4px;
+	}
+
+	.planet-description {
+		font-size: 0.9rem;
+		line-height: 1.6;
+		color: var(--color-text);
+		margin-bottom: 0.75rem;
+	}
+
+	.house-placement {
+		margin-top: 1rem;
+		padding-top: 1rem;
+		border-top: 1px solid var(--color-border);
+	}
+
+	.house-placement-title {
+		font-size: 0.9rem;
+		font-weight: 600;
+		color: var(--color-theme-1);
+		margin-bottom: 0.5rem;
+	}
+
+	.house-placement-description {
+		font-size: 0.85rem;
+		line-height: 1.5;
+		color: var(--color-text-muted);
+	}
+
 	@media (max-width: 640px) {
 		.card {
 			padding: 1.5rem;
@@ -970,4 +1376,3 @@
 		}
 	}
 </style>
-
