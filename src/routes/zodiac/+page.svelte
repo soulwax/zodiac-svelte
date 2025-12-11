@@ -13,8 +13,8 @@
 	} from '$lib/zodiac';
 	import generalData from '../../data/general.json';
 	import planetsData from '../../data/planets.json';
-	import Chart from './Chart.svelte';
 	import type { PageData } from './$types';
+	import Chart from './Chart.svelte';
 
 	let { data }: { data: PageData } = $props();
 
