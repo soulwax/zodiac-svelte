@@ -62,6 +62,14 @@
 		return generalData.info.core_points[point]?.keywords || [];
 	}
 
+	// Format time in 12-hour format with AM/PM
+	function formatTime12Hour(hours: number, minutes: number): string {
+		const period = hours >= 12 ? 'PM' : 'AM';
+		const displayHours = hours % 12 || 12;
+		const displayMinutes = String(minutes).padStart(2, '0');
+		return `${displayHours}:${displayMinutes} ${period}`;
+	}
+
 	// Get house information
 	function getHouseInfo(houseNumber: number) {
 		const houseKey = String(houseNumber);
@@ -83,6 +91,9 @@
 	let planets = $state<PlanetPositions | null>(null);
 	let isLoading = $state(false);
 	let error = $state<string | null>(null);
+	let normalizedTime = $state<string | null>(null);
+	let isDST = $state<boolean | null>(null);
+	let timezoneName = $state<string | null>(null);
 
 	let debounceTimer: ReturnType<typeof setTimeout> | null = null;
 
@@ -317,6 +328,46 @@
 			// Calculate all planet positions
 			planets = calculateAllPlanets(utcYear, utcMonth, utcDay, sunSign);
 
+			// Normalize and format the birth time for display
+			// The time the user entered is already in the birth place's timezone
+			normalizedTime = formatTime12Hour(hours, minutes);
+			timezoneName = timezone || 'Local Time';
+			
+			// Detect if DST was in effect at the birth time
+			if (timezone) {
+				// Create a date object for the birth time (in UTC)
+				const birthDateUTC = new Date(Date.UTC(utcYear, utcMonth - 1, utcDay, utcHour, utcMinute));
+				
+				// Create a date object for January 15 (standard time, typically no DST)
+				const janDateUTC = new Date(Date.UTC(year, 0, 15, 12, 0));
+				
+				// Use Intl.DateTimeFormat to get timezone information
+				const birthFormatter = new Intl.DateTimeFormat('en-US', {
+					timeZone: timezone,
+					timeZoneName: 'short'
+				});
+				const janFormatter = new Intl.DateTimeFormat('en-US', {
+					timeZone: timezone,
+					timeZoneName: 'short'
+				});
+				
+				// Get timezone abbreviations (e.g., "PST", "PDT", "EST", "EDT")
+				const birthParts = birthFormatter.formatToParts(birthDateUTC);
+				const janParts = janFormatter.formatToParts(janDateUTC);
+				
+				const birthTZAbbr = birthParts.find(p => p.type === 'timeZoneName')?.value || '';
+				const janTZAbbr = janParts.find(p => p.type === 'timeZoneName')?.value || '';
+				
+				// DST is typically indicated by:
+				// 1. Timezone abbreviation containing 'D' (Daylight) - e.g., PDT, EDT, CDT
+				// 2. Different abbreviation from January (standard time)
+				isDST = birthTZAbbr.includes('DT') || 
+				        (birthTZAbbr.length >= 3 && birthTZAbbr[1] === 'D') || // e.g., PDT, EDT, CDT
+				        (birthTZAbbr !== janTZAbbr && birthTZAbbr.length > 0 && janTZAbbr.length > 0);
+			} else {
+				isDST = null;
+			}
+
 			// Save results to database
 			try {
 				const formData = new FormData();
@@ -491,6 +542,29 @@
 
 		{#if sunSign && ascendant && moonSign}
 			<div class="result">
+				{#if normalizedTime}
+					<div class="birth-info">
+						<div class="birth-info-item">
+							<strong>Birth Date:</strong> {birthDate}
+						</div>
+						<div class="birth-info-item">
+							<strong>Birth Time:</strong> {normalizedTime}
+							{#if timezoneName}
+								<span class="timezone-info">
+									({timezoneName}
+									{#if isDST !== null}
+										, {isDST ? 'Daylight Saving Time' : 'Standard Time'}
+									{/if})
+								</span>
+							{/if}
+						</div>
+						{#if selectedPlace}
+							<div class="birth-info-item">
+								<strong>Birth Place:</strong> {selectedPlace.display_name}
+							</div>
+						{/if}
+					</div>
+				{/if}
 				<h2>Your Core Astrological Signs</h2>
 				<div class="signs-list">
 					<!-- Sun Sign -->
@@ -1030,6 +1104,38 @@
 		margin: 0 0 1.5rem 0;
 		color: var(--color-text);
 		text-align: center;
+	}
+
+	.birth-info {
+		background: var(--color-bg-2);
+		border: 1px solid var(--color-border);
+		border-radius: 8px;
+		padding: 1.5rem;
+		margin-bottom: 2rem;
+	}
+
+	.birth-info-item {
+		font-size: 0.95rem;
+		line-height: 1.8;
+		color: var(--color-text);
+		margin-bottom: 0.75rem;
+	}
+
+	.birth-info-item:last-child {
+		margin-bottom: 0;
+	}
+
+	.birth-info-item strong {
+		color: var(--color-theme-1);
+		font-weight: 600;
+		margin-right: 0.5rem;
+	}
+
+	.timezone-info {
+		font-size: 0.85rem;
+		color: var(--color-text-muted);
+		font-style: italic;
+		margin-left: 0.25rem;
 	}
 
 	.signs-list {
