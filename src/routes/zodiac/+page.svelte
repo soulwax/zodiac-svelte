@@ -17,18 +17,42 @@
 		return sign.toLowerCase();
 	}
 
+	// Get full sign data
+	function getSignData(sign: ZodiacSign | null) {
+		if (!sign) return null;
+		const signKey = getSignKey(sign);
+		return generalData.zodiac_signs[signKey as keyof typeof generalData.zodiac_signs] || null;
+	}
+
 	// Get description for a sign in a specific placement (sun, moon, ascendant)
 	function getSignDescription(sign: ZodiacSign | null, placement: 'sun' | 'moon' | 'ascendant'): string {
 		if (!sign) return '';
-		const signKey = getSignKey(sign);
-		const signData = generalData.zodiac_signs[signKey as keyof typeof generalData.zodiac_signs];
+		const signData = getSignData(sign);
 		if (!signData || !signData[placement]) return '';
 		return signData[placement].description;
+	}
+
+	// Get keywords for a sign in a specific placement
+	function getSignKeywords(sign: ZodiacSign | null, placement: 'sun' | 'moon' | 'ascendant'): string[] {
+		if (!sign) return [];
+		const signData = getSignData(sign);
+		if (!signData || !signData[placement]) return [];
+		return signData[placement].keywords || [];
 	}
 
 	// Get core point description
 	function getCorePointDescription(point: 'sun' | 'moon' | 'ascendant'): string {
 		return generalData.info.core_points[point]?.description || '';
+	}
+
+	// Get core point role
+	function getCorePointRole(point: 'sun' | 'moon' | 'ascendant'): string {
+		return generalData.info.core_points[point]?.role || '';
+	}
+
+	// Get core point keywords
+	function getCorePointKeywords(point: 'sun' | 'moon' | 'ascendant'): string[] {
+		return generalData.info.core_points[point]?.keywords || [];
 	}
 
 	// Get house information
@@ -51,6 +75,11 @@
 	let error = $state<string | null>(null);
 
 	let debounceTimer: ReturnType<typeof setTimeout> | null = null;
+
+	// Computed sign data for type safety
+	const sunSignData = $derived(sunSign ? getSignData(sunSign) : null);
+	const moonSignData = $derived(moonSign ? getSignData(moonSign) : null);
+	const ascendantSignData = $derived(ascendant ? getSignData(ascendant) : null);
 
 	async function handlePlaceInput(value: string) {
 		placeQuery = value;
@@ -353,27 +382,134 @@
 			<div class="result">
 				<h2>Your Core Astrological Signs</h2>
 				<div class="signs-list">
-					<div class="sign-item">
-						<div class="sign-label">Sun Sign</div>
-						<div class="sign-name">{sunSign}</div>
-						<div class="sign-explanation">
-							{getSignDescription(sunSign, 'sun')}
+					<!-- Sun Sign -->
+					{#if sunSignData}
+						<div class="sign-item">
+							<div class="sign-header">
+								<div class="sign-label">Sun Sign</div>
+								<div class="sign-name">{sunSign}</div>
+								<div class="sign-metadata">
+									<span class="badge badge-{sunSignData.element}">{sunSignData.element}</span>
+									<span class="badge badge-modality">{sunSignData.modality}</span>
+									<span class="badge badge-ruler">Ruled by {sunSignData.ruler}</span>
+								</div>
+							</div>
+						<div class="sign-content">
+							<div class="core-point-info">
+								<div class="core-point-role">{getCorePointRole('sun')}</div>
+								<div class="core-point-description">{getCorePointDescription('sun')}</div>
+								{#if getCorePointKeywords('sun').length > 0}
+									<div class="keywords">
+										<span class="keywords-label">Keywords:</span>
+										{#each getCorePointKeywords('sun') as keyword}
+											<span class="keyword">{keyword}</span>
+										{/each}
+									</div>
+								{/if}
+							</div>
+							<div class="placement-info">
+								<div class="placement-title">Sun in {sunSign}</div>
+								<div class="placement-description">
+									{getSignDescription(sunSign, 'sun')}
+								</div>
+								{#if getSignKeywords(sunSign, 'sun').length > 0}
+									<div class="keywords">
+										<span class="keywords-label">Keywords:</span>
+										{#each getSignKeywords(sunSign, 'sun') as keyword}
+											<span class="keyword">{keyword}</span>
+										{/each}
+									</div>
+								{/if}
+							</div>
 						</div>
 					</div>
-					<div class="sign-item">
-						<div class="sign-label">Ascendant (Rising Sign)</div>
-						<div class="sign-name">{ascendant}</div>
-						<div class="sign-explanation">
-							{getSignDescription(ascendant, 'ascendant')}
+					{/if}
+
+					<!-- Moon Sign -->
+					{#if moonSignData}
+						<div class="sign-item">
+							<div class="sign-header">
+								<div class="sign-label">Moon Sign</div>
+								<div class="sign-name">{moonSign}</div>
+								<div class="sign-metadata">
+									<span class="badge badge-{moonSignData.element}">{moonSignData.element}</span>
+									<span class="badge badge-modality">{moonSignData.modality}</span>
+									<span class="badge badge-ruler">Ruled by {moonSignData.ruler}</span>
+								</div>
+							</div>
+						<div class="sign-content">
+							<div class="core-point-info">
+								<div class="core-point-role">{getCorePointRole('moon')}</div>
+								<div class="core-point-description">{getCorePointDescription('moon')}</div>
+								{#if getCorePointKeywords('moon').length > 0}
+									<div class="keywords">
+										<span class="keywords-label">Keywords:</span>
+										{#each getCorePointKeywords('moon') as keyword}
+											<span class="keyword">{keyword}</span>
+										{/each}
+									</div>
+								{/if}
+							</div>
+							<div class="placement-info">
+								<div class="placement-title">Moon in {moonSign}</div>
+								<div class="placement-description">
+									{getSignDescription(moonSign, 'moon')}
+								</div>
+								{#if getSignKeywords(moonSign, 'moon').length > 0}
+									<div class="keywords">
+										<span class="keywords-label">Keywords:</span>
+										{#each getSignKeywords(moonSign, 'moon') as keyword}
+											<span class="keyword">{keyword}</span>
+										{/each}
+									</div>
+								{/if}
+							</div>
 						</div>
 					</div>
-					<div class="sign-item">
-						<div class="sign-label">Moon Sign</div>
-						<div class="sign-name">{moonSign}</div>
-						<div class="sign-explanation">
-							{getSignDescription(moonSign, 'moon')}
+					{/if}
+
+					<!-- Ascendant Sign -->
+					{#if ascendantSignData}
+						<div class="sign-item">
+							<div class="sign-header">
+								<div class="sign-label">Ascendant (Rising Sign)</div>
+								<div class="sign-name">{ascendant}</div>
+								<div class="sign-metadata">
+									<span class="badge badge-{ascendantSignData.element}">{ascendantSignData.element}</span>
+									<span class="badge badge-modality">{ascendantSignData.modality}</span>
+									<span class="badge badge-ruler">Ruled by {ascendantSignData.ruler}</span>
+								</div>
+							</div>
+						<div class="sign-content">
+							<div class="core-point-info">
+								<div class="core-point-role">{getCorePointRole('ascendant')}</div>
+								<div class="core-point-description">{getCorePointDescription('ascendant')}</div>
+								{#if getCorePointKeywords('ascendant').length > 0}
+									<div class="keywords">
+										<span class="keywords-label">Keywords:</span>
+										{#each getCorePointKeywords('ascendant') as keyword}
+											<span class="keyword">{keyword}</span>
+										{/each}
+									</div>
+								{/if}
+							</div>
+							<div class="placement-info">
+								<div class="placement-title">{ascendant} Rising</div>
+								<div class="placement-description">
+									{getSignDescription(ascendant, 'ascendant')}
+								</div>
+								{#if getSignKeywords(ascendant, 'ascendant').length > 0}
+									<div class="keywords">
+										<span class="keywords-label">Keywords:</span>
+										{#each getSignKeywords(ascendant, 'ascendant') as keyword}
+											<span class="keyword">{keyword}</span>
+										{/each}
+									</div>
+								{/if}
+							</div>
 						</div>
 					</div>
+					{/if}
 				</div>
 			</div>
 		{/if}
@@ -389,11 +525,21 @@
 					{#each houses as house}
 						{@const houseInfo = getHouseInfo(house.number)}
 						<div class="house-item">
-							<div class="house-number">House {house.number}</div>
+							<div class="house-header">
+								<div class="house-number">House {house.number}</div>
+								<div class="house-sign">{house.sign}</div>
+							</div>
 							<div class="house-alias">{houseInfo?.alias || ''}</div>
-							<div class="house-sign">{house.sign}</div>
 							{#if houseInfo}
 								<div class="house-description">{houseInfo.description}</div>
+								{#if houseInfo.keywords && houseInfo.keywords.length > 0}
+									<div class="keywords">
+										<span class="keywords-label">Keywords:</span>
+										{#each houseInfo.keywords as keyword}
+											<span class="keyword">{keyword}</span>
+										{/each}
+									</div>
+								{/if}
 							{/if}
 						</div>
 					{/each}
@@ -572,8 +718,20 @@
 	.sign-item {
 		background: var(--color-bg-2);
 		border: 1px solid var(--color-border);
-		border-radius: 6px;
-		padding: 1.5rem;
+		border-radius: 8px;
+		padding: 2rem;
+		transition: transform 0.2s, box-shadow 0.2s;
+	}
+
+	.sign-item:hover {
+		transform: translateY(-2px);
+		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+	}
+
+	.sign-header {
+		margin-bottom: 1.5rem;
+		padding-bottom: 1rem;
+		border-bottom: 2px solid var(--color-border);
 	}
 
 	.sign-label {
@@ -592,9 +750,132 @@
 		margin-bottom: 1rem;
 	}
 
-	.sign-explanation {
+	.sign-metadata {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.5rem;
+		margin-top: 0.75rem;
+	}
+
+	.badge {
+		padding: 0.35rem 0.75rem;
+		border-radius: 4px;
+		font-size: 0.8rem;
+		font-weight: 500;
+		text-transform: capitalize;
+		background: var(--color-bg-1);
+		border: 1px solid var(--color-border);
+		color: var(--color-text);
+	}
+
+	.badge-fire {
+		background: rgba(255, 87, 34, 0.15);
+		border-color: rgba(255, 87, 34, 0.4);
+		color: #ff6b35;
+	}
+
+	.badge-earth {
+		background: rgba(139, 195, 74, 0.15);
+		border-color: rgba(139, 195, 74, 0.4);
+		color: #8bc34a;
+	}
+
+	.badge-air {
+		background: rgba(33, 150, 243, 0.15);
+		border-color: rgba(33, 150, 243, 0.4);
+		color: #2196f3;
+	}
+
+	.badge-water {
+		background: rgba(63, 81, 181, 0.15);
+		border-color: rgba(63, 81, 181, 0.4);
+		color: #3f51b5;
+	}
+
+	.badge-modality {
+		background: rgba(156, 39, 176, 0.15);
+		border-color: rgba(156, 39, 176, 0.4);
+		color: #9c27b0;
+	}
+
+	.badge-ruler {
+		background: rgba(255, 152, 0, 0.15);
+		border-color: rgba(255, 152, 0, 0.4);
+		color: #ff9800;
+	}
+
+	.sign-content {
+		display: flex;
+		flex-direction: column;
+		gap: 1.5rem;
+	}
+
+	.core-point-info {
+		background: var(--color-bg-1);
+		border: 1px solid var(--color-border);
+		border-radius: 6px;
+		padding: 1.25rem;
+	}
+
+	.core-point-role {
+		font-size: 1rem;
+		font-weight: 600;
+		color: var(--color-theme-1);
+		margin-bottom: 0.75rem;
+	}
+
+	.core-point-description {
+		font-size: 0.9rem;
+		line-height: 1.6;
+		color: var(--color-text);
+		margin-bottom: 0.75rem;
+	}
+
+	.placement-info {
+		background: var(--color-bg-1);
+		border: 1px solid var(--color-border);
+		border-radius: 6px;
+		padding: 1.25rem;
+	}
+
+	.placement-title {
+		font-size: 1rem;
+		font-weight: 600;
+		color: var(--color-text);
+		margin-bottom: 0.75rem;
+	}
+
+	.placement-description {
 		font-size: 0.95rem;
 		line-height: 1.6;
+		color: var(--color-text);
+		margin-bottom: 0.75rem;
+	}
+
+	.keywords {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.5rem;
+		align-items: center;
+		margin-top: 0.75rem;
+		padding-top: 0.75rem;
+		border-top: 1px solid var(--color-border);
+	}
+
+	.keywords-label {
+		font-size: 0.8rem;
+		font-weight: 500;
+		color: var(--color-text-muted);
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+	}
+
+	.keyword {
+		padding: 0.25rem 0.6rem;
+		background: var(--color-bg-2);
+		border: 1px solid var(--color-border);
+		border-radius: 12px;
+		font-size: 0.8rem;
 		color: var(--color-text);
 	}
 
@@ -629,12 +910,20 @@
 		transition: transform 0.2s, box-shadow 0.2s;
 		display: flex;
 		flex-direction: column;
-		gap: 0.5rem;
+		gap: 0.75rem;
 	}
 
 	.house-item:hover {
 		transform: translateY(-2px);
 		box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+	}
+
+	.house-header {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		padding-bottom: 0.75rem;
+		border-bottom: 1px solid var(--color-border);
 	}
 
 	.house-number {
@@ -649,14 +938,16 @@
 		font-size: 1rem;
 		font-weight: 600;
 		color: var(--color-text);
-		margin-bottom: 0.25rem;
 	}
 
 	.house-sign {
 		font-size: 0.9rem;
 		font-weight: 500;
 		color: var(--color-theme-1);
-		margin-bottom: 0.75rem;
+		padding: 0.25rem 0.6rem;
+		background: var(--color-bg-1);
+		border: 1px solid var(--color-border);
+		border-radius: 4px;
 	}
 
 	.house-description {
