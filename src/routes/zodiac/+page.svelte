@@ -387,11 +387,30 @@
 </script>
 
 <svelte:head>
-	<title>Zodiac Calculator</title>
-	<meta
-		name="description"
-		content="Calculate your zodiac sun sign based on your birth date, time, and location"
-	/>
+	<title>{data.seo.title}</title>
+	<meta name="description" content={data.seo.description} />
+	<meta name="keywords" content={data.seo.keywords} />
+	<meta name="author" content={data.seo.author} />
+	
+	<!-- Open Graph / Facebook -->
+	<meta property="og:type" content={data.seo.type} />
+	<meta property="og:url" content={data.seo.url} />
+	<meta property="og:title" content={data.seo.title} />
+	<meta property="og:description" content={data.seo.description} />
+	<meta property="og:image" content={data.seo.image} />
+	<meta property="og:site_name" content="Zodiac Chart Calculator" />
+	
+	<!-- Twitter -->
+	<meta name="twitter:card" content="summary_large_image" />
+	<meta name="twitter:url" content={data.seo.url} />
+	<meta name="twitter:title" content={data.seo.title} />
+	<meta name="twitter:description" content={data.seo.description} />
+	<meta name="twitter:image" content={data.seo.image} />
+	
+	<!-- Additional SEO -->
+	<link rel="canonical" href={data.seo.url} />
+	<meta name="robots" content="index, follow" />
+	<meta name="theme-color" content="#ff3e00" />
 </svelte:head>
 
 <div class="container">
