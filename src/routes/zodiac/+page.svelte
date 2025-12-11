@@ -1,6 +1,14 @@
 <script lang="ts">
 	import { getTimezoneFromCoords, searchPlaces, type Place } from '$lib/geocoding';
-	import { calculateHouses, calculateSunSign, type House, type ZodiacSign } from '$lib/zodiac';
+	import {
+		calculateAscendant,
+		calculateHouses,
+		calculateMoonSign,
+		calculateSunSign,
+		type House,
+		type ZodiacSign
+	} from '$lib/zodiac';
+	import Chart from './Chart.svelte';
 
 	let birthDate = $state('');
 	let birthTime = $state('');
@@ -9,6 +17,8 @@
 	let suggestions = $state<Place[]>([]);
 	let showSuggestions = $state(false);
 	let sunSign = $state<ZodiacSign | null>(null);
+	let ascendant = $state<ZodiacSign | null>(null);
+	let moonSign = $state<ZodiacSign | null>(null);
 	let houses = $state<House[]>([]);
 	let isLoading = $state(false);
 	let error = $state<string | null>(null);
@@ -19,6 +29,8 @@
 		placeQuery = value;
 		selectedPlace = null;
 		sunSign = null;
+		ascendant = null;
+		moonSign = null;
 		houses = [];
 
 		if (debounceTimer) {
@@ -48,6 +60,8 @@
 	async function calculateSign() {
 		error = null;
 		sunSign = null;
+		ascendant = null;
+		moonSign = null;
 		houses = [];
 
 		if (!birthDate || !birthTime || !selectedPlace) {
@@ -171,6 +185,10 @@
 
 			sunSign = calculateSunSign(signMonth, signDay);
 			
+			// Calculate ascendant and moon sign using UTC time and location coordinates
+			ascendant = calculateAscendant(utcYear, utcMonth, utcDay, utcHour, utcMinute, lat, lon);
+			moonSign = calculateMoonSign(utcYear, utcMonth, utcDay, utcHour, utcMinute);
+			
 			// Calculate houses using UTC time and location coordinates
 			houses = calculateHouses(utcYear, utcMonth, utcDay, utcHour, utcMinute, lat, lon);
 		} catch (err) {
@@ -272,11 +290,37 @@
 			<div class="error">{error}</div>
 		{/if}
 
-		{#if sunSign}
+		{#if sunSign && ascendant && moonSign}
 			<div class="result">
-				<h2>Your Sun Sign</h2>
-				<div class="sign-display">{sunSign}</div>
+				<h2>Your Core Astrological Signs</h2>
+				<div class="signs-list">
+					<div class="sign-item">
+						<div class="sign-label">Sun Sign</div>
+						<div class="sign-name">{sunSign}</div>
+						<div class="sign-explanation">
+							Your sun sign represents your core identity, ego, and the essence of who you are. It's determined by the position of the Sun at the time of your birth and reflects your fundamental personality traits and life purpose.
+						</div>
+					</div>
+					<div class="sign-item">
+						<div class="sign-label">Ascendant (Rising Sign)</div>
+						<div class="sign-name">{ascendant}</div>
+						<div class="sign-explanation">
+							Your ascendant, or rising sign, is the zodiac sign that was rising on the eastern horizon at the moment of your birth. It represents your outward personality, how others perceive you, and the mask you present to the world.
+						</div>
+					</div>
+					<div class="sign-item">
+						<div class="sign-label">Moon Sign</div>
+						<div class="sign-name">{moonSign}</div>
+						<div class="sign-explanation">
+							Your moon sign reveals your emotional nature, inner self, and subconscious patterns. It represents your needs, instincts, and how you process feelings and respond to the world on an emotional level.
+						</div>
+					</div>
+				</div>
 			</div>
+		{/if}
+
+		{#if sunSign && ascendant && moonSign && houses.length > 0}
+			<Chart {sunSign} {ascendant} {moonSign} {houses} />
 		{/if}
 
 		{#if houses.length > 0}
@@ -445,21 +489,49 @@
 		background: var(--color-bg-1);
 		border: 1px solid var(--color-border);
 		border-radius: 8px;
-		text-align: center;
 	}
 
 	.result h2 {
-		font-size: 1.25rem;
-		font-weight: 500;
-		margin: 0 0 1rem 0;
-		color: var(--color-text-muted);
+		font-size: 1.5rem;
+		font-weight: 600;
+		margin: 0 0 1.5rem 0;
+		color: var(--color-text);
+		text-align: center;
 	}
 
-	.sign-display {
-		font-size: 2.5rem;
+	.signs-list {
+		display: flex;
+		flex-direction: column;
+		gap: 2rem;
+	}
+
+	.sign-item {
+		background: var(--color-bg-2);
+		border: 1px solid var(--color-border);
+		border-radius: 6px;
+		padding: 1.5rem;
+	}
+
+	.sign-label {
+		font-size: 0.85rem;
+		font-weight: 500;
+		color: var(--color-text-muted);
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+		margin-bottom: 0.5rem;
+	}
+
+	.sign-name {
+		font-size: 1.75rem;
 		font-weight: 600;
 		color: var(--color-theme-1);
-		margin: 0;
+		margin-bottom: 1rem;
+	}
+
+	.sign-explanation {
+		font-size: 0.95rem;
+		line-height: 1.6;
+		color: var(--color-text);
 	}
 
 	.houses-result {
@@ -518,10 +590,6 @@
 
 		h1 {
 			font-size: 1.75rem;
-		}
-
-		.sign-display {
-			font-size: 2rem;
 		}
 
 		.houses-grid {

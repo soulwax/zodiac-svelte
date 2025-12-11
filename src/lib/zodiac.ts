@@ -145,9 +145,39 @@ function calculateGST(year: number, month: number, day: number, hour: number, mi
 }
 
 /**
+ * Calculates the moon sign based on birth date and time
+ * Uses a simplified approximation based on the moon's average cycle
+ */
+export function calculateMoonSign(
+	year: number,
+	month: number,
+	day: number,
+	hour: number,
+	minute: number
+): ZodiacSign {
+	// Calculate days since a reference date (Jan 1, 2000)
+	const referenceDate = new Date(2000, 0, 1, 0, 0, 0);
+	const birthDate = new Date(year, month - 1, day, hour, minute, 0);
+	const daysSinceReference = (birthDate.getTime() - referenceDate.getTime()) / (1000 * 60 * 60 * 24);
+
+	// Moon's average orbital period is approximately 27.321661 days
+	// Moon moves through all 12 signs in this period (360 degrees / 12 signs = 30 degrees per sign)
+	const moonCycle = 27.321661;
+	const degreesPerDay = 360 / moonCycle; // Approximately 13.176 degrees per day
+
+	// Reference: Moon was in Aries at the reference date (approximation)
+	// Calculate how many degrees the moon has moved
+	let moonLongitude = (daysSinceReference * degreesPerDay) % 360;
+	if (moonLongitude < 0) moonLongitude += 360;
+
+	// Convert to zodiac sign
+	return longitudeToSign(moonLongitude);
+}
+
+/**
  * Calculates the ascendant (rising sign) based on birth date, time, and location
  */
-function calculateAscendant(
+export function calculateAscendant(
 	year: number,
 	month: number,
 	day: number,

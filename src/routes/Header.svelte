@@ -1,14 +1,14 @@
 <script lang="ts">
 	import { resolve } from '$app/paths';
 	import { page } from '$app/state';
-	import logo from '$lib/images/svelte-logo.svg';
 	import github from '$lib/images/github.svg';
+	import logo from '$lib/images/svelte-logo.svg';
 </script>
 
 <header>
 	<div class="corner">
-		<a href="https://svelte.dev/docs/kit">
-			<img src={logo} alt="SvelteKit" />
+		<a href="https://battlecry.tech">
+			<img src={logo} alt="Battlecry Tech" />
 		</a>
 	</div>
 
@@ -36,7 +36,7 @@
 	</nav>
 
 	<div class="corner">
-		<a href="https://github.com/sveltejs/kit">
+		<a href="https://github.com/soulwax/zodiac-svelte">
 			<img src={github} alt="GitHub" />
 		</a>
 	</div>
