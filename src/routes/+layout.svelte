@@ -14,7 +14,7 @@
 
 	<footer>
 		<p>
-			visit <a href="https://svelte.dev/docs/kit">svelte.dev/docs/kit</a> to learn about SvelteKit
+			Visit <a href="https://github.com/soulwax/zodiac-svelte">github/soulwax/zodiac-svelte</a> to learn about this project. Copyright © 2025 Soulwax. All rights reserved.
 		</p>
 	</footer>
 </div>

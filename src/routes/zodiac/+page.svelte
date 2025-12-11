@@ -1,6 +1,6 @@
 <script lang="ts">
-	import { calculateSunSign, type ZodiacSign } from '$lib/zodiac';
-	import { searchPlaces, getTimezoneFromCoords, type Place } from '$lib/geocoding';
+	import { getTimezoneFromCoords, searchPlaces, type Place } from '$lib/geocoding';
+	import { calculateHouses, calculateSunSign, type House, type ZodiacSign } from '$lib/zodiac';
 
 	let birthDate = $state('');
 	let birthTime = $state('');
@@ -9,6 +9,7 @@
 	let suggestions = $state<Place[]>([]);
 	let showSuggestions = $state(false);
 	let sunSign = $state<ZodiacSign | null>(null);
+	let houses = $state<House[]>([]);
 	let isLoading = $state(false);
 	let error = $state<string | null>(null);
 
@@ -18,6 +19,7 @@
 		placeQuery = value;
 		selectedPlace = null;
 		sunSign = null;
+		houses = [];
 
 		if (debounceTimer) {
 			clearTimeout(debounceTimer);
@@ -46,6 +48,7 @@
 	async function calculateSign() {
 		error = null;
 		sunSign = null;
+		houses = [];
 
 		if (!birthDate || !birthTime || !selectedPlace) {
 			error = 'Please fill in all fields and select a place from the suggestions.';
@@ -76,8 +79,13 @@
 
 			// Interpret the user's input as local time in the birth place's timezone
 			// For sun sign calculation, we need the date (month/day) in that timezone
-			let signMonth: number;
-			let signDay: number;
+			let signMonth: number = month;
+			let signDay: number = day;
+			let utcYear: number = year;
+			let utcMonth: number = month;
+			let utcDay: number = day;
+			let utcHour: number = hours;
+			let utcMinute: number = minutes;
 
 			if (timezone) {
 				// The user entered a date/time as local time in the birth place's timezone.
@@ -119,6 +127,12 @@
 							// Perfect match - use this date
 							signMonth = tzMonth;
 							signDay = tzDay;
+							// Extract UTC components
+							utcYear = testDate.getUTCFullYear();
+							utcMonth = testDate.getUTCMonth() + 1;
+							utcDay = testDate.getUTCDate();
+							utcHour = testDate.getUTCHours();
+							utcMinute = testDate.getUTCMinutes();
 							break;
 						}
 						
@@ -136,15 +150,29 @@
 						const finalParts = formatter.formatToParts(testDate);
 						signMonth = parseInt(finalParts.find(p => p.type === 'month')?.value || String(month));
 						signDay = parseInt(finalParts.find(p => p.type === 'day')?.value || String(day));
+						utcYear = testDate.getUTCFullYear();
+						utcMonth = testDate.getUTCMonth() + 1;
+						utcDay = testDate.getUTCDate();
+						utcHour = testDate.getUTCHours();
+						utcMinute = testDate.getUTCMinutes();
 					}
 				}
 			} else {
 				// Fallback: use the date as-is (assuming user entered local time)
 				signMonth = month;
 				signDay = day;
+				// For houses, we'll use the local time as UTC (not ideal, but better than nothing)
+				utcYear = year;
+				utcMonth = month;
+				utcDay = day;
+				utcHour = hours;
+				utcMinute = minutes;
 			}
 
 			sunSign = calculateSunSign(signMonth, signDay);
+			
+			// Calculate houses using UTC time and location coordinates
+			houses = calculateHouses(utcYear, utcMonth, utcDay, utcHour, utcMinute, lat, lon);
 		} catch (err) {
 			error = err instanceof Error ? err.message : 'An error occurred while calculating your sun sign.';
 			console.error('Calculation error:', err);
@@ -178,7 +206,7 @@
 <div class="container">
 	<div class="card">
 		<h1>Zodiac Calculator</h1>
-		<p class="subtitle">Enter your birth details to discover your sun sign</p>
+		<p class="subtitle">Enter your birth details to discover your sun sign and astrological houses</p>
 
 		<form
 			onsubmit={(e) => {
@@ -236,7 +264,7 @@
 			</div>
 
 			<button type="submit" disabled={isLoading} class="button">
-				{isLoading ? 'Calculating...' : 'Calculate Sun Sign'}
+				{isLoading ? 'Calculating...' : 'Calculate Chart'}
 			</button>
 		</form>
 
@@ -248,6 +276,20 @@
 			<div class="result">
 				<h2>Your Sun Sign</h2>
 				<div class="sign-display">{sunSign}</div>
+			</div>
+		{/if}
+
+		{#if houses.length > 0}
+			<div class="houses-result">
+				<h2>Your Astrological Houses</h2>
+				<div class="houses-grid">
+					{#each houses as house}
+						<div class="house-item">
+							<div class="house-number">House {house.number}</div>
+							<div class="house-sign">{house.sign}</div>
+						</div>
+					{/each}
+				</div>
 			</div>
 		{/if}
 	</div>
@@ -267,7 +309,7 @@
 		border: 1px solid var(--color-border);
 		border-radius: 8px;
 		padding: 2.5rem;
-		max-width: 500px;
+		max-width: 800px;
 		width: 100%;
 		box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 	}
@@ -420,6 +462,55 @@
 		margin: 0;
 	}
 
+	.houses-result {
+		margin-top: 2rem;
+		padding: 2rem;
+		background: var(--color-bg-1);
+		border: 1px solid var(--color-border);
+		border-radius: 8px;
+	}
+
+	.houses-result h2 {
+		font-size: 1.25rem;
+		font-weight: 500;
+		margin: 0 0 1.5rem 0;
+		color: var(--color-text-muted);
+		text-align: center;
+	}
+
+	.houses-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+		gap: 1rem;
+	}
+
+	.house-item {
+		background: var(--color-bg-2);
+		border: 1px solid var(--color-border);
+		border-radius: 6px;
+		padding: 1rem;
+		text-align: center;
+		transition: transform 0.2s, box-shadow 0.2s;
+	}
+
+	.house-item:hover {
+		transform: translateY(-2px);
+		box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+	}
+
+	.house-number {
+		font-size: 0.85rem;
+		font-weight: 500;
+		color: var(--color-text-muted);
+		margin-bottom: 0.5rem;
+	}
+
+	.house-sign {
+		font-size: 1.1rem;
+		font-weight: 600;
+		color: var(--color-theme-1);
+	}
+
 	@media (max-width: 640px) {
 		.card {
 			padding: 1.5rem;
@@ -431,6 +522,10 @@
 
 		.sign-display {
 			font-size: 2rem;
+		}
+
+		.houses-grid {
+			grid-template-columns: repeat(2, 1fr);
 		}
 	}
 </style>
