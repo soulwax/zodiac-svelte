@@ -8,7 +8,34 @@
 		type House,
 		type ZodiacSign
 	} from '$lib/zodiac';
+	import generalData from '../../data/general.json';
 	import Chart from './Chart.svelte';
+
+	// Helper function to convert ZodiacSign to lowercase key
+	function getSignKey(sign: ZodiacSign | null): string {
+		if (!sign) return '';
+		return sign.toLowerCase();
+	}
+
+	// Get description for a sign in a specific placement (sun, moon, ascendant)
+	function getSignDescription(sign: ZodiacSign | null, placement: 'sun' | 'moon' | 'ascendant'): string {
+		if (!sign) return '';
+		const signKey = getSignKey(sign);
+		const signData = generalData.zodiac_signs[signKey as keyof typeof generalData.zodiac_signs];
+		if (!signData || !signData[placement]) return '';
+		return signData[placement].description;
+	}
+
+	// Get core point description
+	function getCorePointDescription(point: 'sun' | 'moon' | 'ascendant'): string {
+		return generalData.info.core_points[point]?.description || '';
+	}
+
+	// Get house information
+	function getHouseInfo(houseNumber: number) {
+		const houseKey = String(houseNumber);
+		return generalData.info.houses[houseKey as keyof typeof generalData.info.houses];
+	}
 
 	let birthDate = $state('');
 	let birthTime = $state('');
@@ -330,21 +357,21 @@
 						<div class="sign-label">Sun Sign</div>
 						<div class="sign-name">{sunSign}</div>
 						<div class="sign-explanation">
-							Your sun sign represents your core identity, ego, and the essence of who you are. It's determined by the position of the Sun at the time of your birth and reflects your fundamental personality traits and life purpose.
+							{getSignDescription(sunSign, 'sun')}
 						</div>
 					</div>
 					<div class="sign-item">
 						<div class="sign-label">Ascendant (Rising Sign)</div>
 						<div class="sign-name">{ascendant}</div>
 						<div class="sign-explanation">
-							Your ascendant, or rising sign, is the zodiac sign that was rising on the eastern horizon at the moment of your birth. It represents your outward personality, how others perceive you, and the mask you present to the world.
+							{getSignDescription(ascendant, 'ascendant')}
 						</div>
 					</div>
 					<div class="sign-item">
 						<div class="sign-label">Moon Sign</div>
 						<div class="sign-name">{moonSign}</div>
 						<div class="sign-explanation">
-							Your moon sign reveals your emotional nature, inner self, and subconscious patterns. It represents your needs, instincts, and how you process feelings and respond to the world on an emotional level.
+							{getSignDescription(moonSign, 'moon')}
 						</div>
 					</div>
 				</div>
@@ -360,9 +387,14 @@
 				<h2>Your Astrological Houses</h2>
 				<div class="houses-grid">
 					{#each houses as house}
+						{@const houseInfo = getHouseInfo(house.number)}
 						<div class="house-item">
 							<div class="house-number">House {house.number}</div>
+							<div class="house-alias">{houseInfo?.alias || ''}</div>
 							<div class="house-sign">{house.sign}</div>
+							{#if houseInfo}
+								<div class="house-description">{houseInfo.description}</div>
+							{/if}
 						</div>
 					{/each}
 				</div>
@@ -584,17 +616,20 @@
 
 	.houses-grid {
 		display: grid;
-		grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-		gap: 1rem;
+		grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+		gap: 1.5rem;
 	}
 
 	.house-item {
 		background: var(--color-bg-2);
 		border: 1px solid var(--color-border);
 		border-radius: 6px;
-		padding: 1rem;
-		text-align: center;
+		padding: 1.5rem;
+		text-align: left;
 		transition: transform 0.2s, box-shadow 0.2s;
+		display: flex;
+		flex-direction: column;
+		gap: 0.5rem;
 	}
 
 	.house-item:hover {
@@ -606,13 +641,28 @@
 		font-size: 0.85rem;
 		font-weight: 500;
 		color: var(--color-text-muted);
-		margin-bottom: 0.5rem;
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+	}
+
+	.house-alias {
+		font-size: 1rem;
+		font-weight: 600;
+		color: var(--color-text);
+		margin-bottom: 0.25rem;
 	}
 
 	.house-sign {
-		font-size: 1.1rem;
-		font-weight: 600;
+		font-size: 0.9rem;
+		font-weight: 500;
 		color: var(--color-theme-1);
+		margin-bottom: 0.75rem;
+	}
+
+	.house-description {
+		font-size: 0.85rem;
+		line-height: 1.5;
+		color: var(--color-text-muted);
 	}
 
 	@media (max-width: 640px) {
