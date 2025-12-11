@@ -1,6 +1,34 @@
+<script lang="ts">
+	import { page } from '$app/stores';
+	
+	const siteUrl = $derived($page.url.origin);
+	const pageUrl = $derived($page.url.href);
+</script>
+
 <svelte:head>
-	<title>About</title>
-	<meta name="description" content="About this zodiac website" />
+	<title>About - Zodiac Chart Calculator | Soulwax</title>
+	<meta name="description" content="Learn about the creator of this zodiac chart calculator. A passion project combining technology, astronomy, and astrology by soulwax/starchild from Germany." />
+	<meta name="keywords" content="about, zodiac calculator, astrology, soulwax, starchild, birth chart" />
+	<meta name="author" content="Soulwax" />
+	
+	<!-- Open Graph / Facebook -->
+	<meta property="og:type" content="website" />
+	<meta property="og:url" content={pageUrl} />
+	<meta property="og:title" content="About - Zodiac Chart Calculator" />
+	<meta property="og:description" content="Learn about the creator of this zodiac chart calculator. A passion project combining technology, astronomy, and astrology." />
+	<meta property="og:image" content={`${siteUrl}/favicon.png`} />
+	<meta property="og:site_name" content="Zodiac Chart Calculator" />
+	
+	<!-- Twitter -->
+	<meta name="twitter:card" content="summary" />
+	<meta name="twitter:url" content={pageUrl} />
+	<meta name="twitter:title" content="About - Zodiac Chart Calculator" />
+	<meta name="twitter:description" content="Learn about the creator of this zodiac chart calculator." />
+	<meta name="twitter:image" content={`${siteUrl}/favicon.png`} />
+	
+	<!-- Additional SEO -->
+	<link rel="canonical" href={pageUrl} />
+	<meta name="robots" content="index, follow" />
 </svelte:head>
 
 <div class="text-column">
