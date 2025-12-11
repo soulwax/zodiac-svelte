@@ -1,31 +1,15 @@
 <script lang="ts">
-	import Counter from './Counter.svelte';
-	import welcome from '$lib/images/svelte-welcome.webp';
-	import welcomeFallback from '$lib/images/svelte-welcome.png';
 </script>
 
 <svelte:head>
 	<title>Home</title>
-	<meta name="description" content="Svelte demo app" />
+	<meta name="description" content="Zodiac Calculator - Discover your sun sign" />
 </svelte:head>
 
 <section>
-	<h1>
-		<span class="welcome">
-			<picture>
-				<source srcset={welcome} type="image/webp" />
-				<img src={welcomeFallback} alt="Welcome" />
-			</picture>
-		</span>
-
-		to your new<br />SvelteKit app
-	</h1>
-
-	<h2>
-		try editing <strong>src/routes/+page.svelte</strong>
-	</h2>
-
-	<Counter />
+	<h1>Zodiac Calculator</h1>
+	<h2>Discover your sun sign based on your birth details</h2>
+	<a href="/zodiac" class="cta-button">Calculate Your Sun Sign</a>
 </section>
 
 <style>
@@ -35,25 +19,36 @@
 		justify-content: center;
 		align-items: center;
 		flex: 0.6;
+		text-align: center;
 	}
 
 	h1 {
-		width: 100%;
+		font-size: 3rem;
+		margin-bottom: 1rem;
+		color: var(--color-text);
 	}
 
-	.welcome {
-		display: block;
-		position: relative;
-		width: 100%;
-		height: 0;
-		padding: 0 0 calc(100% * 495 / 2048) 0;
+	h2 {
+		font-size: 1.25rem;
+		color: var(--color-text-muted);
+		margin-bottom: 2rem;
+		font-weight: 400;
 	}
 
-	.welcome img {
-		position: absolute;
-		width: 100%;
-		height: 100%;
-		top: 0;
-		display: block;
+	.cta-button {
+		display: inline-block;
+		padding: 1rem 2rem;
+		background: var(--color-theme-1);
+		color: white;
+		text-decoration: none;
+		border-radius: 6px;
+		font-size: 1.1rem;
+		font-weight: 500;
+		transition: background-color 0.2s;
+	}
+
+	.cta-button:hover {
+		background: var(--color-theme-2);
+		text-decoration: none;
 	}
 </style>

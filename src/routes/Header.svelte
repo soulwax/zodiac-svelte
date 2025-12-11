@@ -20,6 +20,9 @@
 			<li aria-current={page.url.pathname === '/' ? 'page' : undefined}>
 				<a href={resolve('/')}>Home</a>
 			</li>
+			<li aria-current={page.url.pathname === '/zodiac' ? 'page' : undefined}>
+				<a href={resolve('/zodiac')}>Zodiac</a>
+			</li>
 			<li aria-current={page.url.pathname === '/about' ? 'page' : undefined}>
 				<a href={resolve('/about')}>About</a>
 			</li>
@@ -67,7 +70,7 @@
 	nav {
 		display: flex;
 		justify-content: center;
-		--background: rgba(255, 255, 255, 0.7);
+		--background: var(--color-bg-2);
 	}
 
 	svg {
