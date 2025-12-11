@@ -1,6 +1,8 @@
+import { db } from '$lib/server/db';
+import { sverdleResults } from '$lib/server/db/schema';
 import { fail } from '@sveltejs/kit';
+import type { Actions, PageServerLoad } from './$types';
 import { Game } from './game.ts';
-import type { PageServerLoad, Actions } from './$types';
 
 export const load = (({ cookies }) => {
 	const game = new Game(cookies.get('sverdle'));
@@ -61,6 +63,36 @@ export const actions = {
 		}
 
 		cookies.set('sverdle', game.toString(), { path: '/' });
+
+		// Check if game is complete and save result
+		const isComplete = game.answers.length >= 6 || game.answers[game.answers.length - 1] === 'xxxxx';
+		if (isComplete) {
+			try {
+				// Get session ID from cookies (or generate one)
+				const sessionId = cookies.get('sessionId') || crypto.randomUUID();
+				if (!cookies.get('sessionId')) {
+					cookies.set('sessionId', sessionId, { path: '/' });
+				}
+
+				// Filter out empty guesses
+				const completedGuesses = game.guesses.filter((g) => g.trim() !== '');
+				const won = game.answers[game.answers.length - 1] === 'xxxxx';
+
+				await db.insert(sverdleResults).values({
+					wordIndex: game.index,
+					answer: game.answer,
+					guesses: completedGuesses,
+					answers: game.answers,
+					won,
+					attempts: completedGuesses.length,
+					completedAt: new Date(),
+					sessionId
+				});
+			} catch (error) {
+				// Don't fail the game if saving fails
+				console.error('Error saving sverdle result:', error);
+			}
+		}
 	},
 
 	restart: async ({ cookies }) => {

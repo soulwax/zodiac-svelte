@@ -87,7 +87,7 @@
 				class="zodiac-symbol"
 				class:highlight={isSun || isMoon || isAscendant}
 			>
-				{zodiacSymbols[sign]}
+				{getZodiacSymbol(sign)}
 			</text>
 
 			<!-- Sign name -->
@@ -148,13 +148,13 @@
 
 		<!-- Central indicators -->
 		<text x="300" y="280" font-size="16" text-anchor="middle" class="indicator-label">
-			☉ {sunSign}
+			{getPlanetarySymbol(Planet.Sun)} {sunSign}
 		</text>
 		<text x="300" y="300" font-size="14" text-anchor="middle" class="indicator-label">
-			☽ {moonSign}
+			{getPlanetarySymbol(Planet.Moon)} {moonSign}
 		</text>
 		<text x="300" y="320" font-size="14" text-anchor="middle" class="indicator-label">
-			ASC {ascendant}
+			{astrologicalSymbols.Ascendant} {ascendant}
 		</text>
 	</svg>
 </div>

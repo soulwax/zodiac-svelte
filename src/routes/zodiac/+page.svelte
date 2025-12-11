@@ -191,6 +191,38 @@
 			
 			// Calculate houses using UTC time and location coordinates
 			houses = calculateHouses(utcYear, utcMonth, utcDay, utcHour, utcMinute, lat, lon);
+
+			// Save results to database
+			try {
+				const formData = new FormData();
+				formData.append('birthDate', birthDate);
+				formData.append('birthTime', birthTime);
+				formData.append('placeName', selectedPlace.display_name);
+				formData.append('latitude', selectedPlace.lat);
+				formData.append('longitude', selectedPlace.lon);
+				if (timezone) formData.append('timezone', timezone);
+				formData.append('sunSign', sunSign);
+				formData.append('ascendant', ascendant);
+				formData.append('moonSign', moonSign);
+				formData.append('houses', JSON.stringify(houses));
+				formData.append('utcYear', String(utcYear));
+				formData.append('utcMonth', String(utcMonth));
+				formData.append('utcDay', String(utcDay));
+				formData.append('utcHour', String(utcHour));
+				formData.append('utcMinute', String(utcMinute));
+
+				const response = await fetch('?/save', {
+					method: 'POST',
+					body: formData
+				});
+
+				if (!response.ok) {
+					console.warn('Failed to save zodiac result to database');
+				}
+			} catch (saveError) {
+				// Don't fail the calculation if saving fails
+				console.warn('Error saving zodiac result:', saveError);
+			}
 		} catch (err) {
 			error = err instanceof Error ? err.message : 'An error occurred while calculating your sun sign.';
 			console.error('Calculation error:', err);
