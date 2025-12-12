@@ -205,25 +205,19 @@ export function calculateAscendant(
 	// Obliquity of the ecliptic (approximately 23.44 degrees)
 	const obliquityRad = (23.44 * Math.PI) / 180;
 
-	// Calculate the ascendant using the formula:
-	// λ_Asc = arctan(-cos(θ_L) / (sin(θ_L) * cos(ε) + tan(φ) * sin(ε)))
-	// The negative sign ensures we get the eastern horizon point
-	const numerator = -Math.cos(lstRad);
-	const denominator = Math.sin(lstRad) * Math.cos(obliquityRad) + Math.tan(latRad) * Math.sin(obliquityRad);
+	// Calculate the ascendant using the correct formula:
+	// λ_Asc = atan2(y, x)
+	// where:
+	// x = cos(LST)
+	// y = -cos(ε) * sin(LST) - tan(φ) * sin(ε)
+	const x = Math.cos(lstRad);
+	const y = -Math.cos(obliquityRad) * Math.sin(lstRad) - Math.tan(latRad) * Math.sin(obliquityRad);
 
-	let ascendantRad = Math.atan2(numerator, denominator);
+	let ascendantRad = Math.atan2(y, x);
 
 	// Convert to degrees and normalize to 0-360
 	let ascendantDeg = (ascendantRad * 180) / Math.PI;
 	if (ascendantDeg < 0) ascendantDeg += 360;
-	
-	// Ensure the ascendant is on the eastern horizon
-	// The atan2 with negative numerator gives us the correct angle,
-	// but we need to ensure it's the eastern rising point (not western setting point)
-	// Standard adjustment: if result is in first two quadrants, add 180° to get eastern horizon
-	if (ascendantDeg < 180) {
-		ascendantDeg += 180;
-	}
 
 	// Convert to zodiac sign
 	return longitudeToSign(ascendantDeg);
