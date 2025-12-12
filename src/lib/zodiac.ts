@@ -204,9 +204,7 @@ export function calculateAscendant(
 	if (ascendantDeg < 0) ascendantDeg += 360;
 
 	// The result from atan2 gives us the ecliptic longitude of the ascendant
-	// We need to add 180° to get the eastern horizon point (the actual rising point)
-	// This is because atan2 gives us the western point initially
-	ascendantDeg = (ascendantDeg + 180) % 360;
+	// No 180° adjustment needed - the formula already calculates the correct eastern horizon point
 
 	// Convert to zodiac sign
 	return longitudeToSign(ascendantDeg);
@@ -249,7 +247,7 @@ export function calculateHouses(
 	const y = Math.cos(ramcRad);
 	let ascendantDeg = (Math.atan2(y, x) * 180) / Math.PI;
 	if (ascendantDeg < 0) ascendantDeg += 360;
-	ascendantDeg = (ascendantDeg + 180) % 360;
+	// No 180° adjustment needed - the formula already calculates the correct eastern horizon point
 
 	// Create houses in Equal House system
 	const houses: House[] = [];
@@ -310,16 +308,21 @@ function getSignFromIndex(index: number): ZodiacSign {
 /**
  * Calculates Mercury sign using astronomy-engine
  * Mercury orbits the Sun every 88 days
+ * Uses geocentric coordinates (GeoVector + Ecliptic) for accurate astrological positions
  */
 export function calculateMercurySign(
 	year: number,
 	month: number,
-	day: number
+	day: number,
+	hour: number = 12,
+	minute: number = 0
 ): ZodiacSign {
-	const date = new Date(Date.UTC(year, month - 1, day, 12, 0, 0));
+	const date = new Date(Date.UTC(year, month - 1, day, hour, minute, 0));
 
-	// Get ecliptic longitude directly
-	const longitude = Astronomy.EclipticLongitude(Astronomy.Body.Mercury, date);
+	// Get geocentric ecliptic longitude (EclipticLongitude returns heliocentric)
+	const geoVector = Astronomy.GeoVector(Astronomy.Body.Mercury, date, false);
+	const ecliptic = Astronomy.Ecliptic(geoVector);
+	const longitude = ecliptic.elon;
 
 	return longitudeToSign(longitude);
 }
@@ -327,16 +330,21 @@ export function calculateMercurySign(
 /**
  * Calculates Venus sign using astronomy-engine
  * Venus orbits the Sun every 225 days
+ * Uses geocentric coordinates (GeoVector + Ecliptic) for accurate astrological positions
  */
 export function calculateVenusSign(
 	year: number,
 	month: number,
-	day: number
+	day: number,
+	hour: number = 12,
+	minute: number = 0
 ): ZodiacSign {
-	const date = new Date(Date.UTC(year, month - 1, day, 12, 0, 0));
+	const date = new Date(Date.UTC(year, month - 1, day, hour, minute, 0));
 
-	// Get ecliptic longitude directly
-	const longitude = Astronomy.EclipticLongitude(Astronomy.Body.Venus, date);
+	// Get geocentric ecliptic longitude (EclipticLongitude returns heliocentric)
+	const geoVector = Astronomy.GeoVector(Astronomy.Body.Venus, date, false);
+	const ecliptic = Astronomy.Ecliptic(geoVector);
+	const longitude = ecliptic.elon;
 
 	return longitudeToSign(longitude);
 }
@@ -344,16 +352,21 @@ export function calculateVenusSign(
 /**
  * Calculates Mars sign using astronomy-engine
  * Mars has an orbital period of ~687 days (1.88 years)
+ * Uses geocentric coordinates (GeoVector + Ecliptic) for accurate astrological positions
  */
 export function calculateMarsSign(
 	year: number,
 	month: number,
-	day: number
+	day: number,
+	hour: number = 12,
+	minute: number = 0
 ): ZodiacSign {
-	const date = new Date(Date.UTC(year, month - 1, day, 12, 0, 0));
+	const date = new Date(Date.UTC(year, month - 1, day, hour, minute, 0));
 
-	// Get ecliptic longitude directly
-	const longitude = Astronomy.EclipticLongitude(Astronomy.Body.Mars, date);
+	// Get geocentric ecliptic longitude (EclipticLongitude returns heliocentric)
+	const geoVector = Astronomy.GeoVector(Astronomy.Body.Mars, date, false);
+	const ecliptic = Astronomy.Ecliptic(geoVector);
+	const longitude = ecliptic.elon;
 
 	return longitudeToSign(longitude);
 }
@@ -460,12 +473,14 @@ export interface PlanetPositions {
 export function calculateAllPlanets(
 	year: number,
 	month: number,
-	day: number
+	day: number,
+	hour: number = 12,
+	minute: number = 0
 ): PlanetPositions {
 	return {
-		mercury: calculateMercurySign(year, month, day),
-		venus: calculateVenusSign(year, month, day),
-		mars: calculateMarsSign(year, month, day),
+		mercury: calculateMercurySign(year, month, day, hour, minute),
+		venus: calculateVenusSign(year, month, day, hour, minute),
+		mars: calculateMarsSign(year, month, day, hour, minute),
 		jupiter: calculateJupiterSign(year, month, day),
 		saturn: calculateSaturnSign(year, month, day),
 		uranus: calculateUranusSign(year, month, day),
@@ -516,9 +531,11 @@ export function getPlanetLongitude(
 	year: number,
 	month: number,
 	day: number,
-	planetName: string
+	planetName: string,
+	hour: number = 12,
+	minute: number = 0
 ): number {
-	const date = new Date(Date.UTC(year, month - 1, day, 12, 0, 0));
+	const date = new Date(Date.UTC(year, month - 1, day, hour, minute, 0));
 
 	try {
 		// Special handling for Sun and Moon
@@ -529,7 +546,8 @@ export function getPlanetLongitude(
 			const moonEcliptic = Astronomy.EclipticGeoMoon(date);
 			return moonEcliptic.lon;
 		} else {
-			// For other planets, use EclipticLongitude
+			// For other planets, use geocentric coordinates for inner planets
+			// and EclipticLongitude (heliocentric) for outer planets
 			const bodyMap: Record<string, Astronomy.Body> = {
 				Mercury: Astronomy.Body.Mercury,
 				Venus: Astronomy.Body.Venus,
@@ -542,7 +560,15 @@ export function getPlanetLongitude(
 			};
 			const body = bodyMap[planetName];
 			if (body) {
-				return Astronomy.EclipticLongitude(body, date);
+				// Inner planets (Mercury, Venus, Mars) need geocentric coordinates
+				if (body === Astronomy.Body.Mercury || body === Astronomy.Body.Venus || body === Astronomy.Body.Mars) {
+					const geoVector = Astronomy.GeoVector(body, date, false);
+					const ecliptic = Astronomy.Ecliptic(geoVector);
+					return ecliptic.elon;
+				} else {
+					// Outer planets: heliocentric ≈ geocentric (close enough)
+					return Astronomy.EclipticLongitude(body, date);
+				}
 			}
 		}
 	} catch (error) {

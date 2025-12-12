@@ -331,8 +331,8 @@
 			// Calculate houses using UTC time and location coordinates
 			houses = calculateHouses(utcYear, utcMonth, utcDay, utcHour, utcMinute, lat, lon);
 			
-			// Calculate all planet positions
-			planets = calculateAllPlanets(utcYear, utcMonth, utcDay);
+			// Calculate all planet positions using exact birth time
+			planets = calculateAllPlanets(utcYear, utcMonth, utcDay, utcHour, utcMinute);
 
 			// Normalize and format the birth time for display
 			// The time the user entered is already in the birth place's timezone
@@ -393,7 +393,7 @@
 				if (planets) {
 					const planetsWithHouses: Record<string, { sign: string; house?: number }> = {};
 					for (const [planetName, planetSign] of Object.entries(planets)) {
-						const planetLon = getPlanetLongitude(planetSign, utcYear, utcMonth, utcDay, planetName.charAt(0).toUpperCase() + planetName.slice(1));
+						const planetLon = getPlanetLongitude(planetSign, utcYear, utcMonth, utcDay, planetName.charAt(0).toUpperCase() + planetName.slice(1), utcHour, utcMinute);
 						const houseNumber = getPlanetHouse(planetLon, houses);
 						planetsWithHouses[planetName] = {
 							sign: planetSign,
@@ -613,7 +613,7 @@
 										</div>
 									{/if}
 									{#if houses.length > 0}
-										{@const sunLon = getPlanetLongitude(sunSign, utcYear, utcMonth, utcDay, 'Sun')}
+										{@const sunLon = getPlanetLongitude(sunSign, utcYear, utcMonth, utcDay, 'Sun', utcHour, utcMinute)}
 										{@const sunHouse = getPlanetHouse(sunLon, houses)}
 										{#if sunHouse}
 											{@const housePlacement = getHousePlacementDescription('sun', sunHouse)}
@@ -669,7 +669,7 @@
 										</div>
 									{/if}
 									{#if houses.length > 0}
-										{@const moonLon = getPlanetLongitude(moonSign, utcYear, utcMonth, utcDay, 'Moon')}
+										{@const moonLon = getPlanetLongitude(moonSign, utcYear, utcMonth, utcDay, 'Moon', utcHour, utcMinute)}
 										{@const moonHouse = getPlanetHouse(moonLon, houses)}
 										{#if moonHouse}
 											{@const housePlacement = getHousePlacementDescription('moon', moonHouse)}
@@ -777,7 +777,7 @@
 						<div class="planets-list">
 							{#if planets.mercury}
 								{@const planetDesc = getPlanetDescription('mercury', planets.mercury)}
-								{@const mercuryLon = getPlanetLongitude(planets.mercury, utcYear, utcMonth, utcDay, 'Mercury')}
+								{@const mercuryLon = getPlanetLongitude(planets.mercury, utcYear, utcMonth, utcDay, 'Mercury', utcHour, utcMinute)}
 								{@const planetHouse = getPlanetHouse(mercuryLon, houses)}
 								<div class="planet-item">
 									<div class="planet-header">
@@ -802,7 +802,7 @@
 							{/if}
 							{#if planets.venus}
 								{@const planetDesc = getPlanetDescription('venus', planets.venus)}
-								{@const venusLon = getPlanetLongitude(planets.venus, utcYear, utcMonth, utcDay, 'Venus')}
+								{@const venusLon = getPlanetLongitude(planets.venus, utcYear, utcMonth, utcDay, 'Venus', utcHour, utcMinute)}
 								{@const planetHouse = getPlanetHouse(venusLon, houses)}
 								<div class="planet-item">
 									<div class="planet-header">
@@ -827,7 +827,7 @@
 							{/if}
 							{#if planets.mars}
 								{@const planetDesc = getPlanetDescription('mars', planets.mars)}
-								{@const marsLon = getPlanetLongitude(planets.mars, utcYear, utcMonth, utcDay, 'Mars')}
+								{@const marsLon = getPlanetLongitude(planets.mars, utcYear, utcMonth, utcDay, 'Mars', utcHour, utcMinute)}
 								{@const planetHouse = getPlanetHouse(marsLon, houses)}
 								<div class="planet-item">
 									<div class="planet-header">
@@ -859,7 +859,7 @@
 						<div class="planets-list">
 							{#if planets.jupiter}
 								{@const planetDesc = getPlanetDescription('jupiter', planets.jupiter)}
-								{@const jupiterLon = getPlanetLongitude(planets.jupiter, utcYear, utcMonth, utcDay, 'Jupiter')}
+								{@const jupiterLon = getPlanetLongitude(planets.jupiter, utcYear, utcMonth, utcDay, 'Jupiter', utcHour, utcMinute)}
 								{@const planetHouse = getPlanetHouse(jupiterLon, houses)}
 								<div class="planet-item">
 									<div class="planet-header">
@@ -876,7 +876,7 @@
 							{/if}
 							{#if planets.saturn}
 								{@const planetDesc = getPlanetDescription('saturn', planets.saturn)}
-								{@const saturnLon = getPlanetLongitude(planets.saturn, utcYear, utcMonth, utcDay, 'Saturn')}
+								{@const saturnLon = getPlanetLongitude(planets.saturn, utcYear, utcMonth, utcDay, 'Saturn', utcHour, utcMinute)}
 								{@const planetHouse = getPlanetHouse(saturnLon, houses)}
 								<div class="planet-item">
 									<div class="planet-header">
@@ -908,7 +908,7 @@
 						<h3>Generational Planets</h3>
 						<div class="planets-list">
 							{#if planets.uranus}
-								{@const uranusLon = getPlanetLongitude(planets.uranus, utcYear, utcMonth, utcDay, 'Uranus')}
+								{@const uranusLon = getPlanetLongitude(planets.uranus, utcYear, utcMonth, utcDay, 'Uranus', utcHour, utcMinute)}
 								{@const planetHouse = getPlanetHouse(uranusLon, houses)}
 								<div class="planet-item">
 									<div class="planet-header">
@@ -924,7 +924,7 @@
 								</div>
 							{/if}
 							{#if planets.neptune}
-								{@const neptuneLon = getPlanetLongitude(planets.neptune, utcYear, utcMonth, utcDay, 'Neptune')}
+								{@const neptuneLon = getPlanetLongitude(planets.neptune, utcYear, utcMonth, utcDay, 'Neptune', utcHour, utcMinute)}
 								{@const planetHouse = getPlanetHouse(neptuneLon, houses)}
 								<div class="planet-item">
 									<div class="planet-header">
@@ -940,7 +940,7 @@
 								</div>
 							{/if}
 							{#if planets.pluto}
-								{@const plutoLon = getPlanetLongitude(planets.pluto, utcYear, utcMonth, utcDay, 'Pluto')}
+								{@const plutoLon = getPlanetLongitude(planets.pluto, utcYear, utcMonth, utcDay, 'Pluto', utcHour, utcMinute)}
 								{@const planetHouse = getPlanetHouse(plutoLon, houses)}
 								<div class="planet-item">
 									<div class="planet-header">

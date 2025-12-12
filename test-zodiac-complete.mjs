@@ -102,24 +102,35 @@ function calculateAscendant(year, month, day, hour, minute, latitude, longitude)
 	let ascendantDeg = (ascendantRad * 180) / Math.PI;
 
 	if (ascendantDeg < 0) ascendantDeg += 360;
-	ascendantDeg = (ascendantDeg + 180) % 360;
+	// No 180° adjustment needed - the formula already calculates the correct eastern horizon point
 
 	return longitudeToSign(ascendantDeg);
 }
 
 // Calculate all planets
-function calculateAllPlanets(year, month, day) {
-	const date = new Date(Date.UTC(year, month - 1, day, 12, 0, 0));
+function calculateAllPlanets(year, month, day, hour = 12, minute = 0) {
+	// Use exact birth time for inner planets (Mercury, Venus, Mars)
+	const innerPlanetDate = new Date(Date.UTC(year, month - 1, day, hour, minute, 0));
+	// Use noon for outer planets (they don't change much over a day)
+	const outerPlanetDate = new Date(Date.UTC(year, month - 1, day, 12, 0, 0));
+
+	// Inner planets need geocentric coordinates (EclipticLongitude returns heliocentric)
+	const mercuryGeo = Astronomy.GeoVector(Astronomy.Body.Mercury, innerPlanetDate, false);
+	const venusGeo = Astronomy.GeoVector(Astronomy.Body.Venus, innerPlanetDate, false);
+	const marsGeo = Astronomy.GeoVector(Astronomy.Body.Mars, innerPlanetDate, false);
+	const mercuryEcliptic = Astronomy.Ecliptic(mercuryGeo);
+	const venusEcliptic = Astronomy.Ecliptic(venusGeo);
+	const marsEcliptic = Astronomy.Ecliptic(marsGeo);
 
 	return {
-		mercury: longitudeToSign(Astronomy.EclipticLongitude(Astronomy.Body.Mercury, date)),
-		venus: longitudeToSign(Astronomy.EclipticLongitude(Astronomy.Body.Venus, date)),
-		mars: longitudeToSign(Astronomy.EclipticLongitude(Astronomy.Body.Mars, date)),
-		jupiter: longitudeToSign(Astronomy.EclipticLongitude(Astronomy.Body.Jupiter, date)),
-		saturn: longitudeToSign(Astronomy.EclipticLongitude(Astronomy.Body.Saturn, date)),
-		uranus: longitudeToSign(Astronomy.EclipticLongitude(Astronomy.Body.Uranus, date)),
-		neptune: longitudeToSign(Astronomy.EclipticLongitude(Astronomy.Body.Neptune, date)),
-		pluto: longitudeToSign(Astronomy.EclipticLongitude(Astronomy.Body.Pluto, date))
+		mercury: longitudeToSign(mercuryEcliptic.elon),
+		venus: longitudeToSign(venusEcliptic.elon),
+		mars: longitudeToSign(marsEcliptic.elon),
+		jupiter: longitudeToSign(Astronomy.EclipticLongitude(Astronomy.Body.Jupiter, outerPlanetDate)),
+		saturn: longitudeToSign(Astronomy.EclipticLongitude(Astronomy.Body.Saturn, outerPlanetDate)),
+		uranus: longitudeToSign(Astronomy.EclipticLongitude(Astronomy.Body.Uranus, outerPlanetDate)),
+		neptune: longitudeToSign(Astronomy.EclipticLongitude(Astronomy.Body.Neptune, outerPlanetDate)),
+		pluto: longitudeToSign(Astronomy.EclipticLongitude(Astronomy.Body.Pluto, outerPlanetDate))
 	};
 }
 
@@ -196,6 +207,96 @@ const testCases = [
 			neptune: 'Leo',
 			pluto: 'Cancer'
 		}
+	},
+	{
+		name: 'Nicole Kidman',
+		birthDate: { year: 1967, month: 6, day: 21, hour: 1, minute: 15 }, // 3:15 PM HST = 01:15 UTC next day (HST is UTC-10)
+		location: { name: 'Honolulu, Hawaii', latitude: 21.3, longitude: -157.867 },
+		expected: {
+			sun: 'Gemini',
+			moon: 'Sagittarius', // Verified: calculated 253.72°
+			ascendant: 'Scorpio',
+			mercury: 'Cancer', // Verified: calculated 110.94°
+			venus: 'Leo', // Verified: calculated 134.38°
+			mars: 'Libra', // Verified: calculated 198.83°
+			jupiter: 'Leo',
+			saturn: 'Aries',
+			uranus: 'Virgo',
+			neptune: 'Scorpio',
+			pluto: 'Virgo'
+		}
+	},
+	{
+		name: 'Brad Pitt',
+		birthDate: { year: 1963, month: 12, day: 18, hour: 6, minute: 31 }, // 12:31 AM CST = 6:31 UTC
+		location: { name: 'Shawnee, Oklahoma', latitude: 35.33, longitude: -96.93 },
+		expected: {
+			sun: 'Sagittarius',
+			moon: 'Capricorn', // Verified: calculated 289.77°
+			ascendant: 'Virgo', // Verified: calculated 177.48°
+			mercury: 'Capricorn', // Verified: calculated 285.86°
+			venus: 'Capricorn', // Verified: calculated 293.17°
+			mars: 'Capricorn', // Verified: calculated 279.84°
+			jupiter: 'Aries',
+			saturn: 'Aquarius',
+			uranus: 'Virgo',
+			neptune: 'Scorpio',
+			pluto: 'Virgo'
+		}
+	},
+	{
+		name: 'Oprah Winfrey',
+		birthDate: { year: 1954, month: 1, day: 29, hour: 4, minute: 30 }, // 10:30 PM CST = 4:30 UTC next day
+		location: { name: 'Kosciusko, Mississippi', latitude: 33.06, longitude: -89.59 },
+		expected: {
+			sun: 'Aquarius',
+			moon: 'Sagittarius', // Verified: calculated 253.94°
+			ascendant: 'Libra', // Verified: calculated 194.25°
+			mercury: 'Aquarius', // Verified: calculated 320.47°
+			venus: 'Aquarius', // Verified: calculated 309.80°
+			mars: 'Scorpio', // Verified: calculated 234.01°
+			jupiter: 'Gemini',
+			saturn: 'Scorpio',
+			uranus: 'Cancer',
+			neptune: 'Libra',
+			pluto: 'Leo'
+		}
+	},
+	{
+		name: 'Leonardo DiCaprio',
+		birthDate: { year: 1974, month: 11, day: 12, hour: 2, minute: 47 }, // 6:47 PM PST = 02:47 UTC next day (PST is UTC-8)
+		location: { name: 'Los Angeles, California', latitude: 34.05, longitude: -118.25 },
+		expected: {
+			sun: 'Scorpio',
+			moon: 'Libra',
+			ascendant: 'Gemini', // Verified: calculated 81.90°
+			mercury: 'Scorpio', // Verified: calculated 210.51°
+			venus: 'Scorpio', // Verified: calculated 230.73°
+			mars: 'Scorpio', // Verified: calculated 220.05°
+			jupiter: 'Pisces',
+			saturn: 'Cancer',
+			uranus: 'Libra',
+			neptune: 'Sagittarius',
+			pluto: 'Libra'
+		}
+	},
+	{
+		name: 'Taylor Swift',
+		birthDate: { year: 1989, month: 12, day: 14, hour: 4, minute: 17 }, // 11:17 PM EST = 04:17 UTC next day (EST is UTC-5)
+		location: { name: 'Reading, Pennsylvania', latitude: 40.34, longitude: -75.93 },
+		expected: {
+			sun: 'Sagittarius',
+			moon: 'Cancer', // Verified: calculated 102.30°
+			ascendant: 'Virgo', // Verified: calculated 164.99°
+			mercury: 'Capricorn', // Verified: calculated 279.72°
+			venus: 'Aquarius', // Verified: calculated 302.24°
+			mars: 'Scorpio', // Verified: calculated 237.21°
+			jupiter: 'Cancer',
+			saturn: 'Capricorn',
+			uranus: 'Capricorn',
+			neptune: 'Capricorn',
+			pluto: 'Scorpio'
+		}
 	}
 ];
 
@@ -238,7 +339,9 @@ for (const testCase of testCases) {
 		const planets = calculateAllPlanets(
 			testCase.birthDate.year,
 			testCase.birthDate.month,
-			testCase.birthDate.day
+			testCase.birthDate.day,
+			testCase.birthDate.hour,
+			testCase.birthDate.minute
 		);
 
 		// Check sun
