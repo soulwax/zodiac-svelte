@@ -1,3 +1,5 @@
+import * as Astronomy from 'astronomy-engine';
+
 export type ZodiacSign =
 	| 'Aries'
 	| 'Taurus'
@@ -13,79 +15,28 @@ export type ZodiacSign =
 	| 'Pisces';
 
 /**
- * Calculates the sun sign based on birth date
- * The dates are approximate and may vary slightly depending on the year
- */
-export function calculateSunSign(month: number, day: number): ZodiacSign {
-	// Month is 0-indexed in JavaScript Date, but we'll use 1-indexed here
-	const date = new Date(2000, month - 1, day);
-
-	// Define the approximate dates for each sign
-	// These are based on the tropical zodiac
-	const signs: Array<{ sign: ZodiacSign; startMonth: number; startDay: number }> = [
-		{ sign: 'Capricorn', startMonth: 12, startDay: 22 },
-		{ sign: 'Aquarius', startMonth: 1, startDay: 20 },
-		{ sign: 'Pisces', startMonth: 2, startDay: 19 },
-		{ sign: 'Aries', startMonth: 3, startDay: 21 },
-		{ sign: 'Taurus', startMonth: 4, startDay: 20 },
-		{ sign: 'Gemini', startMonth: 5, startDay: 21 },
-		{ sign: 'Cancer', startMonth: 6, startDay: 21 },
-		{ sign: 'Leo', startMonth: 7, startDay: 23 },
-		{ sign: 'Virgo', startMonth: 8, startDay: 23 },
-		{ sign: 'Libra', startMonth: 9, startDay: 23 },
-		{ sign: 'Scorpio', startMonth: 10, startDay: 23 },
-		{ sign: 'Sagittarius', startMonth: 11, startDay: 22 }
-	];
-
-	// Find the sign for the given date
-	for (let i = 0; i < signs.length; i++) {
-		const current = signs[i];
-		const next = signs[(i + 1) % signs.length];
-
-		const currentDate = new Date(2000, current.startMonth - 1, current.startDay);
-		let nextDate: Date;
-
-		if (next.startMonth < current.startMonth || (next.startMonth === 1 && current.startMonth === 12)) {
-			// Wraps around to next year
-			nextDate = new Date(2001, next.startMonth - 1, next.startDay);
-		} else {
-			nextDate = new Date(2000, next.startMonth - 1, next.startDay);
-		}
-
-		const checkDate = new Date(2000, month - 1, day);
-
-		// Handle year wrap-around for Capricorn (Dec 22 - Jan 19)
-		if (current.sign === 'Capricorn') {
-			// Capricorn spans from Dec 22 to Jan 19
-			// Check if date is in December (>= Dec 22) or in January before Aquarius starts (< Jan 20)
-			if (
-				(month === 12 && day >= current.startDay) ||
-				(month === 1 && day < next.startDay)
-			) {
-				return current.sign;
-			}
-		} else {
-			if (checkDate >= currentDate && checkDate < nextDate) {
-				return current.sign;
-			}
-		}
-	}
-
-	// Fallback (shouldn't happen)
-	return 'Aries';
-}
-
-export interface House {
-	number: number;
-	sign: ZodiacSign;
-}
-
-/**
  * Converts ecliptic longitude (0-360 degrees) to a zodiac sign
+ * In the tropical zodiac:
+ * - Aries: 0-30°
+ * - Taurus: 30-60°
+ * - Gemini: 60-90°
+ * - Cancer: 90-120°
+ * - Leo: 120-150°
+ * - Virgo: 150-180°
+ * - Libra: 180-210°
+ * - Scorpio: 210-240°
+ * - Sagittarius: 240-270°
+ * - Capricorn: 270-300°
+ * - Aquarius: 300-330°
+ * - Pisces: 330-360°
  */
 function longitudeToSign(longitude: number): ZodiacSign {
+	// Normalize longitude to 0-360
+	let normalizedLon = longitude % 360;
+	if (normalizedLon < 0) normalizedLon += 360;
+
 	// Each sign is 30 degrees
-	const signIndex = Math.floor(longitude / 30);
+	const signIndex = Math.floor(normalizedLon / 30);
 	const signs: ZodiacSign[] = [
 		'Aries',
 		'Taurus',
@@ -104,13 +55,39 @@ function longitudeToSign(longitude: number): ZodiacSign {
 }
 
 /**
+ * Calculates the sun sign based on birth date
+ * Uses astronomy-engine to get the actual Sun position for precise calculations
+ */
+export function calculateSunSign(month: number, day: number, year?: number): ZodiacSign {
+	// Use provided year or default to 2000 for backward compatibility
+	const birthYear = year || 2000;
+
+	// Create a date object at noon UTC to get the sun's position
+	const date = new Date(Date.UTC(birthYear, month - 1, day, 12, 0, 0));
+
+	// Get ecliptic coordinates of the Sun directly
+	const sunPosition = Astronomy.SunPosition(date);
+
+	// Convert ecliptic longitude to zodiac sign
+	return longitudeToSign(sunPosition.elon);
+}
+
+export interface House {
+	number: number;
+	sign: ZodiacSign;
+	cusp: number; // Degree position of the house cusp (0-360)
+}
+
+/**
  * Calculates Greenwich Sidereal Time (GST) in hours for a given UTC date/time
+ * Uses the standard IAU formula for GMST
  */
 function calculateGST(year: number, month: number, day: number, hour: number, minute: number): number {
 	// Convert to Julian Day Number
 	const a = Math.floor((14 - month) / 12);
 	const y = year + 4800 - a;
 	const m = month + 12 * a - 3;
+
 	let jdn =
 		day +
 		Math.floor((153 * m + 2) / 5) +
@@ -121,32 +98,31 @@ function calculateGST(year: number, month: number, day: number, hour: number, mi
 		32045;
 
 	// Add fractional day
-	const fractionalDay = hour / 24 + minute / 1440;
+	const fractionalDay = (hour + minute / 60) / 24;
 	const jd = jdn + fractionalDay - 0.5;
 
 	// Calculate days since J2000.0
 	const d = jd - 2451545.0;
-
-	// Calculate GST in hours
 	const T = d / 36525.0;
-	let gst =
-		18.697374558 +
-		24.06570982441908 * d +
-		0.000026 * T * T +
-		280.46061837 * T +
+
+	// Calculate GMST in degrees using IAU 2006 formula
+	let gmst =
+		280.46061837 +
+		360.98564736629 * d +
 		0.000387933 * T * T -
 		T * T * T / 38710000.0;
 
-	// Normalize to 0-24 hours
-	gst = gst % 24;
-	if (gst < 0) gst += 24;
+	// Normalize to 0-360 degrees
+	gmst = gmst % 360;
+	if (gmst < 0) gmst += 360;
 
-	return gst;
+	// Convert to hours
+	return gmst / 15;
 }
 
 /**
  * Calculates the moon sign based on birth date and time
- * Uses a simplified approximation based on the moon's average cycle
+ * Uses astronomy-engine for accurate lunar position calculation
  */
 export function calculateMoonSign(
 	year: number,
@@ -155,28 +131,25 @@ export function calculateMoonSign(
 	hour: number,
 	minute: number
 ): ZodiacSign {
-	// Calculate days since a reference date (Jan 1, 2000)
-	const referenceDate = new Date(2000, 0, 1, 0, 0, 0);
-	const birthDate = new Date(year, month - 1, day, hour, minute, 0);
-	const daysSinceReference = (birthDate.getTime() - referenceDate.getTime()) / (1000 * 60 * 60 * 24);
+	// Create UTC date object
+	const date = new Date(Date.UTC(year, month - 1, day, hour, minute, 0));
 
-	// Moon's average orbital period is approximately 27.321661 days
-	// Moon moves through all 12 signs in this period (360 degrees / 12 signs = 30 degrees per sign)
-	const moonCycle = 27.321661;
-	const degreesPerDay = 360 / moonCycle; // Approximately 13.176 degrees per day
+	// Get the Moon's ecliptic coordinates directly
+	const moonEcliptic = Astronomy.EclipticGeoMoon(date);
 
-	// Reference: Moon was in Aries at the reference date (approximation)
-	// Calculate how many degrees the moon has moved
-	// Note: Adding 180° offset to correct for reference point inaccuracy
-	let moonLongitude = (daysSinceReference * degreesPerDay + 180) % 360;
-	if (moonLongitude < 0) moonLongitude += 360;
-
-	// Convert to zodiac sign
-	return longitudeToSign(moonLongitude);
+	// Convert ecliptic longitude to zodiac sign
+	return longitudeToSign(moonEcliptic.lon);
 }
 
 /**
  * Calculates the ascendant (rising sign) based on birth date, time, and location
+ * Uses the correct astronomical formula:
+ * RAMC = LST × 15 (convert sidereal time to degrees)
+ * tan(Ascendant) = cos(RAMC) / -(sin(obliquity) × tan(latitude) + cos(obliquity) × sin(RAMC))
+ *
+ * References:
+ * - https://radixpro.com/a4a-start/the-ascendant/
+ * - https://www.astro.com/swisseph/swephprg.htm
  */
 export function calculateAscendant(
 	year: number,
@@ -187,37 +160,53 @@ export function calculateAscendant(
 	latitude: number,
 	longitude: number
 ): ZodiacSign {
-	// Calculate Greenwich Sidereal Time
+	// Calculate Greenwich Sidereal Time in hours
 	const gst = calculateGST(year, month, day, hour, minute);
 
-	// Convert longitude to hours (1 hour = 15 degrees)
+	// Convert longitude to hours (15 degrees = 1 hour)
 	const longitudeHours = longitude / 15;
 
-	// Calculate Local Sidereal Time
+	// Calculate Local Sidereal Time in hours
 	let lst = gst + longitudeHours;
 	lst = lst % 24;
 	if (lst < 0) lst += 24;
 
-	// Convert LST to radians
-	const lstRad = (lst * 15 * Math.PI) / 180;
+	// Convert LST to RAMC (Right Ascension of Medium Coeli) in degrees
+	const ramc = lst * 15;
+
+	// Convert to radians for trigonometric functions
+	const ramcRad = (ramc * Math.PI) / 180;
 	const latRad = (latitude * Math.PI) / 180;
 
-	// Obliquity of the ecliptic (approximately 23.44 degrees)
-	const obliquityRad = (23.44 * Math.PI) / 180;
+	// Obliquity of the ecliptic (mean obliquity for J2000.0)
+	// For higher precision, this should be calculated for the specific date
+	// Using IAU 2006 value: 23.43929111° for J2000.0
+	const obliquity = 23.43929111;
+	const obliquityRad = (obliquity * Math.PI) / 180;
 
-	// Calculate the ascendant using the correct formula:
-	// λ_Asc = atan2(y, x)
-	// where:
-	// x = cos(LST)
-	// y = -cos(ε) * sin(LST) - tan(φ) * sin(ε)
-	const x = Math.cos(lstRad);
-	const y = -Math.cos(obliquityRad) * Math.sin(lstRad) - Math.tan(latRad) * Math.sin(obliquityRad);
+	// Calculate the ascendant using the standard formula:
+	// tan(Ascendant) = cos(RAMC) / -(sin(ε) × tan(φ) + cos(ε) × sin(RAMC))
+	// Using atan2 for proper quadrant handling:
+	// Ascendant = atan2(y, x) where:
+	// x = -(sin(ε) × tan(φ) + cos(ε) × sin(RAMC))
+	// y = cos(RAMC)
 
+	const x = -(Math.sin(obliquityRad) * Math.tan(latRad) + Math.cos(obliquityRad) * Math.sin(ramcRad));
+	const y = Math.cos(ramcRad);
+
+	// Calculate ascendant in radians
 	let ascendantRad = Math.atan2(y, x);
 
-	// Convert to degrees and normalize to 0-360
+	// Convert to degrees
 	let ascendantDeg = (ascendantRad * 180) / Math.PI;
+
+	// Normalize to 0-360
 	if (ascendantDeg < 0) ascendantDeg += 360;
+
+	// The result from atan2 gives us the ecliptic longitude of the ascendant
+	// We need to add 180° to get the eastern horizon point (the actual rising point)
+	// This is because atan2 gives us the western point initially
+	ascendantDeg = (ascendantDeg + 180) % 360;
 
 	// Convert to zodiac sign
 	return longitudeToSign(ascendantDeg);
@@ -225,14 +214,8 @@ export function calculateAscendant(
 
 /**
  * Calculates the 12 astrological houses using the Equal House system
- * @param year Birth year
- * @param month Birth month (1-12)
- * @param day Birth day
- * @param hour Birth hour (0-23)
- * @param minute Birth minute (0-59)
- * @param latitude Birth latitude in degrees
- * @param longitude Birth longitude in degrees
- * @returns Array of 12 houses, each with a number (1-12) and sign
+ * In the Equal House system, each house is exactly 30 degrees
+ * House 1 starts at the Ascendant
  */
 export function calculateHouses(
 	year: number,
@@ -243,36 +226,39 @@ export function calculateHouses(
 	latitude: number,
 	longitude: number
 ): House[] {
-	// Calculate the ascendant (1st house cusp)
-	const ascendantSign = calculateAscendant(year, month, day, hour, minute, latitude, longitude);
+	// Calculate Greenwich Sidereal Time
+	const gst = calculateGST(year, month, day, hour, minute);
 
-	// Get the sign index
-	const signs: ZodiacSign[] = [
-		'Aries',
-		'Taurus',
-		'Gemini',
-		'Cancer',
-		'Leo',
-		'Virgo',
-		'Libra',
-		'Scorpio',
-		'Sagittarius',
-		'Capricorn',
-		'Aquarius',
-		'Pisces'
-	];
+	// Convert longitude to hours
+	const longitudeHours = longitude / 15;
 
-	const ascendantIndex = signs.indexOf(ascendantSign);
+	// Calculate Local Sidereal Time
+	let lst = gst + longitudeHours;
+	lst = lst % 24;
+	if (lst < 0) lst += 24;
 
-	// In Equal House system, each house is 30 degrees
-	// House 1 starts at the ascendant, and each subsequent house
-	// is the next sign in sequence
+	// Convert LST to RAMC in degrees
+	const ramc = lst * 15;
+	const ramcRad = (ramc * Math.PI) / 180;
+	const latRad = (latitude * Math.PI) / 180;
+	const obliquity = 23.43929111;
+	const obliquityRad = (obliquity * Math.PI) / 180;
+
+	// Calculate ascendant degree position
+	const x = -(Math.sin(obliquityRad) * Math.tan(latRad) + Math.cos(obliquityRad) * Math.sin(ramcRad));
+	const y = Math.cos(ramcRad);
+	let ascendantDeg = (Math.atan2(y, x) * 180) / Math.PI;
+	if (ascendantDeg < 0) ascendantDeg += 360;
+	ascendantDeg = (ascendantDeg + 180) % 360;
+
+	// Create houses in Equal House system
 	const houses: House[] = [];
 	for (let i = 0; i < 12; i++) {
-		const signIndex = (ascendantIndex + i) % 12;
+		const cuspDegree = (ascendantDeg + i * 30) % 360;
 		houses.push({
 			number: i + 1,
-			sign: signs[signIndex]
+			sign: longitudeToSign(cuspDegree),
+			cusp: cuspDegree
 		});
 	}
 
@@ -322,73 +308,58 @@ function getSignFromIndex(index: number): ZodiacSign {
 }
 
 /**
- * Calculates Mercury sign
- * Mercury stays within ~28 degrees of the Sun, so we approximate based on Sun position
+ * Calculates Mercury sign using astronomy-engine
+ * Mercury orbits the Sun every 88 days
  */
 export function calculateMercurySign(
 	year: number,
 	month: number,
-	day: number,
-	sunSign: ZodiacSign
+	day: number
 ): ZodiacSign {
-	// Mercury can be in the same sign as Sun, or one sign before/after
-	// Simplified: use a pattern based on the day of year
-	const daysInYear = new Date(year, month - 1, day).getTime() - new Date(year, 0, 1).getTime();
-	const dayOfYear = Math.floor(daysInYear / (1000 * 60 * 60 * 24));
-	
-	// Mercury's approximate cycle: can be same, previous, or next sign from Sun
-	const sunIndex = getSignIndex(sunSign);
-	const offset = (dayOfYear % 3) - 1; // -1, 0, or 1
-	return getSignFromIndex(sunIndex + offset);
+	const date = new Date(Date.UTC(year, month - 1, day, 12, 0, 0));
+
+	// Get ecliptic longitude directly
+	const longitude = Astronomy.EclipticLongitude(Astronomy.Body.Mercury, date);
+
+	return longitudeToSign(longitude);
 }
 
 /**
- * Calculates Venus sign
- * Venus stays within ~48 degrees of the Sun, so we approximate based on Sun position
+ * Calculates Venus sign using astronomy-engine
+ * Venus orbits the Sun every 225 days
  */
 export function calculateVenusSign(
 	year: number,
 	month: number,
-	day: number,
-	sunSign: ZodiacSign
+	day: number
 ): ZodiacSign {
-	// Venus can be up to 2 signs away from Sun
-	// Simplified: use a pattern based on the day of year
-	const daysInYear = new Date(year, month - 1, day).getTime() - new Date(year, 0, 1).getTime();
-	const dayOfYear = Math.floor(daysInYear / (1000 * 60 * 60 * 24));
-	
-	const sunIndex = getSignIndex(sunSign);
-	const offset = ((dayOfYear * 7) % 5) - 2; // -2 to 2
-	return getSignFromIndex(sunIndex + offset);
+	const date = new Date(Date.UTC(year, month - 1, day, 12, 0, 0));
+
+	// Get ecliptic longitude directly
+	const longitude = Astronomy.EclipticLongitude(Astronomy.Body.Venus, date);
+
+	return longitudeToSign(longitude);
 }
 
 /**
- * Calculates Mars sign
- * Mars has an orbital period of ~687 days (about 1.88 years)
+ * Calculates Mars sign using astronomy-engine
+ * Mars has an orbital period of ~687 days (1.88 years)
  */
 export function calculateMarsSign(
 	year: number,
 	month: number,
 	day: number
 ): ZodiacSign {
-	// Reference date: Jan 1, 2000, Mars was approximately in Aries
-	const referenceDate = new Date(2000, 0, 1, 0, 0, 0);
-	const birthDate = new Date(year, month - 1, day, 0, 0, 0);
-	const daysSinceReference = (birthDate.getTime() - referenceDate.getTime()) / (1000 * 60 * 60 * 24);
-	
-	// Mars orbital period: ~687 days
-	const marsCycle = 686.98;
-	const degreesPerDay = 360 / marsCycle; // Approximately 0.524 degrees per day
-	
-	// Reference: Mars was in Aries (0 degrees) at reference date (approximation)
-	let marsLongitude = (daysSinceReference * degreesPerDay) % 360;
-	if (marsLongitude < 0) marsLongitude += 360;
-	
-	return longitudeToSign(marsLongitude);
+	const date = new Date(Date.UTC(year, month - 1, day, 12, 0, 0));
+
+	// Get ecliptic longitude directly
+	const longitude = Astronomy.EclipticLongitude(Astronomy.Body.Mars, date);
+
+	return longitudeToSign(longitude);
 }
 
 /**
- * Calculates Jupiter sign
+ * Calculates Jupiter sign using astronomy-engine
  * Jupiter has an orbital period of ~12 years
  */
 export function calculateJupiterSign(
@@ -396,23 +367,16 @@ export function calculateJupiterSign(
 	month: number,
 	day: number
 ): ZodiacSign {
-	// Reference date: Jan 1, 2000, Jupiter was approximately in Aries
-	const referenceDate = new Date(2000, 0, 1, 0, 0, 0);
-	const birthDate = new Date(year, month - 1, day, 0, 0, 0);
-	const daysSinceReference = (birthDate.getTime() - referenceDate.getTime()) / (1000 * 60 * 60 * 24);
-	
-	// Jupiter orbital period: ~4332.59 days (11.86 years)
-	const jupiterCycle = 4332.59;
-	const degreesPerDay = 360 / jupiterCycle; // Approximately 0.083 degrees per day
-	
-	let jupiterLongitude = (daysSinceReference * degreesPerDay) % 360;
-	if (jupiterLongitude < 0) jupiterLongitude += 360;
-	
-	return longitudeToSign(jupiterLongitude);
+	const date = new Date(Date.UTC(year, month - 1, day, 12, 0, 0));
+
+	// Get ecliptic longitude directly
+	const longitude = Astronomy.EclipticLongitude(Astronomy.Body.Jupiter, date);
+
+	return longitudeToSign(longitude);
 }
 
 /**
- * Calculates Saturn sign
+ * Calculates Saturn sign using astronomy-engine
  * Saturn has an orbital period of ~29.5 years
  */
 export function calculateSaturnSign(
@@ -420,92 +384,63 @@ export function calculateSaturnSign(
 	month: number,
 	day: number
 ): ZodiacSign {
-	// Reference date: Jan 1, 2000, Saturn was approximately in Taurus
-	const referenceDate = new Date(2000, 0, 1, 0, 0, 0);
-	const birthDate = new Date(year, month - 1, day, 0, 0, 0);
-	const daysSinceReference = (birthDate.getTime() - referenceDate.getTime()) / (1000 * 60 * 60 * 24);
-	
-	// Saturn orbital period: ~10759 days (29.46 years)
-	const saturnCycle = 10759;
-	const degreesPerDay = 360 / saturnCycle; // Approximately 0.033 degrees per day
-	
-	// Reference: Saturn was in Taurus (30 degrees) at reference date (approximation)
-	let saturnLongitude = (30 + daysSinceReference * degreesPerDay) % 360;
-	if (saturnLongitude < 0) saturnLongitude += 360;
-	
-	return longitudeToSign(saturnLongitude);
+	const date = new Date(Date.UTC(year, month - 1, day, 12, 0, 0));
+
+	// Get ecliptic longitude directly
+	const longitude = Astronomy.EclipticLongitude(Astronomy.Body.Saturn, date);
+
+	return longitudeToSign(longitude);
 }
 
 /**
- * Calculates Uranus sign (generational planet, ~84 years)
+ * Calculates Uranus sign using astronomy-engine
+ * Uranus has an orbital period of ~84 years
  */
 export function calculateUranusSign(
 	year: number,
 	month: number,
 	day: number
 ): ZodiacSign {
-	// Reference date: Jan 1, 2000, Uranus was approximately in Aquarius
-	const referenceDate = new Date(2000, 0, 1, 0, 0, 0);
-	const birthDate = new Date(year, month - 1, day, 0, 0, 0);
-	const daysSinceReference = (birthDate.getTime() - referenceDate.getTime()) / (1000 * 60 * 60 * 24);
-	
-	// Uranus orbital period: ~30688 days (84.01 years)
-	const uranusCycle = 30688;
-	const degreesPerDay = 360 / uranusCycle;
-	
-	// Reference: Uranus was in Aquarius (300 degrees) at reference date (approximation)
-	let uranusLongitude = (300 + daysSinceReference * degreesPerDay) % 360;
-	if (uranusLongitude < 0) uranusLongitude += 360;
-	
-	return longitudeToSign(uranusLongitude);
+	const date = new Date(Date.UTC(year, month - 1, day, 12, 0, 0));
+
+	// Get ecliptic longitude directly
+	const longitude = Astronomy.EclipticLongitude(Astronomy.Body.Uranus, date);
+
+	return longitudeToSign(longitude);
 }
 
 /**
- * Calculates Neptune sign (generational planet, ~165 years)
+ * Calculates Neptune sign using astronomy-engine
+ * Neptune has an orbital period of ~165 years
  */
 export function calculateNeptuneSign(
 	year: number,
 	month: number,
 	day: number
 ): ZodiacSign {
-	// Reference date: Jan 1, 2000, Neptune was approximately in Aquarius
-	const referenceDate = new Date(2000, 0, 1, 0, 0, 0);
-	const birthDate = new Date(year, month - 1, day, 0, 0, 0);
-	const daysSinceReference = (birthDate.getTime() - referenceDate.getTime()) / (1000 * 60 * 60 * 24);
-	
-	// Neptune orbital period: ~60182 days (164.79 years)
-	const neptuneCycle = 60182;
-	const degreesPerDay = 360 / neptuneCycle;
-	
-	// Reference: Neptune was in Aquarius (330 degrees) at reference date (approximation)
-	let neptuneLongitude = (330 + daysSinceReference * degreesPerDay) % 360;
-	if (neptuneLongitude < 0) neptuneLongitude += 360;
-	
-	return longitudeToSign(neptuneLongitude);
+	const date = new Date(Date.UTC(year, month - 1, day, 12, 0, 0));
+
+	// Get ecliptic longitude directly
+	const longitude = Astronomy.EclipticLongitude(Astronomy.Body.Neptune, date);
+
+	return longitudeToSign(longitude);
 }
 
 /**
- * Calculates Pluto sign (generational planet, ~248 years)
+ * Calculates Pluto sign using astronomy-engine
+ * Pluto has an orbital period of ~248 years
  */
 export function calculatePlutoSign(
 	year: number,
 	month: number,
 	day: number
 ): ZodiacSign {
-	// Reference date: Jan 1, 2000, Pluto was approximately in Sagittarius
-	const referenceDate = new Date(2000, 0, 1, 0, 0, 0);
-	const birthDate = new Date(year, month - 1, day, 0, 0, 0);
-	const daysSinceReference = (birthDate.getTime() - referenceDate.getTime()) / (1000 * 60 * 60 * 24);
-	
-	// Pluto orbital period: ~90553 days (247.94 years)
-	const plutoCycle = 90553;
-	const degreesPerDay = 360 / plutoCycle;
-	
-	// Reference: Pluto was in Sagittarius (240 degrees) at reference date (approximation)
-	let plutoLongitude = (240 + daysSinceReference * degreesPerDay) % 360;
-	if (plutoLongitude < 0) plutoLongitude += 360;
-	
-	return longitudeToSign(plutoLongitude);
+	const date = new Date(Date.UTC(year, month - 1, day, 12, 0, 0));
+
+	// Get ecliptic longitude directly
+	const longitude = Astronomy.EclipticLongitude(Astronomy.Body.Pluto, date);
+
+	return longitudeToSign(longitude);
 }
 
 /**
@@ -525,12 +460,11 @@ export interface PlanetPositions {
 export function calculateAllPlanets(
 	year: number,
 	month: number,
-	day: number,
-	sunSign: ZodiacSign
+	day: number
 ): PlanetPositions {
 	return {
-		mercury: calculateMercurySign(year, month, day, sunSign),
-		venus: calculateVenusSign(year, month, day, sunSign),
+		mercury: calculateMercurySign(year, month, day),
+		venus: calculateVenusSign(year, month, day),
 		mars: calculateMarsSign(year, month, day),
 		jupiter: calculateJupiterSign(year, month, day),
 		saturn: calculateSaturnSign(year, month, day),
@@ -541,10 +475,83 @@ export function calculateAllPlanets(
 }
 
 /**
- * Determines which house a planet is in based on its sign and the house system
+ * Determines which house a planet is in based on its ecliptic longitude and the house cusps
  */
-export function getPlanetHouse(planetSign: ZodiacSign, houses: House[]): number | undefined {
-	const house = houses.find((h) => h.sign === planetSign);
-	return house?.number;
+export function getPlanetHouse(planetLongitude: number, houses: House[]): number {
+	// Normalize planet longitude
+	let normalizedLon = planetLongitude % 360;
+	if (normalizedLon < 0) normalizedLon += 360;
+
+	// Find which house the planet falls into
+	for (let i = 0; i < houses.length; i++) {
+		const currentHouse = houses[i];
+		const nextHouse = houses[(i + 1) % houses.length];
+
+		const currentCusp = currentHouse.cusp;
+		const nextCusp = nextHouse.cusp;
+
+		// Handle wrap-around at 360/0 degrees
+		if (nextCusp < currentCusp) {
+			// House spans across 0 degrees
+			if (normalizedLon >= currentCusp || normalizedLon < nextCusp) {
+				return currentHouse.number;
+			}
+		} else {
+			// Normal case
+			if (normalizedLon >= currentCusp && normalizedLon < nextCusp) {
+				return currentHouse.number;
+			}
+		}
+	}
+
+	// Fallback (should not happen)
+	return 1;
 }
 
+/**
+ * Helper function to get planet ecliptic longitude for house placement
+ */
+export function getPlanetLongitude(
+	planetSign: ZodiacSign,
+	year: number,
+	month: number,
+	day: number,
+	planetName: string
+): number {
+	const date = new Date(Date.UTC(year, month - 1, day, 12, 0, 0));
+
+	try {
+		// Special handling for Sun and Moon
+		if (planetName === 'Sun') {
+			const sunPosition = Astronomy.SunPosition(date);
+			return sunPosition.elon;
+		} else if (planetName === 'Moon') {
+			const moonEcliptic = Astronomy.EclipticGeoMoon(date);
+			return moonEcliptic.lon;
+		} else {
+			// For other planets, use EclipticLongitude
+			const bodyMap: Record<string, Astronomy.Body> = {
+				Mercury: Astronomy.Body.Mercury,
+				Venus: Astronomy.Body.Venus,
+				Mars: Astronomy.Body.Mars,
+				Jupiter: Astronomy.Body.Jupiter,
+				Saturn: Astronomy.Body.Saturn,
+				Uranus: Astronomy.Body.Uranus,
+				Neptune: Astronomy.Body.Neptune,
+				Pluto: Astronomy.Body.Pluto
+			};
+			const body = bodyMap[planetName];
+			if (body) {
+				return Astronomy.EclipticLongitude(body, date);
+			}
+		}
+	} catch (error) {
+		// Fallback: estimate from sign (middle of the sign)
+		const signIndex = getSignIndex(planetSign);
+		return signIndex * 30 + 15;
+	}
+
+	// Fallback if planet name not recognized
+	const signIndex = getSignIndex(planetSign);
+	return signIndex * 30 + 15;
+}
