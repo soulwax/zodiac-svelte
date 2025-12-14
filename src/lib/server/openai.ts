@@ -3,11 +3,12 @@ import OpenAI from 'openai';
 import generalData from '../../data/general.json';
 import planetsData from '../../data/planets.json';
 
-let openai: OpenAI | null = null;
+let perplexity: OpenAI | null = null;
 
-if (env.OPENAI_API_KEY) {
-	openai = new OpenAI({
-		apiKey: env.OPENAI_API_KEY
+if (env.PERPLEXITY_API_KEY) {
+	perplexity = new OpenAI({
+		apiKey: env.PERPLEXITY_API_KEY,
+		baseURL: 'https://api.perplexity.ai'
 	});
 }
 
@@ -24,12 +25,14 @@ interface ChartData {
 	houses: Array<{ number: number; sign: string }>;
 }
 
-function getSignData(sign: string) {
+function getSignData(sign: string | null | undefined) {
+	if (!sign) return null;
 	const signKey = sign.toLowerCase();
 	return generalData.zodiac_signs[signKey as keyof typeof generalData.zodiac_signs] || null;
 }
 
-function getPlanetDescription(planet: string, sign: string) {
+function getPlanetDescription(planet: string, sign: string | null | undefined) {
+	if (!sign) return null;
 	const signKey = sign.toLowerCase();
 	const planetData = planetsData.planetary_sign_details[planet as keyof typeof planetsData.planetary_sign_details];
 	if (!planetData || typeof planetData !== 'object') return null;
@@ -85,6 +88,7 @@ export async function generateMysticalAnalysisDetailed(chartData: ChartData): Pr
 	
 	// Add all other planets
 	for (const [planet, position] of Object.entries(chartData.planets)) {
+		if (!position || !position.sign) continue;
 		const planetDesc = getPlanetDescription(planet, position.sign);
 		if (planetDesc) {
 			const houseInfo = position.house ? getHouseInfo(position.house) : null;
@@ -104,6 +108,7 @@ export async function generateMysticalAnalysisDetailed(chartData: ChartData): Pr
 	// Build house information
 	const houseDescriptions: string[] = [];
 	for (const house of chartData.houses) {
+		if (!house || !house.sign) continue;
 		const houseInfo = getHouseInfo(house.number);
 		if (houseInfo) {
 			houseDescriptions.push(
@@ -120,14 +125,9 @@ They were born on ${chartData.birthDate} at ${chartData.birthTime} in ${chartDat
 ${chartData.lifeTrajectory ? `They describe their life trajectory as: ${chartData.lifeTrajectory}.` : ''}
 
 **THE CELESTIAL TRIAD - THE SOUL'S ESSENCE:**
-- **Sun in ${chartData.sunSign}**: ${sunSignData?.sun?.description || 'The core identity and life force.'}
-  Keywords: ${sunSignData?.sun?.keywords?.join(', ') || 'N/A'}
-
-- **Moon in ${chartData.moonSign}**: ${moonSignData?.moon?.description || 'The emotional nature and inner world.'}
-  Keywords: ${moonSignData?.moon?.keywords?.join(', ') || 'N/A'}
-
-- **Ascendant (Rising) in ${chartData.ascendant}**: ${ascendantSignData?.ascendant?.description || 'The mask worn and first impressions.'}
-  Keywords: ${ascendantSignData?.ascendant?.keywords?.join(', ') || 'N/A'}
+${chartData.sunSign ? `- **Sun in ${chartData.sunSign}**: ${sunSignData?.sun?.description || 'The core identity and life force.'}\n  Keywords: ${sunSignData?.sun?.keywords?.join(', ') || 'N/A'}` : ''}
+${chartData.moonSign ? `- **Moon in ${chartData.moonSign}**: ${moonSignData?.moon?.description || 'The emotional nature and inner world.'}\n  Keywords: ${moonSignData?.moon?.keywords?.join(', ') || 'N/A'}` : ''}
+${chartData.ascendant ? `- **Ascendant (Rising) in ${chartData.ascendant}**: ${ascendantSignData?.ascendant?.description || 'The mask worn and first impressions.'}\n  Keywords: ${ascendantSignData?.ascendant?.keywords?.join(', ') || 'N/A'}` : ''}
 
 **THE PLANETARY COUNCIL - THE COSMIC INFLUENCES:**
 ${planetDescriptions.length > 0 ? planetDescriptions.map(desc => `- ${desc}`).join('\n') : 'No planetary positions provided.'}
@@ -152,31 +152,32 @@ Begin with an opening that acknowledges the sacred moment of their birth, then g
 Write this analysis as if you are channeling the wisdom of the stars themselves.`;
 
 	// Check API key at runtime (not just module load)
-	if (!env.OPENAI_API_KEY) {
-		console.error('OPENAI_API_KEY is not set in environment variables');
-		throw new Error('OPENAI_API_KEY is not set. Please add it to your .env file.');
+	if (!env.PERPLEXITY_API_KEY) {
+		console.error('PERPLEXITY_API_KEY is not set in environment variables');
+		throw new Error('PERPLEXITY_API_KEY is not set. Please add it to your .env file.');
 	}
 
 	// Check if API key is empty or just whitespace
-	if (env.OPENAI_API_KEY.trim().length === 0) {
-		console.error('OPENAI_API_KEY is set but empty');
-		throw new Error('OPENAI_API_KEY is set but empty. Please provide a valid API key in your .env file.');
+	if (env.PERPLEXITY_API_KEY.trim().length === 0) {
+		console.error('PERPLEXITY_API_KEY is set but empty');
+		throw new Error('PERPLEXITY_API_KEY is set but empty. Please provide a valid API key in your .env file.');
 	}
 
-	// Re-initialize OpenAI client if needed (in case env changed or wasn't set at module load)
-	if (!openai) {
-		openai = new OpenAI({
-			apiKey: env.OPENAI_API_KEY
+	// Re-initialize Perplexity client if needed (in case env changed or wasn't set at module load)
+	if (!perplexity) {
+		perplexity = new OpenAI({
+			apiKey: env.PERPLEXITY_API_KEY,
+			baseURL: 'https://api.perplexity.ai'
 		});
 	}
 
 	const systemMessage = 'You are a wise, mystical astrologer with deep knowledge of the cosmos and the human soul. You speak with poetic grace, profound insight, and a touch of ancient wisdom. Your readings are deeply personal, transformative, and written as if you are channeling the stars themselves.';
-	const model = 'gpt-4o';
+	const model = 'llama-3.1-sonar-large-128k-online'; // Perplexity model
 	const temperature = 0.8;
 	const maxTokens = 2000;
 
 	try {
-		const completion = await openai.chat.completions.create({
+		const completion = await perplexity.chat.completions.create({
 			model,
 			messages: [
 				{
@@ -194,7 +195,7 @@ Write this analysis as if you are channeling the wisdom of the stars themselves.
 
 		const analysis = completion.choices[0]?.message?.content;
 		if (!analysis) {
-			throw new Error('No analysis generated from OpenAI');
+			throw new Error('No analysis generated from Perplexity');
 		}
 
 		// Extract detailed metadata
@@ -226,22 +227,22 @@ Write this analysis as if you are channeling the wisdom of the stars themselves.
 		if (error instanceof Error) {
 			const errorMessage = error.message.toLowerCase();
 			
-			// Check for common OpenAI API errors
+			// Check for common Perplexity API errors
 			if (errorMessage.includes('401') || errorMessage.includes('unauthorized') || errorMessage.includes('invalid api key')) {
-				console.error('OpenAI API authentication failed - invalid API key');
-				throw new Error('Invalid OPENAI_API_KEY. Please check your API key in the .env file.');
+				console.error('Perplexity API authentication failed - invalid API key');
+				throw new Error('Invalid PERPLEXITY_API_KEY. Please check your API key in the .env file.');
 			}
 			if (errorMessage.includes('429') || errorMessage.includes('rate limit')) {
-				console.error('OpenAI API rate limit exceeded');
-				throw new Error('OpenAI API rate limit exceeded. Please try again later.');
+				console.error('Perplexity API rate limit exceeded');
+				throw new Error('Perplexity API rate limit exceeded. Please try again later.');
 			}
 			if (errorMessage.includes('500') || errorMessage.includes('internal server error')) {
-				console.error('OpenAI API server error');
-				throw new Error('OpenAI API server error. Please try again later.');
+				console.error('Perplexity API server error');
+				throw new Error('Perplexity API server error. Please try again later.');
 			}
 			if (errorMessage.includes('network') || errorMessage.includes('fetch') || errorMessage.includes('econnrefused')) {
-				console.error('Network error connecting to OpenAI API');
-				throw new Error('Network error connecting to OpenAI API. Please check your internet connection.');
+				console.error('Network error connecting to Perplexity API');
+				throw new Error('Network error connecting to Perplexity API. Please check your internet connection.');
 			}
 		}
 		

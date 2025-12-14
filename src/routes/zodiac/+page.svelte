@@ -471,7 +471,7 @@
 			if (result.success && result.analysis) {
 				aiAnalysis = result.analysis;
 			} else {
-				analysisError = result.error || 'Failed to generate analysis. Please check your OPENAI_API_KEY in .env file.';
+				analysisError = result.error || 'Failed to generate analysis. Please check your PERPLEXITY_API_KEY in .env file.';
 			}
 		} catch (err) {
 			console.error('Error generating analysis:', err);
@@ -1053,10 +1053,10 @@
 				{#if analysisError}
 					<div class="analysis-error">
 						<p>{analysisError}</p>
-						{#if analysisError.includes('OPENAI_API_KEY')}
+						{#if analysisError.includes('PERPLEXITY_API_KEY')}
 							<p class="env-hint">
 								To enable AI analysis, create a <code>.env</code> file in the project root and add:<br>
-								<code>OPENAI_API_KEY=your_api_key_here</code>
+								<code>PERPLEXITY_API_KEY=your_api_key_here</code>
 							</p>
 						{/if}
 					</div>

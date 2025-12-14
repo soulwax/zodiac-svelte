@@ -128,9 +128,9 @@ export const actions = {
 				const birthDate = data.get('birthDate') as string;
 				const birthTime = data.get('birthTime') as string;
 				const placeName = data.get('placeName') as string;
-				const sunSign = data.get('sunSign') as string;
-				const ascendant = data.get('ascendant') as string;
-				const moonSign = data.get('moonSign') as string;
+				const sunSign = (data.get('sunSign') as string)?.trim() || null;
+				const ascendant = (data.get('ascendant') as string)?.trim() || null;
+				const moonSign = (data.get('moonSign') as string)?.trim() || null;
 				const housesJson = data.get('houses') as string;
 				const planetsJson = data.get('planets') as string;
 				const utcYear = parseInt(data.get('utcYear') as string);
@@ -138,6 +138,14 @@ export const actions = {
 				const utcDay = parseInt(data.get('utcDay') as string);
 				const utcHour = parseInt(data.get('utcHour') as string);
 				const utcMinute = parseInt(data.get('utcMinute') as string);
+
+				// Validate required fields
+				if (!sunSign || !moonSign || !ascendant) {
+					return {
+						success: false,
+						error: 'Missing required chart data. Please ensure sun sign, moon sign, and ascendant are provided.'
+					};
+				}
 
 				// Parse planets and houses
 				const planets = planetsJson ? JSON.parse(planetsJson) : {};
@@ -191,6 +199,14 @@ export const actions = {
 					moonSign,
 					planets: planetsWithHouses,
 					houses
+				};
+			}
+
+			// Validate required chart data
+			if (!chartData.sunSign || !chartData.moonSign || !chartData.ascendant) {
+				return {
+					success: false,
+					error: 'Missing required chart data. Please ensure sun sign, moon sign, and ascendant are calculated.'
 				};
 			}
 
