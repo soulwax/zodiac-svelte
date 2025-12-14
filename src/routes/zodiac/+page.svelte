@@ -497,22 +497,64 @@
 					const parsed = JSON.parse(responseData.data);
 					
 					// SvelteKit devalue format: [{"success":1,"analysis":2}, true, "analysis text"]
-					// where 1 and 2 are array indices
+					// where 1 and 2 are array indices pointing to the actual values
 					if (Array.isArray(parsed) && parsed.length >= 3 && parsed[0] && typeof parsed[0] === 'object') {
 						const refs = parsed[0];
-						// Reconstruct: refs.success (1) -> parsed[1], refs.analysis (2) -> parsed[2]
+						// Check if this is a devalue reference map with numeric indices
 						if (typeof refs.success === 'number' && typeof refs.analysis === 'number') {
-							result = {
-								success: parsed[refs.success],
-								analysis: parsed[refs.analysis]
-							};
+							// Validate indices are within array bounds AND > 0 (never point to index 0, the reference map)
+							if (refs.success > 0 && refs.success < parsed.length && 
+							    refs.analysis > 0 && refs.analysis < parsed.length) {
+								// Reconstruct the actual result object from the references
+								result = {
+									success: parsed[refs.success],
+									analysis: parsed[refs.analysis]
+								};
+							} else {
+								// Invalid indices - this shouldn't happen, but handle gracefully
+								// Look for an actual result object in the array (not the reference map)
+								result = parsed.find((item, index) => 
+									index > 0 && // Skip index 0 (the reference map)
+									item && typeof item === 'object' && 
+									'success' in item && 'analysis' in item &&
+									typeof item.success === 'boolean' && typeof item.analysis === 'string'
+								);
+								if (!result) {
+									// Last resort: try to construct from array elements (skip index 0)
+									if (parsed.length > 1 && parsed.length > 2) {
+										result = { success: parsed[1], analysis: parsed[2] };
+									} else {
+										// Can't construct valid result - will be handled by error check below
+										result = null;
+									}
+								}
+							}
 						} else {
-							// Fallback: try direct access
-							result = parsed[0];
+							// Not a devalue reference map - parsed[0] might be the actual result
+							// Check if it has actual boolean/string values (not reference indices)
+							if (typeof refs.success === 'boolean' && typeof refs.analysis === 'string') {
+								result = refs;
+							} else {
+								// Look for actual result object elsewhere in the array (skip index 0)
+								result = parsed.find((item, index) => 
+									index > 0 && // Skip index 0 (might be reference map or invalid)
+									item && typeof item === 'object' && 
+									'success' in item && 'analysis' in item &&
+									typeof item.success === 'boolean' && typeof item.analysis === 'string'
+								);
+								// Don't fallback to parsed[0] - we've already determined it's invalid
+							}
 						}
 					} else if (Array.isArray(parsed) && parsed.length >= 2) {
 						// Alternative format: might be [result, ...]
-						result = parsed[0];
+						// Look for an object with actual success/analysis values
+						result = parsed.find(item => 
+							item && typeof item === 'object' && 
+							'success' in item && 'analysis' in item &&
+							typeof item.success === 'boolean' && typeof item.analysis === 'string'
+						);
+						// Don't fallback to parsed[0] - if no valid result found, result will be undefined
+						// and will be handled by the error check below
 					} else {
 						result = parsed;
 					}

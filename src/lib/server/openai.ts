@@ -144,7 +144,7 @@ Your analysis should:
 - Speak to the deeper meaning behind the planetary alignments
 - Address how the houses activate different areas of their life
 - Be mystical yet grounded, profound yet accessible
-- Be approximately 800-1200 words in length
+- Be comprehensive and complete, typically 1500-2500 words in length, ensuring no important aspects are left unexplored
 - Use metaphors, imagery, and cosmic language that stirs the soul
 
 Begin with an opening that acknowledges the sacred moment of their birth, then guide them through the mysteries revealed in their chart. End with a blessing or cosmic insight that offers hope and direction.
@@ -181,7 +181,7 @@ Write this analysis as if you are channeling the wisdom of the stars themselves.
 	const systemMessage = 'You are a wise, mystical astrologer with deep knowledge of the cosmos and the human soul. You speak with poetic grace, profound insight, and a touch of ancient wisdom. Your readings are deeply personal, transformative, and written as if you are channeling the stars themselves.';
 	const model = 'sonar-pro'; // Perplexity model - advanced search model with 200k token context
 	const temperature = 0.8;
-	const maxTokens = 2000;
+	const maxTokens = 6000; // Increased from 2000 to allow for complete, detailed analyses
 
 	try {
 		const completion = await perplexity.chat.completions.create({
