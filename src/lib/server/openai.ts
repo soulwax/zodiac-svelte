@@ -152,9 +152,16 @@ Begin with an opening that acknowledges the sacred moment of their birth, then g
 Write this analysis as if you are channeling the wisdom of the stars themselves.`;
 
 	// Check API key at runtime (not just module load)
+	// Debug: Log available env keys (without values for security)
+	const availableKeys = Object.keys(env).filter(k => k.includes('API') || k.includes('KEY')).join(', ');
+	console.log('Available env keys:', availableKeys || 'none');
+	console.log('PERPLEXITY_API_KEY exists:', !!env.PERPLEXITY_API_KEY);
+	console.log('PERPLEXITY_API_KEY length:', env.PERPLEXITY_API_KEY?.length || 0);
+	
 	if (!env.PERPLEXITY_API_KEY) {
 		console.error('PERPLEXITY_API_KEY is not set in environment variables');
-		throw new Error('PERPLEXITY_API_KEY is not set. Please add it to your .env file.');
+		console.error('Make sure PERPLEXITY_API_KEY is in your .env file and restart PM2: pm2 restart stars-ssr-svelte-prod');
+		throw new Error('PERPLEXITY_API_KEY is not set. Please add it to your .env file and restart PM2.');
 	}
 
 	// Check if API key is empty or just whitespace

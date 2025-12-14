@@ -4,6 +4,8 @@ module.exports = {
     script: 'build/index.js',
     instances: 1,
     exec_mode: 'fork',
+    // Note: SvelteKit automatically loads .env files via $env/dynamic/private
+    // If env vars aren't loading, restart PM2: pm2 restart stars-ssr-svelte-prod
     env: {
       NODE_ENV: 'production',
       PORT: process.env.PORT || 4332
