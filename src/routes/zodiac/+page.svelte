@@ -463,8 +463,29 @@
 
 			const response = await fetch('?/analyze', {
 				method: 'POST',
+				headers: {
+					accept: 'application/json'
+				},
 				body: formData
 			});
+
+			// Check if response is OK
+			if (!response.ok) {
+				const text = await response.text();
+				console.error('Response error:', response.status, text.substring(0, 200));
+				if (text.includes('Cross-site') || text.includes('CSRF')) {
+					throw new Error('CSRF protection error. Please refresh the page and try again.');
+				}
+				throw new Error(`Server error: ${response.status} ${response.statusText}`);
+			}
+
+			// Check content type before parsing JSON
+			const contentType = response.headers.get('content-type');
+			if (!contentType || !contentType.includes('application/json')) {
+				const text = await response.text();
+				console.error('Non-JSON response:', text.substring(0, 200));
+				throw new Error('Invalid response format from server. Please refresh and try again.');
+			}
 
 			const result = await response.json();
 
