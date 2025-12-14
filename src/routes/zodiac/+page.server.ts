@@ -286,9 +286,15 @@ export const actions = {
 			return { success: true, analysis };
 		} catch (error) {
 			console.error('Error generating analysis:', error);
+			const errorMessage = error instanceof Error ? error.message : String(error);
+			console.error('Full error details:', {
+				message: errorMessage,
+				stack: error instanceof Error ? error.stack : undefined,
+				type: error instanceof Error ? error.constructor.name : typeof error
+			});
 			return {
 				success: false,
-				error: error instanceof Error ? error.message : 'Failed to generate analysis'
+				error: errorMessage
 			};
 		}
 	}
