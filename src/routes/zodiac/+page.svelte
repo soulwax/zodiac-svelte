@@ -1763,15 +1763,15 @@
 		font-size: 1rem;
 	}
 
-	.analysis-content p {
+	:global(.analysis-content p) {
 		margin: 1rem 0;
 	}
 
-	.analysis-content p:first-child {
+	:global(.analysis-content p:first-child) {
 		margin-top: 0;
 	}
 
-	.analysis-content p:last-child {
+	:global(.analysis-content p:last-child) {
 		margin-bottom: 0;
 	}
 

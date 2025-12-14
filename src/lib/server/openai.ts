@@ -151,8 +151,23 @@ Begin with an opening that acknowledges the sacred moment of their birth, then g
 
 Write this analysis as if you are channeling the wisdom of the stars themselves.`;
 
-	if (!openai) {
+	// Check API key at runtime (not just module load)
+	if (!env.OPENAI_API_KEY) {
+		console.error('OPENAI_API_KEY is not set in environment variables');
 		throw new Error('OPENAI_API_KEY is not set. Please add it to your .env file.');
+	}
+
+	// Check if API key is empty or just whitespace
+	if (env.OPENAI_API_KEY.trim().length === 0) {
+		console.error('OPENAI_API_KEY is set but empty');
+		throw new Error('OPENAI_API_KEY is set but empty. Please provide a valid API key in your .env file.');
+	}
+
+	// Re-initialize OpenAI client if needed (in case env changed or wasn't set at module load)
+	if (!openai) {
+		openai = new OpenAI({
+			apiKey: env.OPENAI_API_KEY
+		});
 	}
 
 	const systemMessage = 'You are a wise, mystical astrologer with deep knowledge of the cosmos and the human soul. You speak with poetic grace, profound insight, and a touch of ancient wisdom. Your readings are deeply personal, transformative, and written as if you are channeling the stars themselves.';
@@ -201,6 +216,36 @@ Write this analysis as if you are channeling the wisdom of the stars themselves.
 		};
 	} catch (error) {
 		console.error('Error generating mystical analysis:', error);
+		console.error('Error details:', {
+			name: error instanceof Error ? error.name : 'Unknown',
+			message: error instanceof Error ? error.message : String(error),
+			stack: error instanceof Error ? error.stack : undefined
+		});
+		
+		// Provide more specific error messages
+		if (error instanceof Error) {
+			const errorMessage = error.message.toLowerCase();
+			
+			// Check for common OpenAI API errors
+			if (errorMessage.includes('401') || errorMessage.includes('unauthorized') || errorMessage.includes('invalid api key')) {
+				console.error('OpenAI API authentication failed - invalid API key');
+				throw new Error('Invalid OPENAI_API_KEY. Please check your API key in the .env file.');
+			}
+			if (errorMessage.includes('429') || errorMessage.includes('rate limit')) {
+				console.error('OpenAI API rate limit exceeded');
+				throw new Error('OpenAI API rate limit exceeded. Please try again later.');
+			}
+			if (errorMessage.includes('500') || errorMessage.includes('internal server error')) {
+				console.error('OpenAI API server error');
+				throw new Error('OpenAI API server error. Please try again later.');
+			}
+			if (errorMessage.includes('network') || errorMessage.includes('fetch') || errorMessage.includes('econnrefused')) {
+				console.error('Network error connecting to OpenAI API');
+				throw new Error('Network error connecting to OpenAI API. Please check your internet connection.');
+			}
+		}
+		
+		// Re-throw with original message if it's already informative
 		throw error;
 	}
 }
