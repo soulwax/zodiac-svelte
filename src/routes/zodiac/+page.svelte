@@ -102,6 +102,11 @@
 	let utcMinute = $state<number>(0);
 
 	let debounceTimer: ReturnType<typeof setTimeout> | null = null;
+	
+	// AI Analysis state
+	let aiAnalysis = $state<string | null>(null);
+	let isGeneratingAnalysis = $state(false);
+	let analysisError = $state<string | null>(null);
 
 	// Computed sign data for type safety
 	const sunSignData = $derived(sunSign ? getSignData(sunSign) : null);
@@ -428,6 +433,54 @@
 		}
 	}
 
+	async function generateAnalysis() {
+		if (!sunSign || !moonSign || !ascendant || houses.length === 0 || !planets) {
+			analysisError = 'Please calculate your chart first.';
+			return;
+		}
+
+		isGeneratingAnalysis = true;
+		analysisError = null;
+		aiAnalysis = null;
+
+		try {
+			const formData = new FormData();
+			formData.append('fullName', fullName);
+			formData.append('lifeTrajectory', lifeTrajectory);
+			formData.append('birthDate', birthDate);
+			formData.append('birthTime', birthTime);
+			formData.append('placeName', selectedPlace?.display_name || '');
+			formData.append('sunSign', sunSign);
+			formData.append('moonSign', moonSign);
+			formData.append('ascendant', ascendant);
+			formData.append('houses', JSON.stringify(houses));
+			formData.append('planets', JSON.stringify(planets));
+			formData.append('utcYear', String(utcYear));
+			formData.append('utcMonth', String(utcMonth));
+			formData.append('utcDay', String(utcDay));
+			formData.append('utcHour', String(utcHour));
+			formData.append('utcMinute', String(utcMinute));
+
+			const response = await fetch('?/analyze', {
+				method: 'POST',
+				body: formData
+			});
+
+			const result = await response.json();
+
+			if (result.success && result.analysis) {
+				aiAnalysis = result.analysis;
+			} else {
+				analysisError = result.error || 'Failed to generate analysis. Please check your OPENAI_API_KEY in .env file.';
+			}
+		} catch (err) {
+			console.error('Error generating analysis:', err);
+			analysisError = err instanceof Error ? err.message : 'Failed to generate analysis.';
+		} finally {
+			isGeneratingAnalysis = false;
+		}
+	}
+
 	function handleClickOutside(event: MouseEvent) {
 		const target = event.target as HTMLElement;
 		if (!target.closest('.autocomplete-container')) {
@@ -735,7 +788,18 @@
 		{/if}
 
 		{#if sunSign && ascendant && moonSign && houses.length > 0}
-			<Chart {sunSign} {ascendant} {moonSign} {houses} />
+			<Chart 
+				{sunSign} 
+				{ascendant} 
+				{moonSign} 
+				{houses} 
+				{planets}
+				{utcYear}
+				{utcMonth}
+				{utcDay}
+				{utcHour}
+				{utcMinute}
+			/>
 		{/if}
 
 		{#if houses.length > 0}
@@ -958,6 +1022,60 @@
 						</div>
 					</div>
 				</div>
+			</div>
+		{/if}
+
+		<!-- AI Analysis Section -->
+		{#if sunSign && moonSign && ascendant && houses.length > 0 && planets}
+			<div class="analysis-section">
+				<h2>Mystical Astrological Analysis</h2>
+				<p class="analysis-description">
+					Get a profound, soul-deep understanding of your celestial blueprint with an AI-powered mystical analysis.
+				</p>
+				
+				{#if !aiAnalysis && !isGeneratingAnalysis}
+					<button 
+						type="button" 
+						class="analyze-button"
+						onclick={generateAnalysis}
+					>
+						✨ Generate Mystical Analysis
+					</button>
+				{/if}
+
+				{#if isGeneratingAnalysis}
+					<div class="analysis-loading">
+						<div class="spinner"></div>
+						<p>Channeling the wisdom of the stars...</p>
+					</div>
+				{/if}
+
+				{#if analysisError}
+					<div class="analysis-error">
+						<p>{analysisError}</p>
+						{#if analysisError.includes('OPENAI_API_KEY')}
+							<p class="env-hint">
+								To enable AI analysis, create a <code>.env</code> file in the project root and add:<br>
+								<code>OPENAI_API_KEY=your_api_key_here</code>
+							</p>
+						{/if}
+					</div>
+				{/if}
+
+				{#if aiAnalysis}
+					<div class="analysis-result">
+						<div class="analysis-content">
+							{@html aiAnalysis.split('\n').map(para => para.trim() ? `<p>${para}</p>` : '').join('')}
+						</div>
+						<button 
+							type="button" 
+							class="regenerate-button"
+							onclick={generateAnalysis}
+						>
+							🔄 Regenerate Analysis
+						</button>
+					</div>
+				{/if}
 			</div>
 		{/if}
 	</div>
@@ -1525,6 +1643,142 @@
 		font-size: 0.85rem;
 		line-height: 1.5;
 		color: var(--color-text-muted);
+	}
+
+	.analysis-section {
+		margin-top: 3rem;
+		padding: 2rem;
+		background: var(--color-bg-1);
+		border: 1px solid var(--color-border);
+		border-radius: 8px;
+	}
+
+	.analysis-section h2 {
+		font-size: 1.5rem;
+		font-weight: 600;
+		margin: 0 0 1rem 0;
+		color: var(--color-text);
+		text-align: center;
+	}
+
+	.analysis-description {
+		text-align: center;
+		color: var(--color-text-muted);
+		margin: 0 0 1.5rem 0;
+		font-size: 0.95rem;
+	}
+
+	.analyze-button,
+	.regenerate-button {
+		display: block;
+		margin: 0 auto;
+		padding: 1rem 2rem;
+		font-size: 1rem;
+		font-weight: 600;
+		color: var(--color-bg-1);
+		background: var(--color-theme-1);
+		border: none;
+		border-radius: 8px;
+		cursor: pointer;
+		transition: all 0.2s ease;
+	}
+
+	.analyze-button:hover,
+	.regenerate-button:hover {
+		transform: translateY(-2px);
+		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+	}
+
+	.analyze-button:active,
+	.regenerate-button:active {
+		transform: translateY(0);
+	}
+
+	.analysis-loading {
+		text-align: center;
+		padding: 2rem;
+	}
+
+	.spinner {
+		width: 40px;
+		height: 40px;
+		border: 4px solid var(--color-border);
+		border-top-color: var(--color-theme-1);
+		border-radius: 50%;
+		animation: spin 1s linear infinite;
+		margin: 0 auto 1rem;
+	}
+
+	@keyframes spin {
+		to {
+			transform: rotate(360deg);
+		}
+	}
+
+	.analysis-loading p {
+		color: var(--color-text-muted);
+		font-style: italic;
+	}
+
+	.analysis-error {
+		padding: 1.5rem;
+		background: rgba(220, 53, 69, 0.1);
+		border: 1px solid rgba(220, 53, 69, 0.3);
+		border-radius: 8px;
+		color: var(--color-text);
+		text-align: center;
+	}
+
+	.analysis-error p {
+		margin: 0.5rem 0;
+	}
+
+	.env-hint {
+		margin-top: 1rem;
+		padding: 1rem;
+		background: var(--color-bg-2);
+		border-radius: 4px;
+		font-size: 0.85rem;
+		text-align: left;
+	}
+
+	.env-hint code {
+		background: var(--color-bg-1);
+		padding: 0.25rem 0.5rem;
+		border-radius: 4px;
+		font-family: 'Fira Mono', monospace;
+	}
+
+	.analysis-result {
+		margin-top: 2rem;
+	}
+
+	.analysis-content {
+		background: var(--color-bg-2);
+		border: 1px solid var(--color-border);
+		border-radius: 8px;
+		padding: 2rem;
+		line-height: 1.8;
+		color: var(--color-text);
+		font-size: 1rem;
+	}
+
+	.analysis-content p {
+		margin: 1rem 0;
+	}
+
+	.analysis-content p:first-child {
+		margin-top: 0;
+	}
+
+	.analysis-content p:last-child {
+		margin-bottom: 0;
+	}
+
+	.regenerate-button {
+		margin-top: 1.5rem;
+		padding: 0.75rem 1.5rem;
+		font-size: 0.9rem;
 	}
 
 	@media (max-width: 640px) {

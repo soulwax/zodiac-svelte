@@ -90,6 +90,25 @@ export const actions = {
 				}
 
 				const record = result[0];
+				const planets = (record.planets as Record<string, { sign: string; house?: number }>) || {};
+				const houses = (record.houses as Array<{ number: number; sign: string }>) || [];
+				
+				// Ensure Sun and Moon are included in planets
+				const planetsWithHouses: Record<string, { sign: string; house?: number }> = { ...planets };
+				if (record.sunSign && !planetsWithHouses.sun) {
+					// Import functions to calculate planet houses
+					const { getPlanetLongitude, getPlanetHouse } = await import('$lib/zodiac');
+					const sunLon = getPlanetLongitude(record.sunSign, record.utcYear, record.utcMonth, record.utcDay, 'Sun', record.utcHour, record.utcMinute);
+					const sunHouse = getPlanetHouse(sunLon, houses);
+					planetsWithHouses.sun = { sign: record.sunSign, house: sunHouse };
+				}
+				if (record.moonSign && !planetsWithHouses.moon) {
+					const { getPlanetLongitude, getPlanetHouse } = await import('$lib/zodiac');
+					const moonLon = getPlanetLongitude(record.moonSign, record.utcYear, record.utcMonth, record.utcDay, 'Moon', record.utcHour, record.utcMinute);
+					const moonHouse = getPlanetHouse(moonLon, houses);
+					planetsWithHouses.moon = { sign: record.moonSign, house: moonHouse };
+				}
+				
 				chartData = {
 					fullName: record.fullName,
 					lifeTrajectory: record.lifeTrajectory,
@@ -99,8 +118,8 @@ export const actions = {
 					sunSign: record.sunSign,
 					ascendant: record.ascendant,
 					moonSign: record.moonSign,
-					planets: (record.planets as Record<string, { sign: string; house?: number }>) || {},
-					houses: (record.houses as Array<{ number: number; sign: string }>) || []
+					planets: planetsWithHouses,
+					houses
 				};
 			} else {
 				// Get chart data from form
@@ -114,6 +133,52 @@ export const actions = {
 				const moonSign = data.get('moonSign') as string;
 				const housesJson = data.get('houses') as string;
 				const planetsJson = data.get('planets') as string;
+				const utcYear = parseInt(data.get('utcYear') as string);
+				const utcMonth = parseInt(data.get('utcMonth') as string);
+				const utcDay = parseInt(data.get('utcDay') as string);
+				const utcHour = parseInt(data.get('utcHour') as string);
+				const utcMinute = parseInt(data.get('utcMinute') as string);
+
+				// Parse planets and houses
+				const planets = planetsJson ? JSON.parse(planetsJson) : {};
+				const houses = housesJson ? JSON.parse(housesJson) : [];
+
+				// Import functions to calculate planet houses
+				const { getPlanetLongitude, getPlanetHouse } = await import('$lib/zodiac');
+
+				// Add Sun and Moon to planets with their house positions
+				const planetsWithHouses: Record<string, { sign: string; house?: number }> = { ...planets };
+				
+				// Calculate Sun house
+				if (sunSign) {
+					const sunLon = getPlanetLongitude(sunSign, utcYear, utcMonth, utcDay, 'Sun', utcHour, utcMinute);
+					const sunHouse = getPlanetHouse(sunLon, houses);
+					planetsWithHouses.sun = { sign: sunSign, house: sunHouse };
+				}
+				
+				// Calculate Moon house
+				if (moonSign) {
+					const moonLon = getPlanetLongitude(moonSign, utcYear, utcMonth, utcDay, 'Moon', utcHour, utcMinute);
+					const moonHouse = getPlanetHouse(moonLon, houses);
+					planetsWithHouses.moon = { sign: moonSign, house: moonHouse };
+				}
+
+				// Calculate houses for other planets if not already set
+				for (const [planet, position] of Object.entries(planets)) {
+					if (position && typeof position === 'object' && 'sign' in position && !('house' in position)) {
+						const planetLon = getPlanetLongitude(
+							position.sign,
+							utcYear,
+							utcMonth,
+							utcDay,
+							planet.charAt(0).toUpperCase() + planet.slice(1),
+							utcHour,
+							utcMinute
+						);
+						const planetHouse = getPlanetHouse(planetLon, houses);
+						planetsWithHouses[planet] = { ...position, house: planetHouse };
+					}
+				}
 
 				chartData = {
 					fullName: fullName || null,
@@ -124,8 +189,8 @@ export const actions = {
 					sunSign,
 					ascendant,
 					moonSign,
-					planets: planetsJson ? JSON.parse(planetsJson) : {},
-					houses: housesJson ? JSON.parse(housesJson) : []
+					planets: planetsWithHouses,
+					houses
 				};
 			}
 
