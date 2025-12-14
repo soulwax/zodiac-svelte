@@ -487,12 +487,45 @@
 				throw new Error('Invalid response format from server. Please refresh and try again.');
 			}
 
-			const result = await response.json();
-
-			if (result.success && result.analysis) {
-				aiAnalysis = result.analysis;
+			const responseData = await response.json();
+			
+			// SvelteKit actions return data in a specific format
+			// The data field may be a JSON string that needs parsing
+			let result;
+			if (typeof responseData.data === 'string') {
+				try {
+					const parsed = JSON.parse(responseData.data);
+					// SvelteKit uses devalue serialization - check if it's an array with references
+					if (Array.isArray(parsed) && parsed.length >= 3) {
+						// Reconstruct the object from the array format
+						result = {
+							success: parsed[1], // true
+							analysis: parsed[2]  // the actual analysis text
+						};
+					} else {
+						result = parsed;
+					}
+				} catch (e) {
+					// If parsing fails, try using the data directly
+					result = responseData.data;
+				}
 			} else {
+				result = responseData.data || responseData;
+			}
+
+			// Handle the result
+			if (result && result.success && result.analysis) {
+				aiAnalysis = result.analysis;
+			} else if (result && result.success === false) {
 				analysisError = result.error || 'Failed to generate analysis. Please check your PERPLEXITY_API_KEY in .env file.';
+			} else {
+				// Fallback: check if result itself is the analysis string
+				if (typeof result === 'string') {
+					aiAnalysis = result;
+				} else {
+					console.error('Unexpected response format:', result);
+					analysisError = 'Failed to generate analysis. Unexpected response format.';
+				}
 			}
 		} catch (err) {
 			console.error('Error generating analysis:', err);
@@ -1051,7 +1084,7 @@
 			<div class="analysis-section">
 				<h2>Mystical Astrological Analysis</h2>
 				<p class="analysis-description">
-					Get a profound, soul-deep understanding of your celestial blueprint with an AI-powered mystical analysis.
+					Get a deeper interpretation of this chart with an analysis of planets and houses.
 				</p>
 				
 				{#if !aiAnalysis && !isGeneratingAnalysis}
@@ -1060,7 +1093,7 @@
 						class="analyze-button"
 						onclick={generateAnalysis}
 					>
-						✨ Generate Mystical Analysis
+						✨ Get Analysis Results
 					</button>
 				{/if}
 
