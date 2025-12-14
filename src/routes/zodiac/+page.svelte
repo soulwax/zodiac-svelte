@@ -489,24 +489,26 @@
 
 			const responseData = await response.json();
 			
-			// SvelteKit actions return data in a specific format
-			// The data field may be a JSON string that needs parsing
+			// SvelteKit actions return data in a specific format using devalue serialization
+			// The data field is a JSON string that contains an array with references
 			let result;
 			if (typeof responseData.data === 'string') {
 				try {
 					const parsed = JSON.parse(responseData.data);
-					// SvelteKit uses devalue serialization - check if it's an array with references
-					if (Array.isArray(parsed) && parsed.length >= 3) {
-						// Reconstruct the object from the array format
+					// SvelteKit devalue format: [{"success":1,"analysis":2}, true, "analysis text"]
+					// where 1 and 2 are array indices
+					if (Array.isArray(parsed) && parsed.length >= 3 && typeof parsed[0] === 'object') {
+						const refs = parsed[0];
+						// Reconstruct: refs.success (1) -> parsed[1], refs.analysis (2) -> parsed[2]
 						result = {
-							success: parsed[1], // true
-							analysis: parsed[2]  // the actual analysis text
+							success: parsed[refs.success],
+							analysis: parsed[refs.analysis]
 						};
 					} else {
 						result = parsed;
 					}
 				} catch (e) {
-					// If parsing fails, try using the data directly
+					console.error('Error parsing response data:', e);
 					result = responseData.data;
 				}
 			} else {
@@ -519,13 +521,8 @@
 			} else if (result && result.success === false) {
 				analysisError = result.error || 'Failed to generate analysis. Please check your PERPLEXITY_API_KEY in .env file.';
 			} else {
-				// Fallback: check if result itself is the analysis string
-				if (typeof result === 'string') {
-					aiAnalysis = result;
-				} else {
-					console.error('Unexpected response format:', result);
-					analysisError = 'Failed to generate analysis. Unexpected response format.';
-				}
+				console.error('Unexpected response format:', result);
+				analysisError = 'Failed to generate analysis. Unexpected response format.';
 			}
 		} catch (err) {
 			console.error('Error generating analysis:', err);
