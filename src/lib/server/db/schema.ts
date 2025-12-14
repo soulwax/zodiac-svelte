@@ -1,14 +1,14 @@
+import { relations } from 'drizzle-orm';
 import {
     boolean,
     integer,
     jsonb,
     pgTable,
+    real,
     serial,
     text,
-    timestamp,
-    real
+    timestamp
 } from 'drizzle-orm/pg-core';
-import { relations } from 'drizzle-orm';
 
 export const user = pgTable('user', {
 	id: serial('id').primaryKey(),

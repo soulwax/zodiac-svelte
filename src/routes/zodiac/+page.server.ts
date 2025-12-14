@@ -1,6 +1,6 @@
 import { db } from '$lib/server/db';
-import { zodiacResults } from '$lib/server/db/schema';
-import { generateMysticalAnalysis } from '$lib/server/openai';
+import { analysisRecords, zodiacResults } from '$lib/server/db/schema';
+import { generateMysticalAnalysisDetailed } from '$lib/server/openai';
 import { desc, eq } from 'drizzle-orm';
 import type { Actions } from './$types';
 
@@ -194,21 +194,25 @@ export const actions = {
 				};
 			}
 
-			// Generate mystical analysis
-			const analysis = await generateMysticalAnalysis(chartData);
+			// Generate detailed mystical analysis with metadata
+			const analysisMetadata = await generateMysticalAnalysisDetailed(chartData);
+			const analysis = analysisMetadata.analysisText;
 
-			// Update or insert the analysis
+			// Determine the zodiac result ID
+			let finalResultId: number | null = null;
+			
 			if (resultId) {
-				// Update existing record
+				finalResultId = parseInt(resultId);
+				// Update existing record's aiAnalysis field (for backward compatibility)
 				await db
 					.update(zodiacResults)
 					.set({ aiAnalysis: analysis })
-					.where(eq(zodiacResults.id, parseInt(resultId)));
+					.where(eq(zodiacResults.id, finalResultId));
 			} else {
 				// Get session ID from cookies
 				const sessionId = cookies.get('sessionId');
 				if (sessionId) {
-					// Try to update the most recent record for this session
+					// Try to find the most recent record for this session
 					const recentResult = await db
 						.select()
 						.from(zodiacResults)
@@ -217,12 +221,50 @@ export const actions = {
 						.limit(1);
 
 					if (recentResult.length > 0) {
+						finalResultId = recentResult[0].id;
+						// Update existing record's aiAnalysis field (for backward compatibility)
 						await db
 							.update(zodiacResults)
 							.set({ aiAnalysis: analysis })
-							.where(eq(zodiacResults.id, recentResult[0].id));
+							.where(eq(zodiacResults.id, finalResultId));
 					}
 				}
+			}
+
+			// Save detailed analysis record if we have a result ID
+			if (finalResultId) {
+				const sessionId = cookies.get('sessionId') || null;
+				
+				await db.insert(analysisRecords).values({
+					zodiacResultId: finalResultId,
+					analysisText: analysisMetadata.analysisText,
+					fullPrompt: analysisMetadata.fullPrompt,
+					systemMessage: analysisMetadata.systemMessage,
+					model: analysisMetadata.model,
+					temperature: analysisMetadata.temperature,
+					maxTokens: analysisMetadata.maxTokens,
+					promptTokens: analysisMetadata.promptTokens || null,
+					completionTokens: analysisMetadata.completionTokens || null,
+					totalTokens: analysisMetadata.totalTokens || null,
+					finishReason: analysisMetadata.finishReason || null,
+					responseId: analysisMetadata.responseId || null,
+					chartDataSnapshot: {
+						fullName: chartData.fullName,
+						lifeTrajectory: chartData.lifeTrajectory,
+						birthDate: chartData.birthDate,
+						birthTime: chartData.birthTime,
+						placeName: chartData.placeName,
+						sunSign: chartData.sunSign,
+						ascendant: chartData.ascendant,
+						moonSign: chartData.moonSign,
+						planets: chartData.planets,
+						houses: chartData.houses
+					},
+					analysisType: 'mystical',
+					analysisVersion: '1.0',
+					completedAt: new Date(),
+					sessionId
+				});
 			}
 
 			return { success: true, analysis };

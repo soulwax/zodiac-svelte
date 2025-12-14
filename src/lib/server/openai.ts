@@ -34,7 +34,7 @@ function getPlanetDescription(planet: string, sign: string) {
 	const planetData = planetsData.planetary_sign_details[planet as keyof typeof planetsData.planetary_sign_details];
 	if (!planetData || typeof planetData !== 'object') return null;
 	
-	const signData = (planetData as Record<string, any>)[signKey];
+	const signData = (planetData as Record<string, unknown>)[signKey];
 	return signData || null;
 }
 
