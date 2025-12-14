@@ -495,15 +495,24 @@
 			if (typeof responseData.data === 'string') {
 				try {
 					const parsed = JSON.parse(responseData.data);
+					
 					// SvelteKit devalue format: [{"success":1,"analysis":2}, true, "analysis text"]
 					// where 1 and 2 are array indices
-					if (Array.isArray(parsed) && parsed.length >= 3 && typeof parsed[0] === 'object') {
+					if (Array.isArray(parsed) && parsed.length >= 3 && parsed[0] && typeof parsed[0] === 'object') {
 						const refs = parsed[0];
 						// Reconstruct: refs.success (1) -> parsed[1], refs.analysis (2) -> parsed[2]
-						result = {
-							success: parsed[refs.success],
-							analysis: parsed[refs.analysis]
-						};
+						if (typeof refs.success === 'number' && typeof refs.analysis === 'number') {
+							result = {
+								success: parsed[refs.success],
+								analysis: parsed[refs.analysis]
+							};
+						} else {
+							// Fallback: try direct access
+							result = parsed[0];
+						}
+					} else if (Array.isArray(parsed) && parsed.length >= 2) {
+						// Alternative format: might be [result, ...]
+						result = parsed[0];
 					} else {
 						result = parsed;
 					}
@@ -516,12 +525,22 @@
 			}
 
 			// Handle the result
-			if (result && result.success && result.analysis) {
+			if (result && result.success === true && result.analysis && typeof result.analysis === 'string') {
 				aiAnalysis = result.analysis;
 			} else if (result && result.success === false) {
 				analysisError = result.error || 'Failed to generate analysis. Please check your PERPLEXITY_API_KEY in .env file.';
 			} else {
-				console.error('Unexpected response format:', result);
+				// Debug: log what we got
+				console.error('Unexpected response format:', {
+					result,
+					type: typeof result,
+					keys: result ? Object.keys(result) : null,
+					hasSuccess: result && 'success' in result,
+					hasAnalysis: result && 'analysis' in result,
+					successValue: result && result.success,
+					analysisValue: result && result.analysis,
+					analysisType: result && result.analysis ? typeof result.analysis : 'none'
+				});
 				analysisError = 'Failed to generate analysis. Unexpected response format.';
 			}
 		} catch (err) {
@@ -1097,7 +1116,7 @@
 				{#if isGeneratingAnalysis}
 					<div class="analysis-loading">
 						<div class="spinner"></div>
-						<p>Channeling the wisdom of the stars...</p>
+						<p>Analysing...</p>
 					</div>
 				{/if}
 
