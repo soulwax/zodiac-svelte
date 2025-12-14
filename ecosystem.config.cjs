@@ -1,10 +1,30 @@
 module.exports = {
   apps : [{
-    script: 'index.js',
-    watch: '.'
-  }, {
-    script: './service-worker/',
-    watch: ['./service-worker']
+    name: 'stars-ssr-svelte-prod',
+    script: 'build/index.js',
+    instances: 1,
+    exec_mode: 'fork',
+    env: {
+      NODE_ENV: 'production',
+      PORT: process.env.PORT || 4332
+    },
+    env_production: {
+      NODE_ENV: 'production',
+      PORT: process.env.PORT || 4332
+    },
+    env_development: {
+      NODE_ENV: 'development',
+      PORT: process.env.PORT || 4332
+    },
+    env_preview: {
+      NODE_ENV: 'production',
+      PORT: process.env.PORT || 4332
+    },
+    watch: false,
+    error_file: './logs/pm2-error.log',
+    out_file: './logs/pm2-out.log',
+    log_date_format: 'YYYY-MM-DD HH:mm:ss Z',
+    merge_logs: true
   }],
 
   deploy : {
