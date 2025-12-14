@@ -645,3 +645,12 @@
 2025-12-14 02:04:08 +00:00:     at async Promise.all (index 1)
 2025-12-14 02:04:08 +00:00:     at async internal_respond (file:///home/starchild/workspace/WEB/zodiac-svelte/build/server/index.js:5768:52)
 2025-12-14 02:04:08 +00:00:     at async Array.ssr (file:///home/starchild/workspace/WEB/zodiac-svelte/build/handler.js:1306:3)
+2025-12-14 02:04:11 +00:00: 
+2025-12-14 02:04:11 +00:00: [1;31m[500] GET /zodiac[0m
+2025-12-14 02:04:11 +00:00: Error: DATABASE_URL is not set
+2025-12-14 02:04:11 +00:00:     at file:///home/starchild/workspace/WEB/zodiac-svelte/build/server/chunks/index5-DkcVomAc.js:6743:38
+2025-12-14 02:04:11 +00:00:     at ModuleJob.run (node:internal/modules/esm/module_job:413:25)
+2025-12-14 02:04:11 +00:00:     at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:654:26)
+2025-12-14 02:04:11 +00:00:     at async Promise.all (index 1)
+2025-12-14 02:04:11 +00:00:     at async internal_respond (file:///home/starchild/workspace/WEB/zodiac-svelte/build/server/index.js:5768:52)
+2025-12-14 02:04:11 +00:00:     at async Array.ssr (file:///home/starchild/workspace/WEB/zodiac-svelte/build/handler.js:1306:3)
