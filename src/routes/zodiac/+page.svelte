@@ -602,56 +602,6 @@
 		}
 	}
 
-	async function fetchAIAnalysis() {
-		if (!sunSign || !ascendant || !moonSign || !selectedPlace) {
-			error = 'Please calculate your chart first.';
-			return null;
-		}
-
-		try {
-			const formData = new FormData();
-			if (fullName) formData.append('fullName', fullName);
-			if (lifeTrajectory) formData.append('lifeTrajectory', lifeTrajectory);
-			formData.append('birthDate', birthDate);
-			formData.append('birthTime', birthTime);
-			formData.append('placeName', selectedPlace.display_name);
-			formData.append('sunSign', sunSign);
-			formData.append('ascendant', ascendant);
-			formData.append('moonSign', moonSign);
-			formData.append('houses', JSON.stringify(houses));
-			if (planets) {
-				const planetsWithHouses: Record<string, { sign: string; house?: number }> = {};
-				for (const [planetName, planetSign] of Object.entries(planets)) {
-					const planetLon = getPlanetLongitude(planetSign, utcYear, utcMonth, utcDay, planetName.charAt(0).toUpperCase() + planetName.slice(1), utcHour, utcMinute);
-					const houseNumber = getPlanetHouse(planetLon, houses);
-					planetsWithHouses[planetName] = {
-						sign: planetSign,
-						house: houseNumber
-					};
-				}
-				formData.append('planets', JSON.stringify(planetsWithHouses));
-			}
-
-			const response = await fetch('?/analyze', {
-				method: 'POST',
-				body: formData
-			});
-
-			const result = await response.json();
-
-			if (result.type === 'success' && result.data?.analysis) {
-				aiAnalysis = result.data.analysis;
-				return result.data.analysis;
-			} else {
-				throw new Error(result.data?.error || 'Failed to generate AI analysis');
-			}
-		} catch (err) {
-			error = err instanceof Error ? err.message : 'An error occurred while generating AI analysis.';
-			console.error('AI Analysis error:', err);
-			return null;
-		}
-	}
-
 	async function generatePDF() {
 		if (!sunSign || !ascendant || !moonSign || !selectedPlace) {
 			error = 'Please calculate your chart first.';
@@ -662,14 +612,17 @@
 		error = null;
 
 		try {
-			// Fetch AI analysis if not already available
-			let analysis = aiAnalysis;
-			if (!analysis) {
-				analysis = await fetchAIAnalysis();
-				if (!analysis) {
-					throw new Error('Failed to generate AI analysis');
+			// Generate AI analysis if not already available
+			if (!aiAnalysis) {
+				await generateAnalysis();
+
+				// Check if analysis generation failed
+				if (!aiAnalysis) {
+					throw new Error(analysisError || 'Failed to generate AI analysis. Please try again.');
 				}
 			}
+
+			const analysis = aiAnalysis;
 
 			// Create PDF
 			const doc = new jsPDF();
@@ -898,11 +851,17 @@
 			{#if sunSign && ascendant && moonSign}
 				<button
 					type="button"
-					disabled={isGeneratingPDF}
+					disabled={isGeneratingPDF || isGeneratingAnalysis}
 					onclick={generatePDF}
 					class="button button-pdf"
 				>
-					{isGeneratingPDF ? 'Generating PDF...' : 'Print out the full PDF'}
+					{#if isGeneratingPDF && isGeneratingAnalysis}
+						Generating AI analysis...
+					{:else if isGeneratingPDF}
+						Creating PDF...
+					{:else}
+						📄 Generate PDF with AI Analysis
+					{/if}
 				</button>
 			{/if}
 		</form>
