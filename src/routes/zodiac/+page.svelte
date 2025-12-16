@@ -101,7 +101,6 @@
 	let utcDay = $state<number>(0);
 	let utcHour = $state<number>(0);
 	let utcMinute = $state<number>(0);
-	let aiAnalysis = $state<string | null>(null);
 	let isGeneratingPDF = $state(false);
 
 	let debounceTimer: ReturnType<typeof setTimeout> | null = null;
