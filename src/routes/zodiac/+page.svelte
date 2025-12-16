@@ -16,6 +16,7 @@
 	import planetsData from '../../data/planets.json';
 	import type { PageData } from './$types';
 	import Chart from './Chart.svelte';
+	import { jsPDF } from 'jspdf';
 
 	let { data }: { data: PageData } = $props();
 
@@ -100,6 +101,8 @@
 	let utcDay = $state<number>(0);
 	let utcHour = $state<number>(0);
 	let utcMinute = $state<number>(0);
+	let aiAnalysis = $state<string | null>(null);
+	let isGeneratingPDF = $state(false);
 
 	let debounceTimer: ReturnType<typeof setTimeout> | null = null;
 
@@ -435,6 +438,192 @@
 		}
 	}
 
+	async function fetchAIAnalysis() {
+		if (!sunSign || !ascendant || !moonSign || !selectedPlace) {
+			error = 'Please calculate your chart first.';
+			return null;
+		}
+
+		try {
+			const formData = new FormData();
+			if (fullName) formData.append('fullName', fullName);
+			if (lifeTrajectory) formData.append('lifeTrajectory', lifeTrajectory);
+			formData.append('birthDate', birthDate);
+			formData.append('birthTime', birthTime);
+			formData.append('placeName', selectedPlace.display_name);
+			formData.append('sunSign', sunSign);
+			formData.append('ascendant', ascendant);
+			formData.append('moonSign', moonSign);
+			formData.append('houses', JSON.stringify(houses));
+			if (planets) {
+				const planetsWithHouses: Record<string, { sign: string; house?: number }> = {};
+				for (const [planetName, planetSign] of Object.entries(planets)) {
+					const planetLon = getPlanetLongitude(planetSign, utcYear, utcMonth, utcDay, planetName.charAt(0).toUpperCase() + planetName.slice(1), utcHour, utcMinute);
+					const houseNumber = getPlanetHouse(planetLon, houses);
+					planetsWithHouses[planetName] = {
+						sign: planetSign,
+						house: houseNumber
+					};
+				}
+				formData.append('planets', JSON.stringify(planetsWithHouses));
+			}
+
+			const response = await fetch('?/analyze', {
+				method: 'POST',
+				body: formData
+			});
+
+			const result = await response.json();
+
+			if (result.type === 'success' && result.data?.analysis) {
+				aiAnalysis = result.data.analysis;
+				return result.data.analysis;
+			} else {
+				throw new Error(result.data?.error || 'Failed to generate AI analysis');
+			}
+		} catch (err) {
+			error = err instanceof Error ? err.message : 'An error occurred while generating AI analysis.';
+			console.error('AI Analysis error:', err);
+			return null;
+		}
+	}
+
+	async function generatePDF() {
+		if (!sunSign || !ascendant || !moonSign || !selectedPlace) {
+			error = 'Please calculate your chart first.';
+			return;
+		}
+
+		isGeneratingPDF = true;
+		error = null;
+
+		try {
+			// Fetch AI analysis if not already available
+			let analysis = aiAnalysis;
+			if (!analysis) {
+				analysis = await fetchAIAnalysis();
+				if (!analysis) {
+					throw new Error('Failed to generate AI analysis');
+				}
+			}
+
+			// Create PDF
+			const doc = new jsPDF();
+			const pageWidth = doc.internal.pageSize.getWidth();
+			const pageHeight = doc.internal.pageSize.getHeight();
+			const margin = 20;
+			const maxWidth = pageWidth - (margin * 2);
+			let yPos = margin;
+
+			// Helper function to add text with wrapping
+			const addText = (text: string, fontSize: number = 11, isBold: boolean = false, color: [number, number, number] = [0, 0, 0]) => {
+				doc.setFontSize(fontSize);
+				doc.setFont('helvetica', isBold ? 'bold' : 'normal');
+				doc.setTextColor(color[0], color[1], color[2]);
+
+				const lines = doc.splitTextToSize(text, maxWidth);
+				for (const line of lines) {
+					if (yPos > pageHeight - margin) {
+						doc.addPage();
+						yPos = margin;
+					}
+					doc.text(line, margin, yPos);
+					yPos += fontSize * 0.5;
+				}
+				yPos += 5;
+			};
+
+			// Title
+			addText('Astrological Chart Report', 20, true, [0, 51, 102]);
+			yPos += 5;
+
+			// Birth Information
+			addText('Birth Information', 14, true, [51, 51, 153]);
+			if (fullName) addText(`Name: ${fullName}`, 11);
+			addText(`Birth Date: ${birthDate}`, 11);
+			addText(`Birth Time: ${normalizedTime || birthTime}${timezoneName ? ` (${timezoneName}${isDST !== null ? ', ' + (isDST ? 'Daylight Saving Time' : 'Standard Time') : ''})` : ''}`, 11);
+			addText(`Birth Place: ${selectedPlace.display_name}`, 11);
+			if (lifeTrajectory) addText(`Life Trajectory: ${lifeTrajectory}`, 11);
+			yPos += 5;
+
+			// Core Signs
+			addText('Core Astrological Signs', 14, true, [51, 51, 153]);
+			addText(`Sun Sign: ${sunSign}`, 12, true);
+			if (sunSignData) {
+				addText(`Element: ${sunSignData.element}, Modality: ${sunSignData.modality}, Ruled by: ${sunSignData.ruler}`, 10);
+				addText(getSignDescription(sunSign, 'sun'), 10);
+			}
+			yPos += 3;
+
+			addText(`Moon Sign: ${moonSign}`, 12, true);
+			if (moonSignData) {
+				addText(`Element: ${moonSignData.element}, Modality: ${moonSignData.modality}, Ruled by: ${moonSignData.ruler}`, 10);
+				addText(getSignDescription(moonSign, 'moon'), 10);
+			}
+			yPos += 3;
+
+			addText(`Ascendant (Rising): ${ascendant}`, 12, true);
+			if (ascendantSignData) {
+				addText(`Element: ${ascendantSignData.element}, Modality: ${ascendantSignData.modality}, Ruled by: ${ascendantSignData.ruler}`, 10);
+				addText(getSignDescription(ascendant, 'ascendant'), 10);
+			}
+			yPos += 5;
+
+			// Planetary Positions
+			if (planets) {
+				addText('Planetary Positions', 14, true, [51, 51, 153]);
+				const planetOrder = ['mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune', 'pluto'];
+				for (const planetName of planetOrder) {
+					if (planets[planetName as keyof typeof planets]) {
+						const planetSign = planets[planetName as keyof typeof planets];
+						const planetLon = getPlanetLongitude(planetSign!, utcYear, utcMonth, utcDay, planetName.charAt(0).toUpperCase() + planetName.slice(1), utcHour, utcMinute);
+						const planetHouse = getPlanetHouse(planetLon, houses);
+						addText(`${planetName.charAt(0).toUpperCase() + planetName.slice(1)} in ${planetSign}${planetHouse ? ` (House ${planetHouse})` : ''}`, 11, true);
+						const planetDesc = getPlanetDescription(planetName, planetSign!);
+						if (planetDesc?.description) {
+							addText(planetDesc.description, 10);
+						}
+						yPos += 2;
+					}
+				}
+				yPos += 5;
+			}
+
+			// Houses
+			if (houses.length > 0) {
+				addText('Astrological Houses', 14, true, [51, 51, 153]);
+				for (const house of houses) {
+					const houseInfo = getHouseInfo(house.number);
+					if (houseInfo) {
+						addText(`House ${house.number} (${houseInfo.alias}) in ${house.sign}`, 11, true);
+						addText(houseInfo.description, 10);
+						yPos += 2;
+					}
+				}
+				yPos += 5;
+			}
+
+			// AI Assessment
+			doc.addPage();
+			yPos = margin;
+			addText('Mystical Astrological Analysis', 16, true, [102, 0, 102]);
+			yPos += 5;
+			addText(analysis, 10);
+
+			// Save the PDF
+			const fileName = fullName
+				? `${fullName.replace(/\s+/g, '_')}_Astrology_Chart.pdf`
+				: `Astrology_Chart_${birthDate}.pdf`;
+			doc.save(fileName);
+
+		} catch (err) {
+			error = err instanceof Error ? err.message : 'An error occurred while generating the PDF.';
+			console.error('PDF generation error:', err);
+		} finally {
+			isGeneratingPDF = false;
+		}
+	}
+
 	$effect(() => {
 		if (typeof window !== 'undefined') {
 			document.addEventListener('click', handleClickOutside);
@@ -541,6 +730,17 @@
 			<button type="submit" disabled={isLoading} class="button">
 				{isLoading ? 'Calculating...' : 'Calculate Chart'}
 			</button>
+
+			{#if sunSign && ascendant && moonSign}
+				<button
+					type="button"
+					disabled={isGeneratingPDF}
+					onclick={generatePDF}
+					class="button button-pdf"
+				>
+					{isGeneratingPDF ? 'Generating PDF...' : 'Print out the full PDF'}
+				</button>
+			{/if}
 		</form>
 
 		{#if error}
@@ -1097,6 +1297,15 @@
 		cursor: not-allowed;
 	}
 
+	.button-pdf {
+		background: #dc2626;
+		margin-top: 1rem;
+	}
+
+	.button-pdf:hover:not(:disabled) {
+		background: #b91c1c;
+	}
+
 	.error {
 		margin-top: 1.5rem;
 		padding: 1rem;
@@ -1530,14 +1739,402 @@
 	@media (max-width: 640px) {
 		.card {
 			padding: 1.5rem;
+			border-width: 0.5px;
 		}
 
 		h1 {
 			font-size: 1.75rem;
 		}
 
+		.subtitle {
+			font-size: 0.875rem;
+		}
+
+		.form {
+			gap: 1.25rem;
+		}
+
+		.button {
+			padding: 0.75rem 1rem;
+			font-size: 0.95rem;
+		}
+
+		.button-pdf {
+			margin-top: 0.75rem;
+		}
+
+		.result {
+			padding: 1.5rem;
+			border-width: 0.5px;
+		}
+
+		.result h2 {
+			font-size: 1.25rem;
+		}
+
+		.birth-info {
+			padding: 1rem;
+			border-width: 0.5px;
+		}
+
+		.birth-info-item {
+			font-size: 0.875rem;
+			margin-bottom: 0.5rem;
+		}
+
+		.sign-item {
+			padding: 1.5rem;
+			border-width: 0.5px;
+		}
+
+		.sign-header {
+			border-bottom-width: 0.5px;
+		}
+
+		.sign-name {
+			font-size: 1.5rem;
+		}
+
+		.sign-metadata {
+			gap: 0.4rem;
+		}
+
+		.badge {
+			padding: 0.3rem 0.6rem;
+			font-size: 0.75rem;
+			border-width: 0.5px;
+		}
+
+		.core-point-info,
+		.placement-info {
+			padding: 1rem;
+			border-width: 0.5px;
+		}
+
+		.keywords {
+			border-top-width: 0.5px;
+		}
+
+		.houses-result,
+		.planets-result {
+			padding: 1.5rem;
+			border-width: 0.5px;
+		}
+
 		.houses-grid {
-			grid-template-columns: repeat(2, 1fr);
+			grid-template-columns: 1fr;
+			gap: 1rem;
+		}
+
+		.house-item {
+			padding: 1.25rem;
+			border-width: 0.5px;
+		}
+
+		.house-header {
+			border-bottom-width: 0.5px;
+		}
+
+		.planet-category {
+			padding: 1.25rem;
+			border-width: 0.5px;
+		}
+
+		.planet-item {
+			padding: 1rem;
+			border-width: 0.5px;
+		}
+
+		.planet-header {
+			gap: 0.75rem;
+			border-bottom-width: 0.5px;
+		}
+
+		.house-placement {
+			border-top-width: 0.5px;
+		}
+
+		.input {
+			border-width: 0.5px;
+		}
+
+		.suggestions {
+			border-width: 0.5px;
+			border-top: none;
+		}
+
+		.suggestion-item {
+			border-bottom-width: 0.5px;
+		}
+
+		.error {
+			border-width: 0.5px;
+		}
+	}
+
+	@media (max-width: 420px) {
+		.container {
+			padding: 1rem 0.5rem;
+		}
+
+		.card {
+			padding: 1rem;
+			border-radius: 6px;
+			border-width: 0.5px;
+		}
+
+		h1 {
+			font-size: 1.5rem;
+		}
+
+		.subtitle {
+			font-size: 0.8rem;
+			margin-bottom: 1.5rem;
+		}
+
+		.form {
+			gap: 1rem;
+		}
+
+		.form-group {
+			gap: 0.4rem;
+		}
+
+		label {
+			font-size: 0.85rem;
+		}
+
+		.input {
+			padding: 0.65rem;
+			font-size: 0.95rem;
+			border-width: 0.5px;
+		}
+
+		.button {
+			padding: 0.7rem 0.9rem;
+			font-size: 0.9rem;
+		}
+
+		.button-pdf {
+			margin-top: 0.65rem;
+			white-space: normal;
+			line-height: 1.3;
+		}
+
+		.result {
+			padding: 1rem;
+			border-width: 0.5px;
+		}
+
+		.result h2 {
+			font-size: 1.15rem;
+			margin-bottom: 1rem;
+		}
+
+		.birth-info {
+			padding: 0.875rem;
+			border-width: 0.5px;
+		}
+
+		.birth-info-item {
+			font-size: 0.825rem;
+			line-height: 1.6;
+			margin-bottom: 0.5rem;
+		}
+
+		.birth-info-item strong {
+			display: block;
+			margin-bottom: 0.15rem;
+		}
+
+		.timezone-info {
+			font-size: 0.8rem;
+			display: block;
+			margin-left: 0;
+			margin-top: 0.15rem;
+		}
+
+		.signs-list {
+			gap: 1.5rem;
+		}
+
+		.sign-item {
+			padding: 1.25rem;
+			border-width: 0.5px;
+		}
+
+		.sign-header {
+			margin-bottom: 1.25rem;
+			padding-bottom: 0.875rem;
+			border-bottom-width: 0.5px;
+		}
+
+		.sign-label {
+			font-size: 0.8rem;
+		}
+
+		.sign-name {
+			font-size: 1.35rem;
+			margin-bottom: 0.75rem;
+		}
+
+		.sign-metadata {
+			gap: 0.35rem;
+		}
+
+		.badge {
+			padding: 0.25rem 0.5rem;
+			font-size: 0.7rem;
+			border-width: 0.5px;
+		}
+
+		.sign-content {
+			gap: 1.25rem;
+		}
+
+		.core-point-info,
+		.placement-info {
+			padding: 0.875rem;
+			border-width: 0.5px;
+		}
+
+		.core-point-role,
+		.placement-title {
+			font-size: 0.925rem;
+		}
+
+		.core-point-description,
+		.placement-description {
+			font-size: 0.875rem;
+			line-height: 1.5;
+		}
+
+		.keywords {
+			gap: 0.4rem;
+			margin-top: 0.65rem;
+			padding-top: 0.65rem;
+			border-top-width: 0.5px;
+		}
+
+		.keywords-label {
+			font-size: 0.75rem;
+		}
+
+		.keyword {
+			padding: 0.2rem 0.5rem;
+			font-size: 0.75rem;
+		}
+
+		.houses-result,
+		.planets-result {
+			padding: 1.25rem;
+			border-width: 0.5px;
+		}
+
+		.houses-result h2,
+		.planets-result h2 {
+			font-size: 1.1rem;
+			margin-bottom: 1rem;
+		}
+
+		.houses-grid {
+			gap: 0.875rem;
+		}
+
+		.house-item {
+			padding: 1rem;
+			border-width: 0.5px;
+		}
+
+		.house-header {
+			border-bottom-width: 0.5px;
+		}
+
+		.house-number,
+		.house-sign {
+			font-size: 0.8rem;
+			border-width: 0.5px;
+		}
+
+		.house-alias {
+			font-size: 0.925rem;
+		}
+
+		.house-description {
+			font-size: 0.8rem;
+		}
+
+		.planet-category {
+			padding: 1rem;
+			border-width: 0.5px;
+		}
+
+		.planet-category h3 {
+			font-size: 1rem;
+			margin-bottom: 1rem;
+		}
+
+		.planets-list {
+			gap: 1.25rem;
+		}
+
+		.planet-item {
+			padding: 0.875rem;
+			border-width: 0.5px;
+		}
+
+		.planet-header {
+			gap: 0.65rem;
+			margin-bottom: 0.65rem;
+			padding-bottom: 0.65rem;
+			border-bottom-width: 0.5px;
+		}
+
+		.planet-name {
+			font-size: 1rem;
+		}
+
+		.planet-sign,
+		.planet-house {
+			font-size: 0.825rem;
+			padding: 0.2rem 0.5rem;
+			border-width: 0.5px;
+		}
+
+		.planet-description {
+			font-size: 0.85rem;
+			line-height: 1.55;
+		}
+
+		.house-placement {
+			margin-top: 0.875rem;
+			padding-top: 0.875rem;
+			border-top-width: 0.5px;
+		}
+
+		.house-placement-title {
+			font-size: 0.85rem;
+		}
+
+		.house-placement-description {
+			font-size: 0.8rem;
+		}
+
+		.error {
+			margin-top: 1rem;
+			padding: 0.875rem;
+			font-size: 0.85rem;
+			border-width: 0.5px;
+		}
+
+		.suggestions {
+			border-width: 0.5px;
+		}
+
+		.suggestion-item {
+			padding: 0.65rem;
+			font-size: 0.9rem;
+			border-bottom-width: 0.5px;
 		}
 	}
 </style>
