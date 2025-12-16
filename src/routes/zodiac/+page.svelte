@@ -105,6 +105,11 @@
 	let isGeneratingPDF = $state(false);
 
 	let debounceTimer: ReturnType<typeof setTimeout> | null = null;
+	
+	// AI Analysis state
+	let aiAnalysis = $state<string | null>(null);
+	let isGeneratingAnalysis = $state(false);
+	let analysisError = $state<string | null>(null);
 
 	// Computed sign data for type safety
 	const sunSignData = $derived(sunSign ? getSignData(sunSign) : null);
@@ -428,6 +433,166 @@
 			console.error('Calculation error:', err);
 		} finally {
 			isLoading = false;
+		}
+	}
+
+	async function generateAnalysis() {
+		if (!sunSign || !moonSign || !ascendant || houses.length === 0 || !planets) {
+			analysisError = 'Please calculate your chart first.';
+			return;
+		}
+
+		isGeneratingAnalysis = true;
+		analysisError = null;
+		aiAnalysis = null;
+
+		try {
+			const formData = new FormData();
+			formData.append('fullName', fullName);
+			formData.append('lifeTrajectory', lifeTrajectory);
+			formData.append('birthDate', birthDate);
+			formData.append('birthTime', birthTime);
+			formData.append('placeName', selectedPlace?.display_name || '');
+			formData.append('sunSign', sunSign);
+			formData.append('moonSign', moonSign);
+			formData.append('ascendant', ascendant);
+			formData.append('houses', JSON.stringify(houses));
+			formData.append('planets', JSON.stringify(planets));
+			formData.append('utcYear', String(utcYear));
+			formData.append('utcMonth', String(utcMonth));
+			formData.append('utcDay', String(utcDay));
+			formData.append('utcHour', String(utcHour));
+			formData.append('utcMinute', String(utcMinute));
+
+			const response = await fetch('?/analyze', {
+				method: 'POST',
+				headers: {
+					accept: 'application/json'
+				},
+				body: formData
+			});
+
+			// Check if response is OK
+			if (!response.ok) {
+				const text = await response.text();
+				console.error('Response error:', response.status, text.substring(0, 200));
+				if (text.includes('Cross-site') || text.includes('CSRF')) {
+					throw new Error('CSRF protection error. Please refresh the page and try again.');
+				}
+				throw new Error(`Server error: ${response.status} ${response.statusText}`);
+			}
+
+			// Check content type before parsing JSON
+			const contentType = response.headers.get('content-type');
+			if (!contentType || !contentType.includes('application/json')) {
+				const text = await response.text();
+				console.error('Non-JSON response:', text.substring(0, 200));
+				throw new Error('Invalid response format from server. Please refresh and try again.');
+			}
+
+			const responseData = await response.json();
+			
+			// SvelteKit actions return data in a specific format using devalue serialization
+			// The data field is a JSON string that contains an array with references
+			let result;
+			if (typeof responseData.data === 'string') {
+				try {
+					const parsed = JSON.parse(responseData.data);
+					
+					// SvelteKit devalue format: [{"success":1,"analysis":2}, true, "analysis text"]
+					// where 1 and 2 are array indices pointing to the actual values
+					if (Array.isArray(parsed) && parsed.length >= 3 && parsed[0] && typeof parsed[0] === 'object') {
+						const refs = parsed[0];
+						// Check if this is a devalue reference map with numeric indices
+						if (typeof refs.success === 'number' && typeof refs.analysis === 'number') {
+							// Validate indices are within array bounds AND > 0 (never point to index 0, the reference map)
+							if (refs.success > 0 && refs.success < parsed.length && 
+							    refs.analysis > 0 && refs.analysis < parsed.length) {
+								// Reconstruct the actual result object from the references
+								result = {
+									success: parsed[refs.success],
+									analysis: parsed[refs.analysis]
+								};
+							} else {
+								// Invalid indices - this shouldn't happen, but handle gracefully
+								// Look for an actual result object in the array (not the reference map)
+								result = parsed.find((item, index) => 
+									index > 0 && // Skip index 0 (the reference map)
+									item && typeof item === 'object' && 
+									'success' in item && 'analysis' in item &&
+									typeof item.success === 'boolean' && typeof item.analysis === 'string'
+								);
+								if (!result) {
+									// Last resort: try to construct from array elements (skip index 0)
+									if (parsed.length > 1 && parsed.length > 2) {
+										result = { success: parsed[1], analysis: parsed[2] };
+									} else {
+										// Can't construct valid result - will be handled by error check below
+										result = null;
+									}
+								}
+							}
+						} else {
+							// Not a devalue reference map - parsed[0] might be the actual result
+							// Check if it has actual boolean/string values (not reference indices)
+							if (typeof refs.success === 'boolean' && typeof refs.analysis === 'string') {
+								result = refs;
+							} else {
+								// Look for actual result object elsewhere in the array (skip index 0)
+								result = parsed.find((item, index) => 
+									index > 0 && // Skip index 0 (might be reference map or invalid)
+									item && typeof item === 'object' && 
+									'success' in item && 'analysis' in item &&
+									typeof item.success === 'boolean' && typeof item.analysis === 'string'
+								);
+								// Don't fallback to parsed[0] - we've already determined it's invalid
+							}
+						}
+					} else if (Array.isArray(parsed) && parsed.length >= 2) {
+						// Alternative format: might be [result, ...]
+						// Look for an object with actual success/analysis values
+						result = parsed.find(item => 
+							item && typeof item === 'object' && 
+							'success' in item && 'analysis' in item &&
+							typeof item.success === 'boolean' && typeof item.analysis === 'string'
+						);
+						// Don't fallback to parsed[0] - if no valid result found, result will be undefined
+						// and will be handled by the error check below
+					} else {
+						result = parsed;
+					}
+				} catch (e) {
+					console.error('Error parsing response data:', e);
+					result = responseData.data;
+				}
+			} else {
+				result = responseData.data || responseData;
+			}
+
+			// Handle the result
+			if (result && result.success === true && result.analysis && typeof result.analysis === 'string') {
+				aiAnalysis = result.analysis;
+			} else if (result && result.success === false) {
+				analysisError = result.error || 'Failed to generate analysis. Please check your PERPLEXITY_API_KEY in .env file.';
+			} else {
+				// Debug: log what we got
+				console.error('Unexpected response format:', {
+					result,
+					type: typeof result,
+					keys: result ? Object.keys(result) : null,
+					hasSuccess: result && 'success' in result,
+					hasAnalysis: result && 'analysis' in result,
+					successValue: result && result.success,
+					analysisValue: result && result.analysis,
+					analysisType: result && result.analysis ? typeof result.analysis : 'none'
+				});
+				analysisError = 'Failed to generate analysis. Unexpected response format.';
+			}
+		} catch (err) {
+			console.error('Error generating analysis:', err);
+			analysisError = err instanceof Error ? err.message : 'Failed to generate analysis.';
+		} finally {
+			isGeneratingAnalysis = false;
 		}
 	}
 
@@ -935,7 +1100,18 @@
 		{/if}
 
 		{#if sunSign && ascendant && moonSign && houses.length > 0}
-			<Chart {sunSign} {ascendant} {moonSign} {houses} />
+			<Chart 
+				{sunSign} 
+				{ascendant} 
+				{moonSign} 
+				{houses} 
+				{planets}
+				{utcYear}
+				{utcMonth}
+				{utcDay}
+				{utcHour}
+				{utcMinute}
+			/>
 		{/if}
 
 		{#if houses.length > 0}
@@ -1158,6 +1334,60 @@
 						</div>
 					</div>
 				</div>
+			</div>
+		{/if}
+
+		<!-- AI Analysis Section -->
+		{#if sunSign && moonSign && ascendant && houses.length > 0 && planets}
+			<div class="analysis-section">
+				<h2>Mystical Astrological Analysis</h2>
+				<p class="analysis-description">
+					Get a deeper interpretation of this chart with an analysis of planets and houses.
+				</p>
+				
+				{#if !aiAnalysis && !isGeneratingAnalysis}
+					<button 
+						type="button" 
+						class="analyze-button"
+						onclick={generateAnalysis}
+					>
+						✨ Get Analysis Results
+					</button>
+				{/if}
+
+				{#if isGeneratingAnalysis}
+					<div class="analysis-loading">
+						<div class="spinner"></div>
+						<p>Analysing...</p>
+					</div>
+				{/if}
+
+				{#if analysisError}
+					<div class="analysis-error">
+						<p>{analysisError}</p>
+						{#if analysisError.includes('PERPLEXITY_API_KEY')}
+							<p class="env-hint">
+								To enable AI analysis, create a <code>.env</code> file in the project root and add:<br>
+								<code>PERPLEXITY_API_KEY=your_api_key_here</code>
+							</p>
+						{/if}
+					</div>
+				{/if}
+
+				{#if aiAnalysis}
+					<div class="analysis-result">
+						<div class="analysis-content">
+							{@html aiAnalysis.split('\n').map(para => para.trim() ? `<p>${para}</p>` : '').join('')}
+						</div>
+						<button 
+							type="button" 
+							class="regenerate-button"
+							onclick={generateAnalysis}
+						>
+							🔄 Regenerate Analysis
+						</button>
+					</div>
+				{/if}
 			</div>
 		{/if}
 	</div>
@@ -1734,6 +1964,142 @@
 		font-size: 0.85rem;
 		line-height: 1.5;
 		color: var(--color-text-muted);
+	}
+
+	.analysis-section {
+		margin-top: 3rem;
+		padding: 2rem;
+		background: var(--color-bg-1);
+		border: 1px solid var(--color-border);
+		border-radius: 8px;
+	}
+
+	.analysis-section h2 {
+		font-size: 1.5rem;
+		font-weight: 600;
+		margin: 0 0 1rem 0;
+		color: var(--color-text);
+		text-align: center;
+	}
+
+	.analysis-description {
+		text-align: center;
+		color: var(--color-text-muted);
+		margin: 0 0 1.5rem 0;
+		font-size: 0.95rem;
+	}
+
+	.analyze-button,
+	.regenerate-button {
+		display: block;
+		margin: 0 auto;
+		padding: 1rem 2rem;
+		font-size: 1rem;
+		font-weight: 600;
+		color: var(--color-bg-1);
+		background: var(--color-theme-1);
+		border: none;
+		border-radius: 8px;
+		cursor: pointer;
+		transition: all 0.2s ease;
+	}
+
+	.analyze-button:hover,
+	.regenerate-button:hover {
+		transform: translateY(-2px);
+		box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+	}
+
+	.analyze-button:active,
+	.regenerate-button:active {
+		transform: translateY(0);
+	}
+
+	.analysis-loading {
+		text-align: center;
+		padding: 2rem;
+	}
+
+	.spinner {
+		width: 40px;
+		height: 40px;
+		border: 4px solid var(--color-border);
+		border-top-color: var(--color-theme-1);
+		border-radius: 50%;
+		animation: spin 1s linear infinite;
+		margin: 0 auto 1rem;
+	}
+
+	@keyframes spin {
+		to {
+			transform: rotate(360deg);
+		}
+	}
+
+	.analysis-loading p {
+		color: var(--color-text-muted);
+		font-style: italic;
+	}
+
+	.analysis-error {
+		padding: 1.5rem;
+		background: rgba(220, 53, 69, 0.1);
+		border: 1px solid rgba(220, 53, 69, 0.3);
+		border-radius: 8px;
+		color: var(--color-text);
+		text-align: center;
+	}
+
+	.analysis-error p {
+		margin: 0.5rem 0;
+	}
+
+	.env-hint {
+		margin-top: 1rem;
+		padding: 1rem;
+		background: var(--color-bg-2);
+		border-radius: 4px;
+		font-size: 0.85rem;
+		text-align: left;
+	}
+
+	.env-hint code {
+		background: var(--color-bg-1);
+		padding: 0.25rem 0.5rem;
+		border-radius: 4px;
+		font-family: 'Fira Mono', monospace;
+	}
+
+	.analysis-result {
+		margin-top: 2rem;
+	}
+
+	.analysis-content {
+		background: var(--color-bg-2);
+		border: 1px solid var(--color-border);
+		border-radius: 8px;
+		padding: 2rem;
+		line-height: 1.8;
+		color: var(--color-text);
+		font-size: 1rem;
+	}
+
+	:global(.analysis-content p) {
+		margin: 1rem 0;
+	}
+
+	:global(.analysis-content p:first-child) {
+		margin-top: 0;
+	}
+
+	:global(.analysis-content p:last-child) {
+		margin-bottom: 0;
+	}
+
+	.regenerate-button {
+		margin-top: 1.5rem;
+		padding: 0.75rem 1.5rem;
+		font-size: 0.9rem;
 	}
 
 	@media (max-width: 640px) {

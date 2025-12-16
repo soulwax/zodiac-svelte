@@ -7,9 +7,10 @@ const config = {
 	// for more information about preprocessors
 	preprocess: vitePreprocess(),
 	kit: {
-		// adapter-node creates a Node.js server that can be run with PM2
-		// See https://svelte.dev/docs/kit/adapters for more information about adapters.
-		adapter: adapter()
+		// adapter-node creates a standalone Node.js server that can be run with PM2
+		adapter: adapter({
+			out: 'build'
+		})
 	}
 };
 
