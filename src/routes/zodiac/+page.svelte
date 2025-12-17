@@ -739,7 +739,6 @@
 			doc.setFont('times', 'bold');
 			doc.setTextColor(...colors.deepPurple);
 			const titleText = 'Astrological Chart';
-			const titleWidth = doc.getTextWidth(titleText);
 			const centerX = pageWidth / 2;
 			doc.text(titleText, centerX, yPos, { align: 'center' });
 			yPos += 8;
