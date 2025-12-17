@@ -784,16 +784,18 @@
 					const ctx = canvas.getContext('2d');
 					const img = new Image();
 
-					// Wait for image to load
+					// Wait for image to load - use high resolution for print quality
 					await new Promise<void>((resolve, reject) => {
 						img.onload = () => {
-							canvas.width = 600;
-							canvas.height = 600;
+							// High resolution canvas for crisp PDF output
+							canvas.width = 2400;
+							canvas.height = 2400;
 							if (ctx) {
 								// White background
 								ctx.fillStyle = '#ffffff';
 								ctx.fillRect(0, 0, canvas.width, canvas.height);
-								ctx.drawImage(img, 0, 0);
+								// Draw SVG at high resolution
+								ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 							}
 							resolve();
 						};
