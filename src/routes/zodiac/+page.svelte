@@ -666,7 +666,54 @@
 			addText(`Birth Time: ${normalizedTime || birthTime}${timezoneName ? ` (${timezoneName}${isDST !== null ? ', ' + (isDST ? 'Daylight Saving Time' : 'Standard Time') : ''})` : ''}`, 11);
 			addText(`Birth Place: ${selectedPlace.display_name}`, 11);
 			if (lifeTrajectory) addText(`Life Trajectory: ${lifeTrajectory}`, 11);
-			yPos += 5;
+			yPos += 10;
+
+			// Add Celestial Chart Visualization
+			try {
+				const chartSvg = document.querySelector('.chart-svg');
+				if (chartSvg) {
+					// Convert SVG to canvas
+					const svgData = new XMLSerializer().serializeToString(chartSvg);
+					const canvas = document.createElement('canvas');
+					const ctx = canvas.getContext('2d');
+					const img = new Image();
+
+					// Wait for image to load
+					await new Promise<void>((resolve, reject) => {
+						img.onload = () => {
+							canvas.width = 600;
+							canvas.height = 600;
+							if (ctx) {
+								// White background
+								ctx.fillStyle = '#ffffff';
+								ctx.fillRect(0, 0, canvas.width, canvas.height);
+								ctx.drawImage(img, 0, 0);
+							}
+							resolve();
+						};
+						img.onerror = reject;
+						img.src = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgData)));
+					});
+
+					// Add chart to PDF
+					const imgData = canvas.toDataURL('image/png');
+					const chartWidth = 160; // Fit within page width
+					const chartHeight = 160;
+					const chartX = (pageWidth - chartWidth) / 2; // Center it
+
+					if (yPos + chartHeight > pageHeight - margin) {
+						doc.addPage();
+						yPos = margin;
+					}
+
+					addText('Celestial Chart', 14, true, [51, 51, 153]);
+					doc.addImage(imgData, 'PNG', chartX, yPos, chartWidth, chartHeight);
+					yPos += chartHeight + 10;
+				}
+			} catch (chartErr: unknown) {
+				console.warn('Could not add chart to PDF:', chartErr);
+				// Continue without chart if there's an error
+			}
 
 			// Core Signs
 			addText('Core Astrological Signs', 14, true, [51, 51, 153]);
