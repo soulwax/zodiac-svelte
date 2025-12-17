@@ -697,9 +697,9 @@
 
 					// Add chart to PDF
 					const imgData = canvas.toDataURL('image/png');
-					const chartWidth = 160; // Fit within page width
-					const chartHeight = 160;
-					const chartX = (pageWidth - chartWidth) / 2; // Center it
+					const chartWidth = maxWidth; // Fill page width
+					const chartHeight = maxWidth; // Keep square aspect ratio
+					const chartX = margin; // Align to margin
 
 					if (yPos + chartHeight > pageHeight - margin) {
 						doc.addPage();
