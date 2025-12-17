@@ -20,6 +20,19 @@
 
 	let { data }: { data: PageData } = $props();
 
+	// Type definitions for planet data structures
+	type PlanetSignData = {
+		keywords: string[];
+		description: string;
+	};
+
+	// type PlanetWithEntries = {
+	// 	generic_formula: string;
+	// 	entries: Record<string, string>;
+	// };
+
+	// type PlanetDataRecord = Record<string, PlanetSignData>;
+
 	// Helper function to convert ZodiacSign to lowercase key
 	function getSignKey(sign: ZodiacSign | null): string {
 		if (!sign) return '';
@@ -139,22 +152,12 @@
 				signData &&
 				typeof signData === 'object' &&
 				signData !== null &&
-				'description' in signData &&
-				Array.isArray((signData as any).keywords)
-			) {
-				return {
-					keywords: (signData as { keywords: string[] }).keywords,
-					description: (signData as { description: string }).description
-				};
-			} else if (
-				signData &&
-				typeof signData === 'object' &&
-				signData !== null &&
 				'description' in signData
 			) {
+				const typedSignData = signData as PlanetSignData;
 				return {
-					keywords: [],
-					description: (signData as { description: string }).description
+					keywords: typedSignData.keywords || [],
+					description: typedSignData.description
 				};
 			}
 		}
@@ -212,6 +215,8 @@
 		moonSign = null;
 		houses = [];
 		planets = null;
+		aiAnalysis = null;
+		analysisError = null;
 
 		if (!birthDate || !birthTime || !selectedPlace) {
 			error = 'Please fill in all fields and select a place from the suggestions.';
@@ -236,8 +241,8 @@
 			let timezone: string | null = null;
 			try {
 				timezone = await getTimezoneFromCoords(lat, lon);
-			} catch (err) {
-				console.warn('Could not fetch timezone, using local timezone');
+			} catch (err: unknown) {
+				console.warn(`Failed to get timezone for coordinates (${lat}, ${lon}):`, err);
 			}
 
 			// Interpret the user's input as local time in the birth place's timezone
@@ -427,7 +432,7 @@
 				// Don't fail the calculation if saving fails
 				console.warn('Error saving zodiac result:', saveError);
 			}
-		} catch (err) {
+		} catch (err: unknown) {
 			error = err instanceof Error ? err.message : 'An error occurred while calculating your sun sign.';
 			console.error('Calculation error:', err);
 		} finally {
@@ -560,7 +565,7 @@
 					} else {
 						result = parsed;
 					}
-				} catch (e) {
+				} catch (e: unknown) {
 					console.error('Error parsing response data:', e);
 					result = responseData.data;
 				}
@@ -587,7 +592,7 @@
 				});
 				analysisError = 'Failed to generate analysis. Unexpected response format.';
 			}
-		} catch (err) {
+		} catch (err: unknown) {
 			console.error('Error generating analysis:', err);
 			analysisError = err instanceof Error ? err.message : 'Failed to generate analysis.';
 		} finally {
@@ -733,7 +738,7 @@
 				: `Astrology_Chart_${birthDate}.pdf`;
 			doc.save(fileName);
 
-		} catch (err) {
+		} catch (err: unknown) {
 			error = err instanceof Error ? err.message : 'An error occurred while generating the PDF.';
 			console.error('PDF generation error:', err);
 		} finally {
@@ -833,7 +838,7 @@
 				/>
 				{#if showSuggestions && suggestions.length > 0}
 					<ul class="suggestions">
-						{#each suggestions as suggestion}
+						{#each suggestions as suggestion (suggestion.lat + '-' + suggestion.lon)}
 							<!-- svelte-ignore a11y_click_events_have_key_events -->
 							<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
 							<li onclick={() => selectPlace(suggestion)} class="suggestion-item">
@@ -916,7 +921,7 @@
 									{#if getCorePointKeywords('sun').length > 0}
 										<div class="keywords">
 											<span class="keywords-label">Keywords:</span>
-											{#each getCorePointKeywords('sun') as keyword}
+											{#each getCorePointKeywords('sun') as keyword (keyword)}
 												<span class="keyword">{keyword}</span>
 											{/each}
 										</div>
@@ -930,7 +935,7 @@
 									{#if getSignKeywords(sunSign, 'sun').length > 0}
 										<div class="keywords">
 											<span class="keywords-label">Keywords:</span>
-											{#each getSignKeywords(sunSign, 'sun') as keyword}
+											{#each getSignKeywords(sunSign, 'sun') as keyword (keyword)}
 												<span class="keyword">{keyword}</span>
 											{/each}
 										</div>
@@ -972,7 +977,7 @@
 									{#if getCorePointKeywords('moon').length > 0}
 										<div class="keywords">
 											<span class="keywords-label">Keywords:</span>
-											{#each getCorePointKeywords('moon') as keyword}
+											{#each getCorePointKeywords('moon') as keyword (keyword)}
 												<span class="keyword">{keyword}</span>
 											{/each}
 										</div>
@@ -986,7 +991,7 @@
 									{#if getSignKeywords(moonSign, 'moon').length > 0}
 										<div class="keywords">
 											<span class="keywords-label">Keywords:</span>
-											{#each getSignKeywords(moonSign, 'moon') as keyword}
+											{#each getSignKeywords(moonSign, 'moon') as keyword (keyword)}
 												<span class="keyword">{keyword}</span>
 											{/each}
 										</div>
@@ -1030,7 +1035,7 @@
 									{#if getCorePointKeywords('ascendant').length > 0}
 										<div class="keywords">
 											<span class="keywords-label">Keywords:</span>
-											{#each getCorePointKeywords('ascendant') as keyword}
+											{#each getCorePointKeywords('ascendant') as keyword (keyword)}
 												<span class="keyword">{keyword}</span>
 											{/each}
 										</div>
@@ -1044,7 +1049,7 @@
 									{#if getSignKeywords(ascendant, 'ascendant').length > 0}
 										<div class="keywords">
 											<span class="keywords-label">Keywords:</span>
-											{#each getSignKeywords(ascendant, 'ascendant') as keyword}
+											{#each getSignKeywords(ascendant, 'ascendant') as keyword (keyword)}
 												<span class="keyword">{keyword}</span>
 											{/each}
 										</div>
@@ -1076,7 +1081,7 @@
 			<div class="houses-result">
 				<h2>Your Astrological Houses</h2>
 				<div class="houses-grid">
-					{#each houses as house}
+					{#each houses as house (house.number)}
 						{@const houseInfo = getHouseInfo(house.number)}
 						<div class="house-item">
 							<div class="house-header">
@@ -1089,7 +1094,7 @@
 								{#if houseInfo.keywords && houseInfo.keywords.length > 0}
 									<div class="keywords">
 										<span class="keywords-label">Keywords:</span>
-										{#each houseInfo.keywords as keyword}
+										{#each houseInfo.keywords as keyword (keyword)}
 											<span class="keyword">{keyword}</span>
 										{/each}
 									</div>
@@ -1126,7 +1131,7 @@
 										{#if planetDesc.keywords && planetDesc.keywords.length > 0}
 											<div class="keywords">
 												<span class="keywords-label">Keywords:</span>
-												{#each planetDesc.keywords as keyword}
+												{#each planetDesc.keywords as keyword (keyword)}
 													<span class="keyword">{keyword}</span>
 												{/each}
 											</div>
@@ -1151,7 +1156,7 @@
 										{#if planetDesc.keywords && planetDesc.keywords.length > 0}
 											<div class="keywords">
 												<span class="keywords-label">Keywords:</span>
-												{#each planetDesc.keywords as keyword}
+												{#each planetDesc.keywords as keyword (keyword)}
 													<span class="keyword">{keyword}</span>
 												{/each}
 											</div>
@@ -1176,7 +1181,7 @@
 										{#if planetDesc.keywords && planetDesc.keywords.length > 0}
 											<div class="keywords">
 												<span class="keywords-label">Keywords:</span>
-												{#each planetDesc.keywords as keyword}
+												{#each planetDesc.keywords as keyword (keyword)}
 													<span class="keyword">{keyword}</span>
 												{/each}
 											</div>
@@ -1335,7 +1340,11 @@
 				{#if aiAnalysis}
 					<div class="analysis-result">
 						<div class="analysis-content">
-							{@html aiAnalysis.split('\n').map(para => para.trim() ? `<p>${para}</p>` : '').join('')}
+							{#each aiAnalysis.split('\n') as paragraph, index (index)}
+								{#if paragraph.trim()}
+									<p>{paragraph}</p>
+								{/if}
+							{/each}
 						</div>
 						<button 
 							type="button" 
