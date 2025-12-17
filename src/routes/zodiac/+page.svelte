@@ -637,17 +637,67 @@
 			const maxWidth = pageWidth - (margin * 2);
 			let yPos = margin;
 
+			// Color palette - Mystical celestial theme
+			const colors = {
+				deepPurple: [45, 20, 70] as [number, number, number],
+				gold: [184, 134, 11] as [number, number, number],
+				navy: [25, 25, 112] as [number, number, number],
+				silver: [192, 192, 192] as [number, number, number],
+				mysticPurple: [75, 0, 130] as [number, number, number],
+				darkText: [20, 20, 40] as [number, number, number],
+				accent: [138, 43, 226] as [number, number, number]
+			};
+
+			// Helper function to draw decorative border on page
+			const drawPageBorder = () => {
+				// Outer border with double lines
+				doc.setDrawColor(...colors.gold);
+				doc.setLineWidth(0.5);
+				doc.rect(10, 10, pageWidth - 20, pageHeight - 20);
+				doc.setLineWidth(0.3);
+				doc.rect(12, 12, pageWidth - 24, pageHeight - 24);
+
+				// Corner stars
+				doc.setFontSize(16);
+				doc.setTextColor(...colors.gold);
+				doc.setFont('times', 'normal');
+				doc.text('✦', 8, 12);
+				doc.text('✦', pageWidth - 12, 12);
+				doc.text('✦', 8, pageHeight - 8);
+				doc.text('✦', pageWidth - 12, pageHeight - 8);
+			};
+
+			// Helper function to add ornamental divider
+			const addDivider = () => {
+				const centerX = pageWidth / 2;
+				doc.setDrawColor(...colors.silver);
+				doc.setLineWidth(0.3);
+
+				// Left line
+				doc.line(margin + 10, yPos, centerX - 15, yPos);
+				// Right line
+				doc.line(centerX + 15, yPos, pageWidth - margin - 10, yPos);
+
+				// Center ornament
+				doc.setFontSize(10);
+				doc.setTextColor(...colors.gold);
+				doc.text('✧ ⋆ ✧', centerX, yPos + 1, { align: 'center' });
+
+				yPos += 8;
+			};
+
 			// Helper function to add text with wrapping
-			const addText = (text: string, fontSize: number = 11, isBold: boolean = false, color: [number, number, number] = [0, 0, 0]) => {
+			const addText = (text: string, fontSize: number = 11, isBold: boolean = false, color: [number, number, number] = colors.darkText, font: string = 'times') => {
 				doc.setFontSize(fontSize);
-				doc.setFont('helvetica', isBold ? 'bold' : 'normal');
+				doc.setFont(font, isBold ? 'bold' : 'normal');
 				doc.setTextColor(color[0], color[1], color[2]);
 
 				const lines = doc.splitTextToSize(text, maxWidth);
 				for (const line of lines) {
-					if (yPos > pageHeight - margin) {
+					if (yPos > pageHeight - margin - 5) {
 						doc.addPage();
-						yPos = margin;
+						drawPageBorder();
+						yPos = margin + 5;
 					}
 					doc.text(line, margin, yPos);
 					yPos += fontSize * 0.5;
@@ -655,18 +705,74 @@
 				yPos += 5;
 			};
 
-			// Title
-			addText('Astrological Chart Report', 20, true, [0, 51, 102]);
-			yPos += 5;
+			// Helper function for section headers
+			const addSectionHeader = (text: string, symbol: string = '✦') => {
+				if (yPos > pageHeight - margin - 20) {
+					doc.addPage();
+					drawPageBorder();
+					yPos = margin + 5;
+				}
+
+				const centerX = pageWidth / 2;
+				doc.setFontSize(16);
+				doc.setFont('times', 'bold');
+				doc.setTextColor(...colors.navy);
+
+				// Add decorative symbols
+				doc.setTextColor(...colors.gold);
+				doc.text(symbol, centerX - doc.getTextWidth(text) / 2 - 8, yPos);
+				doc.text(symbol, centerX + doc.getTextWidth(text) / 2 + 5, yPos);
+
+				// Add section title
+				doc.setTextColor(...colors.navy);
+				doc.text(text, centerX, yPos, { align: 'center' });
+
+				yPos += 10;
+			};
+
+			// Draw first page border
+			drawPageBorder();
+			yPos = margin + 10;
+
+			// Title with celestial decoration
+			doc.setFontSize(24);
+			doc.setFont('times', 'bold');
+			doc.setTextColor(...colors.deepPurple);
+			const titleText = 'Astrological Chart';
+			const titleWidth = doc.getTextWidth(titleText);
+			const centerX = pageWidth / 2;
+			doc.text(titleText, centerX, yPos, { align: 'center' });
+			yPos += 8;
+
+			doc.setFontSize(18);
+			doc.setFont('times', 'italic');
+			doc.setTextColor(...colors.mysticPurple);
+			doc.text('Celestial Blueprint', centerX, yPos, { align: 'center' });
+			yPos += 10;
+
+			// Decorative stars under title
+			doc.setFontSize(12);
+			doc.setTextColor(...colors.gold);
+			doc.text('✧ ⋆ ✦ ⋆ ✧', centerX, yPos, { align: 'center' });
+			yPos += 12;
+
+			addDivider();
 
 			// Birth Information
-			addText('Birth Information', 14, true, [51, 51, 153]);
-			if (fullName) addText(`Name: ${fullName}`, 11);
-			addText(`Birth Date: ${birthDate}`, 11);
-			addText(`Birth Time: ${normalizedTime || birthTime}${timezoneName ? ` (${timezoneName}${isDST !== null ? ', ' + (isDST ? 'Daylight Saving Time' : 'Standard Time') : ''})` : ''}`, 11);
-			addText(`Birth Place: ${selectedPlace.display_name}`, 11);
-			if (lifeTrajectory) addText(`Life Trajectory: ${lifeTrajectory}`, 11);
-			yPos += 10;
+			addSectionHeader('Birth Information', '☾');
+			if (fullName) {
+				doc.setFont('times', 'italic');
+				doc.setTextColor(...colors.navy);
+				addText(`${fullName}`, 13, false, colors.navy);
+			}
+			addText(`Born: ${birthDate}`, 11, false, colors.darkText);
+			addText(`Time: ${normalizedTime || birthTime}${timezoneName ? ` (${timezoneName}${isDST !== null ? ', ' + (isDST ? 'DST' : 'Standard') : ''})` : ''}`, 11, false, colors.darkText);
+			addText(`Location: ${selectedPlace.display_name}`, 11, false, colors.darkText);
+			if (lifeTrajectory) {
+				addText(`Life Path: ${lifeTrajectory}`, 11, true, colors.accent);
+			}
+			yPos += 8;
+			addDivider();
 
 			// Add Celestial Chart Visualization
 			try {
@@ -701,14 +807,23 @@
 					const chartHeight = maxWidth; // Keep square aspect ratio
 					const chartX = margin; // Align to margin
 
-					if (yPos + chartHeight > pageHeight - margin) {
+					if (yPos + chartHeight > pageHeight - margin - 25) {
 						doc.addPage();
-						yPos = margin;
+						drawPageBorder();
+						yPos = margin + 5;
 					}
 
-					addText('Celestial Chart', 14, true, [51, 51, 153]);
+					addSectionHeader('Celestial Chart', '✦');
+					yPos += 5;
+
+					// Add decorative frame around chart
+					doc.setDrawColor(...colors.gold);
+					doc.setLineWidth(0.8);
+					doc.rect(chartX - 2, yPos - 2, chartWidth + 4, chartHeight + 4);
+
 					doc.addImage(imgData, 'PNG', chartX, yPos, chartWidth, chartHeight);
-					yPos += chartHeight + 10;
+					yPos += chartHeight + 12;
+					addDivider();
 				}
 			} catch (chartErr: unknown) {
 				console.warn('Could not add chart to PDF:', chartErr);
@@ -716,68 +831,121 @@
 			}
 
 			// Core Signs
-			addText('Core Astrological Signs', 14, true, [51, 51, 153]);
-			addText(`Sun Sign: ${sunSign}`, 12, true);
+			addSectionHeader('The Trinity of Self', '☉');
+
+			// Sun Sign
+			doc.setFontSize(13);
+			doc.setFont('times', 'bold');
+			doc.setTextColor(...colors.gold);
+			addText(`☉ Sun Sign: ${sunSign}`, 13, true, colors.gold);
 			if (sunSignData) {
-				addText(`Element: ${sunSignData.element}, Modality: ${sunSignData.modality}, Ruled by: ${sunSignData.ruler}`, 10);
-				addText(getSignDescription(sunSign, 'sun'), 10);
-			}
-			yPos += 3;
-
-			addText(`Moon Sign: ${moonSign}`, 12, true);
-			if (moonSignData) {
-				addText(`Element: ${moonSignData.element}, Modality: ${moonSignData.modality}, Ruled by: ${moonSignData.ruler}`, 10);
-				addText(getSignDescription(moonSign, 'moon'), 10);
-			}
-			yPos += 3;
-
-			addText(`Ascendant (Rising): ${ascendant}`, 12, true);
-			if (ascendantSignData) {
-				addText(`Element: ${ascendantSignData.element}, Modality: ${ascendantSignData.modality}, Ruled by: ${ascendantSignData.ruler}`, 10);
-				addText(getSignDescription(ascendant, 'ascendant'), 10);
+				doc.setFont('times', 'italic');
+				addText(`${sunSignData.element} • ${sunSignData.modality} • Ruled by ${sunSignData.ruler}`, 10, false, colors.silver);
+				addText(getSignDescription(sunSign, 'sun'), 10, false, colors.darkText);
 			}
 			yPos += 5;
 
+			// Moon Sign
+			doc.setFont('times', 'bold');
+			addText(`☽ Moon Sign: ${moonSign}`, 13, true, colors.mysticPurple);
+			if (moonSignData) {
+				doc.setFont('times', 'italic');
+				addText(`${moonSignData.element} • ${moonSignData.modality} • Ruled by ${moonSignData.ruler}`, 10, false, colors.silver);
+				addText(getSignDescription(moonSign, 'moon'), 10, false, colors.darkText);
+			}
+			yPos += 5;
+
+			// Ascendant
+			doc.setFont('times', 'bold');
+			addText(`⇑ Ascendant (Rising): ${ascendant}`, 13, true, colors.navy);
+			if (ascendantSignData) {
+				doc.setFont('times', 'italic');
+				addText(`${ascendantSignData.element} • ${ascendantSignData.modality} • Ruled by ${ascendantSignData.ruler}`, 10, false, colors.silver);
+				addText(getSignDescription(ascendant, 'ascendant'), 10, false, colors.darkText);
+			}
+			yPos += 8;
+			addDivider();
+
 			// Planetary Positions
 			if (planets) {
-				addText('Planetary Positions', 14, true, [51, 51, 153]);
+				addSectionHeader('Planetary Positions', '★');
+
+				const planetSymbols: Record<string, string> = {
+					mercury: '☿',
+					venus: '♀',
+					mars: '♂',
+					jupiter: '♃',
+					saturn: '♄',
+					uranus: '♅',
+					neptune: '♆',
+					pluto: '♇'
+				};
+
 				const planetOrder = ['mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune', 'pluto'];
 				for (const planetName of planetOrder) {
 					if (planets[planetName as keyof typeof planets]) {
 						const planetSign = planets[planetName as keyof typeof planets];
 						const planetLon = getPlanetLongitude(planetSign!, utcYear, utcMonth, utcDay, planetName.charAt(0).toUpperCase() + planetName.slice(1), utcHour, utcMinute);
 						const planetHouse = getPlanetHouse(planetLon, houses);
-						addText(`${planetName.charAt(0).toUpperCase() + planetName.slice(1)} in ${planetSign}${planetHouse ? ` (House ${planetHouse})` : ''}`, 11, true);
+						const symbol = planetSymbols[planetName] || '●';
+
+						doc.setFont('times', 'bold');
+						addText(`${symbol} ${planetName.charAt(0).toUpperCase() + planetName.slice(1)} in ${planetSign}${planetHouse ? ` • House ${planetHouse}` : ''}`, 11, true, colors.navy);
+
 						const planetDesc = getPlanetDescription(planetName, planetSign!);
 						if (planetDesc?.description) {
-							addText(planetDesc.description, 10);
+							addText(planetDesc.description, 10, false, colors.darkText);
 						}
-						yPos += 2;
+						yPos += 4;
 					}
 				}
 				yPos += 5;
+				addDivider();
 			}
 
 			// Houses
 			if (houses.length > 0) {
-				addText('Astrological Houses', 14, true, [51, 51, 153]);
+				addSectionHeader('The Twelve Houses', '⌂');
+
 				for (const house of houses) {
 					const houseInfo = getHouseInfo(house.number);
 					if (houseInfo) {
-						addText(`House ${house.number} (${houseInfo.alias}) in ${house.sign}`, 11, true);
-						addText(houseInfo.description, 10);
-						yPos += 2;
+						doc.setFont('times', 'bold');
+						addText(`House ${house.number} • ${houseInfo.alias} in ${house.sign}`, 11, true, colors.accent);
+						addText(houseInfo.description, 10, false, colors.darkText);
+						yPos += 4;
 					}
 				}
-				yPos += 5;
 			}
 
-			// AI Assessment
+			// AI Assessment - New decorated page
 			doc.addPage();
-			yPos = margin;
-			addText('Mystical Astrological Analysis', 16, true, [102, 0, 102]);
+			drawPageBorder();
+			yPos = margin + 10;
+
+			// Mystical header
+			doc.setFontSize(20);
+			doc.setFont('times', 'bold');
+			doc.setTextColor(...colors.deepPurple);
+			doc.text('Mystical Analysis', centerX, yPos, { align: 'center' });
+			yPos += 8;
+
+			doc.setFontSize(14);
+			doc.setFont('times', 'italic');
+			doc.setTextColor(...colors.mysticPurple);
+			doc.text('An Interpretation of Your Celestial Blueprint', centerX, yPos, { align: 'center' });
+			yPos += 8;
+
+			// Decorative stars
+			doc.setFontSize(10);
+			doc.setTextColor(...colors.gold);
+			doc.text('✧ ⋆ ✦ ⋆ ✧', centerX, yPos, { align: 'center' });
+			yPos += 10;
+
+			addDivider();
 			yPos += 5;
-			addText(analysis, 10);
+
+			addText(analysis, 10, false, colors.darkText);
 
 			// Save the PDF
 			const fileName = fullName
