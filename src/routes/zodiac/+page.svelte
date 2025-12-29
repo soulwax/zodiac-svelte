@@ -440,6 +440,42 @@
 		}
 	}
 
+	async function pollJobStatus(jobId: string) {
+		const maxAttempts = 120; // 120 attempts * 2.5 seconds = 5 minutes max
+		let attempts = 0;
+
+		while (attempts < maxAttempts) {
+			try {
+				const response = await fetch(`/api/analyze/status/${jobId}`);
+
+				if (!response.ok) {
+					throw new Error('Failed to check job status');
+				}
+
+				const data = await response.json();
+
+				if (data.status === 'completed') {
+					if (data.result) {
+						aiAnalysis = data.result;
+					} else {
+						throw new Error('Analysis completed but no result returned');
+					}
+					return;
+				} else if (data.status === 'failed') {
+					throw new Error(data.error || 'Analysis failed');
+				}
+
+				// Still pending or processing, wait and try again
+				await new Promise(resolve => setTimeout(resolve, 2500));
+				attempts++;
+			} catch (err) {
+				throw err;
+			}
+		}
+
+		throw new Error('Analysis timed out after 5 minutes');
+	}
+
 	async function generateAnalysis() {
 		if (!sunSign || !moonSign || !ascendant || houses.length === 0 || !planets) {
 			analysisError = 'Please calculate your chart first.';
@@ -468,6 +504,7 @@
 			formData.append('utcHour', String(utcHour));
 			formData.append('utcMinute', String(utcMinute));
 
+			// Call analyze action to start async job
 			const response = await fetch('?/analyze', {
 				method: 'POST',
 				headers: {
@@ -476,122 +513,46 @@
 				body: formData
 			});
 
-			// Check if response is OK
 			if (!response.ok) {
 				const text = await response.text();
 				console.error('Response error:', response.status, text.substring(0, 200));
-				if (text.includes('Cross-site') || text.includes('CSRF')) {
-					throw new Error('CSRF protection error. Please refresh the page and try again.');
-				}
 				throw new Error(`Server error: ${response.status} ${response.statusText}`);
 			}
 
-			// Check content type before parsing JSON
-			const contentType = response.headers.get('content-type');
-			if (!contentType || !contentType.includes('application/json')) {
-				const text = await response.text();
-				console.error('Non-JSON response:', text.substring(0, 200));
-				throw new Error('Invalid response format from server. Please refresh and try again.');
-			}
-
 			const responseData = await response.json();
-			
-			// SvelteKit actions return data in a specific format using devalue serialization
-			// The data field is a JSON string that contains an array with references
+
+			// Extract result from SvelteKit action response
 			let result;
 			if (typeof responseData.data === 'string') {
 				try {
 					const parsed = JSON.parse(responseData.data);
-					
-					// SvelteKit devalue format: [{"success":1,"analysis":2}, true, "analysis text"]
-					// where 1 and 2 are array indices pointing to the actual values
-					if (Array.isArray(parsed) && parsed.length >= 3 && parsed[0] && typeof parsed[0] === 'object') {
+					if (Array.isArray(parsed) && parsed[0] && typeof parsed[0] === 'object') {
 						const refs = parsed[0];
-						// Check if this is a devalue reference map with numeric indices
-						if (typeof refs.success === 'number' && typeof refs.analysis === 'number') {
-							// Validate indices are within array bounds AND > 0 (never point to index 0, the reference map)
-							if (refs.success > 0 && refs.success < parsed.length && 
-							    refs.analysis > 0 && refs.analysis < parsed.length) {
-								// Reconstruct the actual result object from the references
-								result = {
-									success: parsed[refs.success],
-									analysis: parsed[refs.analysis]
-								};
-							} else {
-								// Invalid indices - this shouldn't happen, but handle gracefully
-								// Look for an actual result object in the array (not the reference map)
-								result = parsed.find((item, index) => 
-									index > 0 && // Skip index 0 (the reference map)
-									item && typeof item === 'object' && 
-									'success' in item && 'analysis' in item &&
-									typeof item.success === 'boolean' && typeof item.analysis === 'string'
-								);
-								if (!result) {
-									// Last resort: try to construct from array elements (skip index 0)
-									if (parsed.length > 1 && parsed.length > 2) {
-										result = { success: parsed[1], analysis: parsed[2] };
-									} else {
-										// Can't construct valid result - will be handled by error check below
-										result = null;
-									}
-								}
-							}
-						} else {
-							// Not a devalue reference map - parsed[0] might be the actual result
-							// Check if it has actual boolean/string values (not reference indices)
-							if (typeof refs.success === 'boolean' && typeof refs.analysis === 'string') {
-								result = refs;
-							} else {
-								// Look for actual result object elsewhere in the array (skip index 0)
-								result = parsed.find((item, index) => 
-									index > 0 && // Skip index 0 (might be reference map or invalid)
-									item && typeof item === 'object' && 
-									'success' in item && 'analysis' in item &&
-									typeof item.success === 'boolean' && typeof item.analysis === 'string'
-								);
-								// Don't fallback to parsed[0] - we've already determined it's invalid
-							}
+						if (typeof refs.success === 'number' && typeof refs.jobId === 'number') {
+							result = {
+								success: parsed[refs.success],
+								jobId: parsed[refs.jobId]
+							};
+						} else if (typeof refs.success === 'boolean' && typeof refs.jobId === 'string') {
+							result = refs;
 						}
-					} else if (Array.isArray(parsed) && parsed.length >= 2) {
-						// Alternative format: might be [result, ...]
-						// Look for an object with actual success/analysis values
-						result = parsed.find(item => 
-							item && typeof item === 'object' && 
-							'success' in item && 'analysis' in item &&
-							typeof item.success === 'boolean' && typeof item.analysis === 'string'
-						);
-						// Don't fallback to parsed[0] - if no valid result found, result will be undefined
-						// and will be handled by the error check below
 					} else {
 						result = parsed;
 					}
-				} catch (e: unknown) {
-					console.error('Error parsing response data:', e);
+				} catch (e) {
 					result = responseData.data;
 				}
 			} else {
 				result = responseData.data || responseData;
 			}
 
-			// Handle the result
-			if (result && result.success === true && result.analysis && typeof result.analysis === 'string') {
-				aiAnalysis = result.analysis;
-			} else if (result && result.success === false) {
-				analysisError = result.error || 'Failed to generate analysis. Please check your PERPLEXITY_API_KEY in .env file.';
-			} else {
-				// Debug: log what we got
-				console.error('Unexpected response format:', {
-					result,
-					type: typeof result,
-					keys: result ? Object.keys(result) : null,
-					hasSuccess: result && 'success' in result,
-					hasAnalysis: result && 'analysis' in result,
-					successValue: result && result.success,
-					analysisValue: result && result.analysis,
-					analysisType: result && result.analysis ? typeof result.analysis : 'none'
-				});
-				analysisError = 'Failed to generate analysis. Unexpected response format.';
+			if (!result || !result.success || !result.jobId) {
+				throw new Error(result?.error || 'Failed to start analysis job');
 			}
+
+			// Poll for job status
+			const jobId = result.jobId;
+			await pollJobStatus(jobId)
 		} catch (err: unknown) {
 			console.error('Error generating analysis:', err);
 			analysisError = err instanceof Error ? err.message : 'Failed to generate analysis.';

@@ -1,6 +1,5 @@
 import { db } from '$lib/server/db';
-import { analysisRecords, zodiacResults } from '$lib/server/db/schema';
-import { generateMysticalAnalysisDetailed } from '$lib/server/openai';
+import { zodiacResults } from '$lib/server/db/schema';
 import { desc, eq } from 'drizzle-orm';
 import type { Actions } from './$types';
 
@@ -92,7 +91,7 @@ export const actions = {
 				const record = result[0];
 				const planets = (record.planets as Record<string, { sign: string; house?: number }>) || {};
 				const houses = (record.houses as Array<{ number: number; sign: string }>) || [];
-				
+
 				// Ensure Sun and Moon are included in planets
 				const planetsWithHouses: Record<string, { sign: string; house?: number }> = { ...planets };
 				if (record.sunSign && !planetsWithHouses.sun) {
@@ -108,8 +107,9 @@ export const actions = {
 					const moonHouse = getPlanetHouse(moonLon, houses);
 					planetsWithHouses.moon = { sign: record.moonSign, house: moonHouse };
 				}
-				
+
 				chartData = {
+					resultId,
 					fullName: record.fullName,
 					lifeTrajectory: record.lifeTrajectory,
 					birthDate: record.birthDate,
@@ -156,14 +156,14 @@ export const actions = {
 
 				// Add Sun and Moon to planets with their house positions
 				const planetsWithHouses: Record<string, { sign: string; house?: number }> = { ...planets };
-				
+
 				// Calculate Sun house
 				if (sunSign) {
 					const sunLon = getPlanetLongitude(sunSign, utcYear, utcMonth, utcDay, 'Sun', utcHour, utcMinute);
 					const sunHouse = getPlanetHouse(sunLon, houses);
 					planetsWithHouses.sun = { sign: sunSign, house: sunHouse };
 				}
-				
+
 				// Calculate Moon house
 				if (moonSign) {
 					const moonLon = getPlanetLongitude(moonSign, utcYear, utcMonth, utcDay, 'Moon', utcHour, utcMinute);
@@ -210,82 +210,32 @@ export const actions = {
 				};
 			}
 
-			// Generate detailed mystical analysis with metadata
-			const analysisMetadata = await generateMysticalAnalysisDetailed(chartData);
-			const analysis = analysisMetadata.analysisText;
+			// Call the analyze API endpoint to create an async job
+			const response = await fetch('/api/analyze', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+					'Cookie': request.headers.get('Cookie') || ''
+				},
+				body: JSON.stringify(chartData)
+			});
 
-			// Determine the zodiac result ID
-			let finalResultId: number | null = null;
-			
-			if (resultId) {
-				finalResultId = parseInt(resultId);
-				// Update existing record's aiAnalysis field (for backward compatibility)
-				await db
-					.update(zodiacResults)
-					.set({ aiAnalysis: analysis })
-					.where(eq(zodiacResults.id, finalResultId));
-			} else {
-				// Get session ID from cookies
-				const sessionId = cookies.get('sessionId');
-				if (sessionId) {
-					// Try to find the most recent record for this session
-					const recentResult = await db
-						.select()
-						.from(zodiacResults)
-						.where(eq(zodiacResults.sessionId, sessionId))
-						.orderBy(desc(zodiacResults.createdAt))
-						.limit(1);
+			const result = await response.json();
 
-					if (recentResult.length > 0) {
-						finalResultId = recentResult[0].id;
-						// Update existing record's aiAnalysis field (for backward compatibility)
-						await db
-							.update(zodiacResults)
-							.set({ aiAnalysis: analysis })
-							.where(eq(zodiacResults.id, finalResultId));
-					}
-				}
+			if (!result.success) {
+				return {
+					success: false,
+					error: result.error || 'Failed to start analysis'
+				};
 			}
 
-			// Save detailed analysis record if we have a result ID
-			if (finalResultId) {
-				const sessionId = cookies.get('sessionId') || null;
-				
-				await db.insert(analysisRecords).values({
-					zodiacResultId: finalResultId,
-					analysisText: analysisMetadata.analysisText,
-					fullPrompt: analysisMetadata.fullPrompt,
-					systemMessage: analysisMetadata.systemMessage,
-					model: analysisMetadata.model,
-					temperature: analysisMetadata.temperature,
-					maxTokens: analysisMetadata.maxTokens,
-					promptTokens: analysisMetadata.promptTokens || null,
-					completionTokens: analysisMetadata.completionTokens || null,
-					totalTokens: analysisMetadata.totalTokens || null,
-					finishReason: analysisMetadata.finishReason || null,
-					responseId: analysisMetadata.responseId || null,
-					chartDataSnapshot: {
-						fullName: chartData.fullName,
-						lifeTrajectory: chartData.lifeTrajectory,
-						birthDate: chartData.birthDate,
-						birthTime: chartData.birthTime,
-						placeName: chartData.placeName,
-						sunSign: chartData.sunSign,
-						ascendant: chartData.ascendant,
-						moonSign: chartData.moonSign,
-						planets: chartData.planets,
-						houses: chartData.houses
-					},
-					analysisType: 'mystical',
-					analysisVersion: '1.0',
-					completedAt: new Date(),
-					sessionId
-				});
-			}
-
-			return { success: true, analysis };
+			// Return the job ID to the client for polling
+			return {
+				success: true,
+				jobId: result.jobId
+			};
 		} catch (error) {
-			console.error('Error generating analysis:', error);
+			console.error('Error starting analysis:', error);
 			const errorMessage = error instanceof Error ? error.message : String(error);
 			console.error('Full error details:', {
 				message: errorMessage,
