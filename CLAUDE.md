@@ -10,7 +10,7 @@ Full-stack astrological birth chart calculator built with SvelteKit. Combines pr
 
 - **Frontend**: Svelte 5.43.8, SvelteKit 2.48.5, Tailwind CSS 4.1.17
 - **Backend**: SvelteKit server-side actions, Drizzle ORM 0.44.7
-- **Database**: Vercel Postgres (via @vercel/postgres@0.10.0)
+- **Database**: Neon Postgres (via @neondatabase/serverless@0.10.4)
 - **AI**: Perplexity API (sonar-pro) for mystical analysis generation
 - **Build**: Vite 7.2.2, TypeScript 5.9.3
 - **Deployment**: Vercel serverless with adapter-auto
@@ -81,7 +81,7 @@ API Routes (Serverless Functions)
     └→ GET /api/analyze/status/[jobId]: Check job status
         └─ src/lib/server/jobs.ts (in-memory job tracking)
     ↓
-Vercel Postgres Database
+Neon Postgres Database
     ├─ zodiacResults (main chart data)
     ├─ analysisRecords (AI generation history)
     └─ sverdleResults (game data)
@@ -110,10 +110,10 @@ Three main tables:
 - **sverdleResults**: Wordle game variant data
 
 ### Database Connection (`src/lib/server/db/index.ts`)
-- Uses `@vercel/postgres` for serverless-optimized connection pooling
-- Automatically manages connections for Vercel serverless functions
-- No manual connection management needed
-- Supports both `POSTGRES_URL` (Vercel) and `DATABASE_URL` (local) environment variables
+- Uses `@neondatabase/serverless` for serverless-optimized connection pooling
+- Neon HTTP driver designed for edge functions and serverless environments
+- Automatically manages connections with instant cold-start performance
+- Supports both `DATABASE_URL` (Neon standard) and `POSTGRES_URL` (Vercel compatibility)
 
 ### AI Integration (`src/lib/server/openai.ts`)
 - Perplexity API client initialized with sonar-pro model
@@ -145,46 +145,49 @@ Three main tables:
 Set these in Vercel project settings (Settings → Environment Variables):
 
 - **PERPLEXITY_API_KEY**: API key for Perplexity AI (get from https://docs.perplexity.ai/)
-- **POSTGRES_URL**: Auto-populated when you link Vercel Postgres to your project
-- **POSTGRES_PRISMA_URL**: Auto-populated by Vercel Postgres
-- **POSTGRES_URL_NON_POOLING**: Auto-populated by Vercel Postgres
+- **DATABASE_URL**: Neon database connection string (pooled)
+  - Format: `postgresql://user:password@ep-xxx.region.aws.neon.tech/dbname?sslmode=require`
+  - Get from Neon dashboard → Connection Details → Connection string (Pooled)
+- **DATABASE_URL_UNPOOLED** (optional): Direct connection for migrations
+  - Get from Neon dashboard → Connection Details → Connection string (Direct)
 
 ### Local Development
 Create a `.env` file (see `.env.example`):
 
 - **PERPLEXITY_API_KEY**: Same as above
-- **POSTGRES_URL** or **DATABASE_URL**: Local PostgreSQL connection string
-  - Format: `postgres://user:pass@localhost:5432/dbname`
+- **DATABASE_URL**: Neon connection string (same as production)
+  - Or use local PostgreSQL: `postgres://user:pass@localhost:5432/dbname`
 
 ### Compatibility Note
 The application supports both naming conventions:
-- `POSTGRES_URL` (Vercel standard)
-- `DATABASE_URL` (local development fallback)
+- `DATABASE_URL` (Neon standard, preferred)
+- `POSTGRES_URL` (Vercel compatibility, fallback)
 
 ## Vercel Deployment
 
 ### Initial Setup
-1. **Create Vercel Project**
+1. **Create Neon Database**
+   - Visit https://neon.tech and create account
+   - Create new project
+   - Copy connection string (pooled) from dashboard
+
+2. **Create Vercel Project**
    - Visit https://vercel.com/new
    - Import your Git repository
    - Vercel auto-detects SvelteKit and configures build settings
 
-2. **Add Vercel Postgres**
-   - Go to your project dashboard → Storage → Create Database
-   - Select "Postgres"
-   - Link to your project (auto-populates environment variables)
-
 3. **Configure Environment Variables**
-   - Project Settings → Environment Variables
+   - Vercel Project Settings → Environment Variables
    - Add `PERPLEXITY_API_KEY` (from https://docs.perplexity.ai/)
-   - `POSTGRES_URL` and related vars are auto-populated when you link Postgres
+   - Add `DATABASE_URL` (Neon pooled connection string)
+   - Optional: Add `DATABASE_URL_UNPOOLED` (for migrations)
 
 4. **Run Database Migrations**
    ```bash
    # Pull environment variables locally
    vercel env pull .env.local
 
-   # Run migrations
+   # Run migrations against Neon database
    npm run db:push
    # or
    npm run db:migrate
@@ -207,9 +210,10 @@ The application supports both naming conventions:
 
 ### Important Notes
 - **Serverless Functions**: Each route handler runs in an isolated serverless function
-- **Cold Starts**: First request may be slower due to function initialization
+- **Cold Starts**: Neon database resumes from suspend in <500ms, minimal impact
 - **Job Persistence**: AI analysis jobs are stored in memory and lost on cold starts (acceptable for Hobby plan)
-- **Connection Pooling**: `@vercel/postgres` automatically manages database connections for serverless
+- **Connection Pooling**: Neon's HTTP driver automatically manages connections for serverless
+- **Database Branching**: Neon supports database branches for preview deployments (available on paid plans)
 
 ## Important Implementation Details
 

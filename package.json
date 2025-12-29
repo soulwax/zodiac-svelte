@@ -47,7 +47,7 @@
 		"vite-plugin-devtools-json": "^1.0.0"
 	},
 	"dependencies": {
-		"@vercel/postgres": "^0.10.0",
+		"@neondatabase/serverless": "^0.10.4",
 		"astronomy-engine": "^2.1.19",
 		"jspdf": "^3.0.4",
 		"openai": "^6.10.0"
