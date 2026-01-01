@@ -8,7 +8,10 @@ const config = {
 	preprocess: vitePreprocess(),
 	kit: {
 		// adapter-auto automatically detects Vercel and uses the correct adapter
-		adapter: adapter()
+		adapter: adapter(),
+		csrf: {
+			checkOrigin: false
+		}
 	}
 };
 

@@ -277,10 +277,21 @@
 				// Start with an approximate UTC time (using the date as if it were UTC)
 				const dateStr = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}T${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:00`;
 				let testDate = new Date(dateStr + 'Z');
-				
+
+				// Validate that the initial date is valid
+				if (isNaN(testDate.getTime())) {
+					throw new Error('Invalid birth date or time');
+				}
+
 				// Adjust for timezone offset (most timezones are within ±14 hours of UTC)
 				// We'll iterate to find the exact match
 				for (let i = 0; i < 20; i++) {
+					// Validate testDate before using it
+					if (isNaN(testDate.getTime())) {
+						console.error('Invalid date created during timezone conversion iteration', i);
+						break;
+					}
+
 					const parts = formatter.formatToParts(testDate);
 					const tzYear = parseInt(parts.find(p => p.type === 'year')?.value || '0');
 					const tzMonth = parseInt(parts.find(p => p.type === 'month')?.value || '0');
