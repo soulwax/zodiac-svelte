@@ -366,33 +366,38 @@
 			if (timezone) {
 				// Create a date object for the birth time (in UTC)
 				const birthDateUTC = new Date(Date.UTC(utcYear, utcMonth - 1, utcDay, utcHour, utcMinute));
-				
+
 				// Create a date object for January 15 (standard time, typically no DST)
 				const janDateUTC = new Date(Date.UTC(year, 0, 15, 12, 0));
-				
-				// Use Intl.DateTimeFormat to get timezone information
-				const birthFormatter = new Intl.DateTimeFormat('en-US', {
-					timeZone: timezone,
-					timeZoneName: 'short'
-				});
-				const janFormatter = new Intl.DateTimeFormat('en-US', {
-					timeZone: timezone,
-					timeZoneName: 'short'
-				});
-				
-				// Get timezone abbreviations (e.g., "PST", "PDT", "EST", "EDT")
-				const birthParts = birthFormatter.formatToParts(birthDateUTC);
-				const janParts = janFormatter.formatToParts(janDateUTC);
-				
-				const birthTZAbbr = birthParts.find(p => p.type === 'timeZoneName')?.value || '';
-				const janTZAbbr = janParts.find(p => p.type === 'timeZoneName')?.value || '';
-				
-				// DST is typically indicated by:
-				// 1. Timezone abbreviation containing 'D' (Daylight) - e.g., PDT, EDT, CDT
-				// 2. Different abbreviation from January (standard time)
-				isDST = birthTZAbbr.includes('DT') || 
-				        (birthTZAbbr.length >= 3 && birthTZAbbr[1] === 'D') || // e.g., PDT, EDT, CDT
-				        (birthTZAbbr !== janTZAbbr && birthTZAbbr.length > 0 && janTZAbbr.length > 0);
+
+				// Validate dates before using formatToParts
+				if (!isNaN(birthDateUTC.getTime()) && !isNaN(janDateUTC.getTime())) {
+					// Use Intl.DateTimeFormat to get timezone information
+					const birthFormatter = new Intl.DateTimeFormat('en-US', {
+						timeZone: timezone,
+						timeZoneName: 'short'
+					});
+					const janFormatter = new Intl.DateTimeFormat('en-US', {
+						timeZone: timezone,
+						timeZoneName: 'short'
+					});
+
+					// Get timezone abbreviations (e.g., "PST", "PDT", "EST", "EDT")
+					const birthParts = birthFormatter.formatToParts(birthDateUTC);
+					const janParts = janFormatter.formatToParts(janDateUTC);
+
+					const birthTZAbbr = birthParts.find(p => p.type === 'timeZoneName')?.value || '';
+					const janTZAbbr = janParts.find(p => p.type === 'timeZoneName')?.value || '';
+
+					// DST is typically indicated by:
+					// 1. Timezone abbreviation containing 'D' (Daylight) - e.g., PDT, EDT, CDT
+					// 2. Different abbreviation from January (standard time)
+					isDST = birthTZAbbr.includes('DT') ||
+					        (birthTZAbbr.length >= 3 && birthTZAbbr[1] === 'D') || // e.g., PDT, EDT, CDT
+					        (birthTZAbbr !== janTZAbbr && birthTZAbbr.length > 0 && janTZAbbr.length > 0);
+				} else {
+					isDST = null;
+				}
 			} else {
 				isDST = null;
 			}
