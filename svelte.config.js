@@ -10,7 +10,7 @@ const config = {
 		// adapter-auto automatically detects Vercel and uses the correct adapter
 		adapter: adapter(),
 		csrf: {
-			checkOrigin: false
+			trustedOrigins: ['https://starseek.vercel.app']
 		}
 	}
 };

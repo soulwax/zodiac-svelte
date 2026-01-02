@@ -14,5 +14,8 @@ export default defineConfig({
 		port: Number(process.env.PORT) || 4332,
 		host: true,
 		allowedHosts: ['127.0.0.1', 'localhost', 'stars.soulwax.dev', '*.soulwax.dev']
+	},
+	ssr: {
+		noExternal: ['astronomy-engine']
 	}
 });
