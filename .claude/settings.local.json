@@ -46,7 +46,10 @@
       "Bash(npm run deploy:*)",
       "Bash(npm run db:push:*)",
       "Bash(printf:*)",
-      "Bash(npm run dev:*)"
+      "Bash(npm run dev:*)",
+      "Bash(echo:*)",
+      "Bash(pkill:*)",
+      "Bash(npx drizzle-kit push:*)"
     ],
     "deny": [],
     "ask": []

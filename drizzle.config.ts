@@ -1,4 +1,10 @@
 import { defineConfig } from 'drizzle-kit';
+import * as dotenv from 'dotenv';
+
+// Load environment variables from .env.local for local development
+// Load .env first, then .env.local (which will override)
+dotenv.config({ path: '.env' });
+dotenv.config({ path: '.env.local', override: true });
 
 // Support both Vercel's POSTGRES_URL and local DATABASE_URL
 const databaseUrl = process.env.POSTGRES_URL || process.env.DATABASE_URL;

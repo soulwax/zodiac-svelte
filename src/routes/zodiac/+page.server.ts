@@ -69,7 +69,7 @@ export const actions = {
 			return { success: false, error: 'Failed to save result' };
 		}
 	},
-	analyze: async ({ request, cookies }) => {
+	analyze: async ({ request, cookies, fetch }) => {
 		try {
 			const data = await request.formData();
 			const resultId = data.get('resultId') as string | null;
