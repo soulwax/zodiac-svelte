@@ -49,7 +49,10 @@
       "Bash(npm run dev:*)",
       "Bash(echo:*)",
       "Bash(pkill:*)",
-      "Bash(npx drizzle-kit push:*)"
+      "Bash(npx drizzle-kit push:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push)"
     ],
     "deny": [],
     "ask": []
