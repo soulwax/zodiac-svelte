@@ -1,3 +1,5 @@
+<!-- File: src/routes/Counter.svelte -->
+
 <script lang="ts">
 	import { Spring } from 'svelte/motion';
 

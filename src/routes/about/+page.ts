@@ -1,3 +1,5 @@
+// File: src/routes/about/+page.ts
+
 import { dev } from '$app/environment';
 
 // we don't need any JS on this page, though we'll load

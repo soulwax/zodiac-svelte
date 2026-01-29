@@ -1,3 +1,5 @@
+<!-- File: src/routes/Header.svelte -->
+
 <script lang="ts">
 	import { resolve } from '$app/paths';
 	import { page } from '$app/state';

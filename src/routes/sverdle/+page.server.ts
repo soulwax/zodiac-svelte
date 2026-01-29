@@ -1,3 +1,5 @@
+// File: src/routes/sverdle/+page.server.ts
+
 import { db } from '$lib/server/db';
 import { sverdleResults } from '$lib/server/db/schema';
 import { fail } from '@sveltejs/kit';

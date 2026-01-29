@@ -1,3 +1,5 @@
+// File: src/lib/zodiac.ts
+
 import * as Astronomy from 'astronomy-engine';
 
 export type ZodiacSign =

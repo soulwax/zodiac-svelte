@@ -1,3 +1,5 @@
+// File: src/lib/server/db/schema.ts
+
 import { relations } from 'drizzle-orm';
 import {
     boolean,

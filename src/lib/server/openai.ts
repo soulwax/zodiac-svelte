@@ -1,3 +1,5 @@
+// File: src/lib/server/openai.ts
+
 import { env } from '$env/dynamic/private';
 import OpenAI from 'openai';
 import generalData from '../../data/general.json';

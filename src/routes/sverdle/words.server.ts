@@ -1,3 +1,5 @@
+// File: src/routes/sverdle/words.server.ts
+
 /** The list of possible words */
 export const words = [
 	'aback',

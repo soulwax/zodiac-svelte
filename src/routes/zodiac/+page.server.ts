@@ -1,3 +1,5 @@
+// File: src/routes/zodiac/+page.server.ts
+
 import { db } from '$lib/server/db';
 import { zodiacResults } from '$lib/server/db/schema';
 import { desc, eq } from 'drizzle-orm';

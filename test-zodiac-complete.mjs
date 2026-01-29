@@ -1,3 +1,5 @@
+/* File: test-zodiac-complete.mjs */
+
 /**
  * Complete test suite for zodiac calculations using verified celebrity birth charts
  * Run with: node test-zodiac-complete.mjs

@@ -1,3 +1,5 @@
+// File: src/lib/server/jobs.ts
+
 /**
  * In-memory job tracking for AI analysis on Vercel Hobby plan
  *

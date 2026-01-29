@@ -1,3 +1,5 @@
+// File: src/routes/sverdle/game.ts
+
 import { words, allowed } from './words.server.ts';
 
 export class Game {

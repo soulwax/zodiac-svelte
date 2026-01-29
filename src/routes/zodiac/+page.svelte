@@ -1,3 +1,5 @@
+<!-- File: src/routes/zodiac/+page.svelte -->
+
 <script lang="ts">
 	import { getTimezoneFromCoords, searchPlaces, type Place } from '$lib/geocoding';
 	import {

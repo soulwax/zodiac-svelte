@@ -1,3 +1,5 @@
+// File: src/lib/server/db/index.ts
+
 import { env } from '$env/dynamic/private';
 import { neon } from '@neondatabase/serverless';
 import { drizzle } from 'drizzle-orm/neon-http';

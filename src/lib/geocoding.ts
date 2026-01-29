@@ -1,3 +1,5 @@
+// File: src/lib/geocoding.ts
+
 export interface Place {
 	display_name: string;
 	lat: string;
@@ -97,4 +99,3 @@ function getTimezoneFallback(lat: number, lon: number): string | null {
 	// For now, we'll return null and handle it on the client side
 	return null;
 }
-

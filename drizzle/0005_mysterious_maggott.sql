@@ -1,3 +1,5 @@
+-- File: drizzle/0005_mysterious_maggott.sql
+
 CREATE TABLE "analysis_records" (
 	"id" serial PRIMARY KEY NOT NULL,
 	"zodiac_result_id" integer NOT NULL,

@@ -1,3 +1,5 @@
+// File: src/routes/zodiac/+page.ts
+
 import type { PageLoadEvent } from './$types';
 
 export const load = async ({ url }: PageLoadEvent) => {

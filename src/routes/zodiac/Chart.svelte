@@ -1,3 +1,5 @@
+<!-- File: src/routes/zodiac/Chart.svelte -->
+
 <script lang="ts">
 	import { astrologicalSymbols, getPlanetarySymbol, getZodiacSymbol, Planet } from '$lib/symbols';
 	import type { House, PlanetPositions, ZodiacSign } from '$lib/zodiac';

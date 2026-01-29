@@ -1,0 +1,395 @@
+zodiac-svelte
+├───.env.example
+├───.gitignore
+├───.npmrc
+├───.prettierignore
+├───.prettierrc
+├───CLAUDE.md
+├───drizzle.config.ts
+├───ecosystem.config.cjs
+├───eslint.config.js
+├───package.json
+├───pnpm-lock.yaml
+├───pnpm-workspace.yaml
+├───README.md
+├───run-zodiac-tests.js
+├───svelte.config.js
+├───test-zodiac-complete.mjs
+├───test-zodiac-simple.mjs
+├───TEST_RESULTS.md
+├───tsconfig.json
+├───vercel.json
+├───vite.config.ts
+├───.claude/
+│   └───settings.local.json
+├───.cursor/
+│   ├───mcp.json
+│   └───commands/
+│       ├───api-contract.md
+│       ├───commit-message.md
+│       ├───db-schema.md
+│       ├───docker-audit.md
+│       ├───docs.md
+│       ├───init.md
+│       ├───perf-check.md
+│       ├───refactor.md
+│       ├───review.md
+│       ├───security-scan.md
+│       └───test-setup.md
+├───.github/
+│   └───appmod/
+│       └───appcat/
+├───.svelte-kit/
+│   ├───ambient.d.ts
+│   ├───non-ambient.d.ts
+│   ├───tsconfig.json
+│   ├───adapter-node/
+│   │   ├───index.js
+│   │   ├───internal.js
+│   │   ├───manifest-full.js
+│   │   ├───manifest.js
+│   │   ├───remote-entry.js
+│   │   ├───.vite/
+│   │   │   └───manifest.json
+│   │   ├───_app/
+│   │   │   └───immutable/
+│   │   │       └───assets/
+│   │   │           ├───_layout.CM4zzeqt.css
+│   │   │           ├───_page.BERWdqeB.css
+│   │   │           ├───_page.C7uEq_1w.css
+│   │   │           ├───_page.coQmJpy9.css
+│   │   │           ├───_page.COsVWyq4.css
+│   │   │           ├───_page.DnkwH8di.css
+│   │   │           ├───Chart.ZVcJk3LE.css
+│   │   │           ├───fira-mono-cyrillic-400-normal.BJkDdjbt.woff2
+│   │   │           ├───fira-mono-cyrillic-400-normal.DUd3efVn.woff
+│   │   │           ├───fira-mono-cyrillic-ext-400-normal.Co4MVjrD.woff
+│   │   │           ├───fira-mono-cyrillic-ext-400-normal.FAIU8e3o.woff2
+│   │   │           ├───fira-mono-greek-400-normal.B_0AmgK7.woff
+│   │   │           ├───fira-mono-greek-400-normal.ftNhKy_S.woff2
+│   │   │           ├───fira-mono-greek-ext-400-normal.Be4g_LSk.woff2
+│   │   │           ├───fira-mono-greek-ext-400-normal.BQ5yw6bY.woff
+│   │   │           ├───fira-mono-latin-400-normal.C3FQ26ho.woff
+│   │   │           ├───fira-mono-latin-400-normal.DVTTRLHv.woff2
+│   │   │           ├───fira-mono-latin-ext-400-normal.B2gPvaNr.woff2
+│   │   │           ├───fira-mono-latin-ext-400-normal.CbD3vWRE.woff
+│   │   │           ├───fira-mono-symbols2-400-normal.C6JptOil.woff2
+│   │   │           └───fira-mono-symbols2-400-normal.CpeG9ob9.woff
+│   │   ├───chunks/
+│   │   │   ├───attributes.js
+│   │   │   ├───context.js
+│   │   │   ├───environment.js
+│   │   │   ├───exports.js
+│   │   │   ├───false.js
+│   │   │   ├───general.js
+│   │   │   ├───index.js
+│   │   │   ├───index2.js
+│   │   │   ├───index3.js
+│   │   │   ├───index4.js
+│   │   │   ├───index5.js
+│   │   │   ├───internal.js
+│   │   │   ├───routing.js
+│   │   │   ├───server.js
+│   │   │   ├───server2.js
+│   │   │   ├───shared-server.js
+│   │   │   ├───shared.js
+│   │   │   ├───state.svelte.js
+│   │   │   ├───stores.js
+│   │   │   ├───utils.js
+│   │   │   └───zodiac.js
+│   │   ├───entries/
+│   │   │   ├───fallbacks/
+│   │   │   │   └───error.svelte.js
+│   │   │   └───pages/
+│   │   │       ├───_layout.svelte.js
+│   │   │       ├───_page.svelte.js
+│   │   │       ├───_page.ts.js
+│   │   │       ├───about/
+│   │   │       │   ├───_page.svelte.js
+│   │   │       │   └───_page.ts.js
+│   │   │       ├───sverdle/
+│   │   │       │   ├───_page.server.ts.js
+│   │   │       │   ├───_page.svelte.js
+│   │   │       │   └───how-to-play/
+│   │   │       │       ├───_page.svelte.js
+│   │   │       │       └───_page.ts.js
+│   │   │       └───zodiac/
+│   │   │           ├───_page.server.ts.js
+│   │   │           ├───_page.svelte.js
+│   │   │           └───_page.ts.js
+│   │   └───nodes/
+│   │       ├───0.js
+│   │       ├───1.js
+│   │       ├───2.js
+│   │       ├───3.js
+│   │       ├───4.js
+│   │       ├───5.js
+│   │       └───6.js
+│   ├───generated/
+│   │   ├───root.js
+│   │   ├───root.svelte
+│   │   ├───client/
+│   │   │   ├───app.js
+│   │   │   ├───matchers.js
+│   │   │   └───nodes/
+│   │   │       ├───0.js
+│   │   │       ├───1.js
+│   │   │       ├───2.js
+│   │   │       ├───3.js
+│   │   │       ├───4.js
+│   │   │       ├───5.js
+│   │   │       └───6.js
+│   │   ├───client-optimized/
+│   │   │   ├───app.js
+│   │   │   ├───matchers.js
+│   │   │   └───nodes/
+│   │   │       ├───0.js
+│   │   │       ├───1.js
+│   │   │       ├───2.js
+│   │   │       ├───3.js
+│   │   │       ├───4.js
+│   │   │       ├───5.js
+│   │   │       └───6.js
+│   │   └───server/
+│   │       └───internal.js
+│   ├───output/
+│   │   ├───client/
+│   │   │   ├───favicon.png
+│   │   │   ├───favicon_svelte.svg
+│   │   │   ├───robots.txt
+│   │   │   ├───.vite/
+│   │   │   │   └───manifest.json
+│   │   │   └───_app/
+│   │   │       ├───version.json
+│   │   │       └───immutable/
+│   │   │           ├───assets/
+│   │   │           │   ├───0.L-9AXGNW.css
+│   │   │           │   ├───2.COsVWyq4.css
+│   │   │           │   ├───3.BERWdqeB.css
+│   │   │           │   ├───4.C7uEq_1w.css
+│   │   │           │   ├───5.DnkwH8di.css
+│   │   │           │   ├───6.coQmJpy9.css
+│   │   │           │   ├───Chart.SXoe2dDu.css
+│   │   │           │   ├───fira-mono-cyrillic-400-normal.BJkDdjbt.woff2
+│   │   │           │   ├───fira-mono-cyrillic-400-normal.DUd3efVn.woff
+│   │   │           │   ├───fira-mono-cyrillic-ext-400-normal.Co4MVjrD.woff
+│   │   │           │   ├───fira-mono-cyrillic-ext-400-normal.FAIU8e3o.woff2
+│   │   │           │   ├───fira-mono-greek-400-normal.B_0AmgK7.woff
+│   │   │           │   ├───fira-mono-greek-400-normal.ftNhKy_S.woff2
+│   │   │           │   ├───fira-mono-greek-ext-400-normal.Be4g_LSk.woff2
+│   │   │           │   ├───fira-mono-greek-ext-400-normal.BQ5yw6bY.woff
+│   │   │           │   ├───fira-mono-latin-400-normal.C3FQ26ho.woff
+│   │   │           │   ├───fira-mono-latin-400-normal.DVTTRLHv.woff2
+│   │   │           │   ├───fira-mono-latin-ext-400-normal.B2gPvaNr.woff2
+│   │   │           │   ├───fira-mono-latin-ext-400-normal.CbD3vWRE.woff
+│   │   │           │   ├───fira-mono-symbols2-400-normal.C6JptOil.woff2
+│   │   │           │   └───fira-mono-symbols2-400-normal.CpeG9ob9.woff
+│   │   │           ├───chunks/
+│   │   │           │   ├───B4E1rfGg.js
+│   │   │           │   ├───BFsmEqma.js
+│   │   │           │   ├───BIWxRItj.js
+│   │   │           │   ├───BNLIUOAx.js
+│   │   │           │   ├───BooA7heZ.js
+│   │   │           │   ├───BsvsdUEb.js
+│   │   │           │   ├───BYV8N5bF.js
+│   │   │           │   ├───Bzr520pe.js
+│   │   │           │   ├───C6751teb.js
+│   │   │           │   ├───CEk1jBEJ.js
+│   │   │           │   ├───CgMgjUw2.js
+│   │   │           │   ├───D3ONGup0.js
+│   │   │           │   ├───DCjqB64a.js
+│   │   │           │   ├───DHivxRFs.js
+│   │   │           │   ├───DQ5NcBaK.js
+│   │   │           │   ├───DsnmJJEf.js
+│   │   │           │   ├───DYclPLdh.js
+│   │   │           │   ├───Ge7aVWlp.js
+│   │   │           │   ├───kKsBUBxj.js
+│   │   │           │   ├───PPVm8Dsz.js
+│   │   │           │   └───RRqGf15f.js
+│   │   │           ├───entry/
+│   │   │           │   ├───app.COtpdK07.js
+│   │   │           │   └───start.DzpJww8g.js
+│   │   │           └───nodes/
+│   │   │               ├───0.RY9qV762.js
+│   │   │               ├───1.BA8tfuWR.js
+│   │   │               ├───2.Bj3R86Ek.js
+│   │   │               ├───3.z5VnMf6s.js
+│   │   │               ├───4.D-6mtNOq.js
+│   │   │               ├───5.DT6dWaVg.js
+│   │   │               └───6.Cf_9BRIj.js
+│   │   ├───prerendered/
+│   │   │   └───pages/
+│   │   │       ├───about.html
+│   │   │       ├───index.html
+│   │   │       └───sverdle/
+│   │   │           └───how-to-play.html
+│   │   └───server/
+│   │       ├───index.js
+│   │       ├───internal.js
+│   │       ├───manifest-full.js
+│   │       ├───manifest.js
+│   │       ├───remote-entry.js
+│   │       ├───.vite/
+│   │       │   └───manifest.json
+│   │       ├───_app/
+│   │       │   └───immutable/
+│   │       │       └───assets/
+│   │       │           ├───_layout.CM4zzeqt.css
+│   │       │           ├───_page.BERWdqeB.css
+│   │       │           ├───_page.C7uEq_1w.css
+│   │       │           ├───_page.coQmJpy9.css
+│   │       │           ├───_page.COsVWyq4.css
+│   │       │           ├───_page.DnkwH8di.css
+│   │       │           ├───Chart.ZVcJk3LE.css
+│   │       │           ├───fira-mono-cyrillic-400-normal.BJkDdjbt.woff2
+│   │       │           ├───fira-mono-cyrillic-400-normal.DUd3efVn.woff
+│   │       │           ├───fira-mono-cyrillic-ext-400-normal.Co4MVjrD.woff
+│   │       │           ├───fira-mono-cyrillic-ext-400-normal.FAIU8e3o.woff2
+│   │       │           ├───fira-mono-greek-400-normal.B_0AmgK7.woff
+│   │       │           ├───fira-mono-greek-400-normal.ftNhKy_S.woff2
+│   │       │           ├───fira-mono-greek-ext-400-normal.Be4g_LSk.woff2
+│   │       │           ├───fira-mono-greek-ext-400-normal.BQ5yw6bY.woff
+│   │       │           ├───fira-mono-latin-400-normal.C3FQ26ho.woff
+│   │       │           ├───fira-mono-latin-400-normal.DVTTRLHv.woff2
+│   │       │           ├───fira-mono-latin-ext-400-normal.B2gPvaNr.woff2
+│   │       │           ├───fira-mono-latin-ext-400-normal.CbD3vWRE.woff
+│   │       │           ├───fira-mono-symbols2-400-normal.C6JptOil.woff2
+│   │       │           └───fira-mono-symbols2-400-normal.CpeG9ob9.woff
+│   │       ├───chunks/
+│   │       │   ├───attributes.js
+│   │       │   ├───context.js
+│   │       │   ├───environment.js
+│   │       │   ├───exports.js
+│   │       │   ├───false.js
+│   │       │   ├───general.js
+│   │       │   ├───index.js
+│   │       │   ├───index2.js
+│   │       │   ├───index3.js
+│   │       │   ├───index4.js
+│   │       │   ├───index5.js
+│   │       │   ├───internal.js
+│   │       │   ├───routing.js
+│   │       │   ├───server.js
+│   │       │   ├───server2.js
+│   │       │   ├───shared-server.js
+│   │       │   ├───shared.js
+│   │       │   ├───state.svelte.js
+│   │       │   ├───stores.js
+│   │       │   ├───utils.js
+│   │       │   └───zodiac.js
+│   │       ├───entries/
+│   │       │   ├───fallbacks/
+│   │       │   │   └───error.svelte.js
+│   │       │   └───pages/
+│   │       │       ├───_layout.svelte.js
+│   │       │       ├───_page.svelte.js
+│   │       │       ├───_page.ts.js
+│   │       │       ├───about/
+│   │       │       │   ├───_page.svelte.js
+│   │       │       │   └───_page.ts.js
+│   │       │       ├───sverdle/
+│   │       │       │   ├───_page.server.ts.js
+│   │       │       │   ├───_page.svelte.js
+│   │       │       │   └───how-to-play/
+│   │       │       │       ├───_page.svelte.js
+│   │       │       │       └───_page.ts.js
+│   │       │       └───zodiac/
+│   │       │           ├───_page.server.ts.js
+│   │       │           ├───_page.svelte.js
+│   │       │           └───_page.ts.js
+│   │       ├───nodes/
+│   │       │   ├───0.js
+│   │       │   ├───1.js
+│   │       │   ├───2.js
+│   │       │   ├───3.js
+│   │       │   ├───4.js
+│   │       │   ├───5.js
+│   │       │   └───6.js
+│   │       └───stylesheets/
+│   └───types/
+│       ├───route_meta_data.json
+│       └───src/
+│           └───routes/
+│               ├───$types.d.ts
+│               ├───about/
+│               │   └───$types.d.ts
+│               ├───sverdle/
+│               │   ├───$types.d.ts
+│               │   └───how-to-play/
+│               │       └───$types.d.ts
+│               └───zodiac/
+│                   └───$types.d.ts
+├───drizzle/
+│   ├───0000_heavy_leo.sql
+│   ├───0001_dapper_wallow.sql
+│   ├───0002_swift_otto_octavius.sql
+│   ├───0003_next_nico_minoru.sql
+│   ├───0004_clean_baron_zemo.sql
+│   ├───0005_mysterious_maggott.sql
+│   └───meta/
+│       ├───0000_snapshot.json
+│       ├───0001_snapshot.json
+│       ├───0002_snapshot.json
+│       ├───0003_snapshot.json
+│       ├───0004_snapshot.json
+│       ├───0005_snapshot.json
+│       └───_journal.json
+├───logs/
+│   ├───pm2-error.log
+│   └───pm2-out.log
+├───src/
+│   ├───app.d.ts
+│   ├───app.html
+│   ├───hooks.server.ts
+│   ├───data/
+│   │   ├───general.json
+│   │   └───planets.json
+│   ├───lib/
+│   │   ├───geocoding.ts
+│   │   ├───symbols.ts
+│   │   ├───zodiac.test.ts
+│   │   ├───zodiac.ts
+│   │   ├───images/
+│   │   │   ├───github.svg
+│   │   │   ├───svelte-logo.svg
+│   │   │   ├───svelte-welcome.png
+│   │   │   └───svelte-welcome.webp
+│   │   └───server/
+│   │       ├───jobs.ts
+│   │       ├───openai.ts
+│   │       └───db/
+│   │           ├───index.ts
+│   │           └───schema.ts
+│   └───routes/
+│       ├───+layout.svelte
+│       ├───+page.svelte
+│       ├───+page.ts
+│       ├───Counter.svelte
+│       ├───Header.svelte
+│       ├───layout.css
+│       ├───about/
+│       │   ├───+page.svelte
+│       │   └───+page.ts
+│       ├───api/
+│       │   └───analyze/
+│       │       ├───+server.ts
+│       │       └───status/
+│       │           └───[jobId]/
+│       │               └───+server.ts
+│       ├───sverdle/
+│       │   ├───+page.server.ts
+│       │   ├───+page.svelte
+│       │   ├───game.ts
+│       │   ├───words.server.ts
+│       │   └───how-to-play/
+│       │       ├───+page.svelte
+│       │       └───+page.ts
+│       └───zodiac/
+│           ├───+page.server.ts
+│           ├───+page.svelte
+│           ├───+page.ts
+│           └───Chart.svelte
+└───static/
+    ├───favicon.png
+    ├───favicon_svelte.svg
+    └───robots.txt

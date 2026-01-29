@@ -1,3 +1,5 @@
+-- File: drizzle/0000_heavy_leo.sql
+
 CREATE TABLE "sverdle_results" (
 	"id" serial PRIMARY KEY NOT NULL,
 	"word_index" integer NOT NULL,

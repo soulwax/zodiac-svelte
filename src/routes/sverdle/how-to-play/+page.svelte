@@ -1,3 +1,5 @@
+<!-- File: src/routes/sverdle/how-to-play/+page.svelte -->
+
 <svelte:head>
 	<title>How to play Sverdle</title>
 	<meta name="description" content="How to play Sverdle" />

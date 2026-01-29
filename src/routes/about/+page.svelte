@@ -1,3 +1,5 @@
+<!-- File: src/routes/about/+page.svelte -->
+
 <script lang="ts">
 	import { page } from '$app/stores';
 	

@@ -1,3 +1,5 @@
+<!-- File: src/routes/sverdle/+page.svelte -->
+
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import { resolve } from '$app/paths';

@@ -1,3 +1,5 @@
+// File: src/lib/symbols.ts
+
 import type { ZodiacSign } from './zodiac';
 
 /**

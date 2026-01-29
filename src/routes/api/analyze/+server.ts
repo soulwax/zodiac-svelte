@@ -1,3 +1,5 @@
+// File: src/routes/api/analyze/+server.ts
+
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { createJob, updateJob } from '$lib/server/jobs';

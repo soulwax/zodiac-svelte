@@ -1,3 +1,5 @@
+// File: ecosystem.config.cjs
+
 // ecosystem.config.js for a sveltekit project using pm2
 module.exports = {
   apps: [

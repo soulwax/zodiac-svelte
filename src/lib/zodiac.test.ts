@@ -1,3 +1,5 @@
+// File: src/lib/zodiac.test.ts
+
 /**
  * Test suite for zodiac calculations using verified celebrity birth charts
  *

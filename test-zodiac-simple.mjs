@@ -1,3 +1,5 @@
+/* File: test-zodiac-simple.mjs */
+
 /**
  * Simple test script for zodiac calculations
  * Run with: node test-zodiac-simple.mjs
