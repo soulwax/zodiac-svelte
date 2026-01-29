@@ -10,10 +10,10 @@ Full-stack astrological birth chart calculator built with SvelteKit. Combines pr
 
 - **Frontend**: Svelte 5.43.8, SvelteKit 2.48.5, Tailwind CSS 4.1.17
 - **Backend**: SvelteKit server-side actions, Drizzle ORM 0.44.7
-- **Database**: PostgreSQL (via postgres@3.4.7)
+- **Database**: Neon Postgres (via @neondatabase/serverless@0.10.4)
 - **AI**: Perplexity API (sonar-pro) for mystical analysis generation
 - **Build**: Vite 7.2.2, TypeScript 5.9.3
-- **Deployment**: PM2 process manager with adapter-node
+- **Deployment**: Vercel serverless with adapter-auto
 
 ## Common Commands
 
@@ -40,26 +40,21 @@ npm run db:migrate       # Run migrations
 npm run db:studio        # Open Drizzle Studio GUI
 ```
 
-### PM2 Process Management
+### Vercel Deployment
 ```bash
-# Starting
-npm run pm2:start               # Start in production mode
-npm run pm2:start:dev           # Start in dev mode with watch
-npm run pm2:build:start         # Build then start
-npm run pm2:build:reload        # Build then reload
+# Install Vercel CLI (optional)
+npm i -g vercel
 
-# Management
-npm run pm2:restart             # Restart with updated env
-npm run pm2:reload              # Zero-downtime reload
-npm run pm2:stop                # Stop production instance
-npm run pm2:delete              # Delete from PM2 registry
+# Deploy to Vercel
+vercel                          # Deploy to preview
+vercel --prod                   # Deploy to production
 
-# Monitoring
-npm run pm2:status              # Show process status
-npm run pm2:logs                # View all logs
-npm run pm2:logs:error          # View error logs only
-npm run pm2:monit               # Real-time monitoring dashboard
-npm run pm2:info                # Detailed process information
+# Pull environment variables from Vercel
+vercel env pull .env.local
+
+# GitHub Integration
+# Push to main branch for auto-deployment
+git push origin main
 ```
 
 ## Architecture Overview
@@ -76,10 +71,17 @@ Routes (src/routes/zodiac/+page.svelte)
     ↓
 Server Actions (+page.server.ts)
     ├→ save: Persist to database
-    └→ analyze: Generate AI analysis
-        └─ src/lib/server/openai.ts (Perplexity API)
+    └→ analyze: Create async analysis job (returns jobId)
+        └─ Client polls /api/analyze/status/[jobId]
     ↓
-PostgreSQL Database
+API Routes (Serverless Functions)
+    ├→ POST /api/analyze: Start AI analysis job
+    │  └─ src/lib/server/openai.ts (Perplexity API)
+    │  └─ Updates job status in memory
+    └→ GET /api/analyze/status/[jobId]: Check job status
+        └─ src/lib/server/jobs.ts (in-memory job tracking)
+    ↓
+Neon Postgres Database
     ├─ zodiacResults (main chart data)
     ├─ analysisRecords (AI generation history)
     └─ sverdleResults (game data)
@@ -107,12 +109,19 @@ Three main tables:
 - **analysisRecords**: Analysis generation history with prompts, token usage, model config, links to zodiacResults
 - **sverdleResults**: Wordle game variant data
 
+### Database Connection (`src/lib/server/db/index.ts`)
+- Uses `@neondatabase/serverless` for serverless-optimized connection pooling
+- Neon HTTP driver designed for edge functions and serverless environments
+- Automatically manages connections with instant cold-start performance
+- Supports both `DATABASE_URL` (Neon standard) and `POSTGRES_URL` (Vercel compatibility)
+
 ### AI Integration (`src/lib/server/openai.ts`)
 - Perplexity API client initialized with sonar-pro model
 - `generateMysticalAnalysisDetailed()`: Generates 1500-2500 word poetic analyses
 - Max 8000 tokens, temperature 0.8
 - Integrates sign descriptions from `src/data/general.json`
 - Tracks token usage and stores full prompts in analysisRecords
+- **Async Job Pattern**: Analysis runs as background job to avoid serverless timeout (10s on Hobby plan)
 
 ### Main UI (`src/routes/zodiac/+page.svelte` - 2507 lines)
 - Birth information input with autocomplete location search
@@ -122,26 +131,89 @@ Three main tables:
 - Responsive Tailwind design with mobile optimization
 
 ### Server Actions (`src/routes/zodiac/+page.server.ts`)
-- **save**: Persists calculated charts to zodiacResults table
-- **analyze**: Generates AI analysis via Perplexity, stores in both tables
+- **save**: Persists calculated charts to zodiacResults table (fast, direct save)
+- **analyze**: Initiates async AI analysis job, returns jobId for client-side polling
+
+### API Routes (Serverless Functions)
+- **POST /api/analyze**: Receives chart data, creates job, starts async AI analysis
+- **GET /api/analyze/status/[jobId]**: Returns current job status (pending/processing/completed/failed)
+- **Job Tracking** (`src/lib/server/jobs.ts`): In-memory job store with automatic cleanup after 1 hour
 
 ## Environment Variables
 
-Required in `.env` file:
-- **DATABASE_URL**: PostgreSQL connection string (format: `postgres://user:pass@host:5432/dbname`)
-- **PERPLEXITY_API_KEY**: API key for Perplexity AI (NOT OpenAI - uses their compatible SDK)
-- **PORT**: Server port (default: 4332)
+### Required for Vercel Deployment
+Set these in Vercel project settings (Settings → Environment Variables):
 
-Note: `.env.example` incorrectly mentions OPENAI_API_KEY; the actual key is PERPLEXITY_API_KEY.
+- **PERPLEXITY_API_KEY**: API key for Perplexity AI (get from https://docs.perplexity.ai/)
+- **DATABASE_URL**: Neon database connection string (pooled)
+  - Format: `postgresql://user:password@ep-xxx.region.aws.neon.tech/dbname?sslmode=require`
+  - Get from Neon dashboard → Connection Details → Connection string (Pooled)
+- **DATABASE_URL_UNPOOLED** (optional): Direct connection for migrations
+  - Get from Neon dashboard → Connection Details → Connection string (Direct)
 
-## PM2 Deployment
+### Local Development
+Create a `.env` file (see `.env.example`):
 
-Configuration in `ecosystem.config.cjs`:
-- App name: `stars-ssr-svelte-prod`
-- Entry point: `build/index.js` (generated by `npm run build`)
-- Loads environment variables from `.env` file via custom parser
-- Logs written to `./logs/pm2-error.log` and `./logs/pm2-out.log`
-- Must restart PM2 after changing .env: `npm run pm2:restart`
+- **PERPLEXITY_API_KEY**: Same as above
+- **DATABASE_URL**: Neon connection string (same as production)
+  - Or use local PostgreSQL: `postgres://user:pass@localhost:5432/dbname`
+
+### Compatibility Note
+The application supports both naming conventions:
+- `DATABASE_URL` (Neon standard, preferred)
+- `POSTGRES_URL` (Vercel compatibility, fallback)
+
+## Vercel Deployment
+
+### Initial Setup
+1. **Create Neon Database**
+   - Visit https://neon.tech and create account
+   - Create new project
+   - Copy connection string (pooled) from dashboard
+
+2. **Create Vercel Project**
+   - Visit https://vercel.com/new
+   - Import your Git repository
+   - Vercel auto-detects SvelteKit and configures build settings
+
+3. **Configure Environment Variables**
+   - Vercel Project Settings → Environment Variables
+   - Add `PERPLEXITY_API_KEY` (from https://docs.perplexity.ai/)
+   - Add `DATABASE_URL` (Neon pooled connection string)
+   - Optional: Add `DATABASE_URL_UNPOOLED` (for migrations)
+
+4. **Run Database Migrations**
+   ```bash
+   # Pull environment variables locally
+   vercel env pull .env.local
+
+   # Run migrations against Neon database
+   npm run db:push
+   # or
+   npm run db:migrate
+   ```
+
+5. **Deploy**
+   - Push to GitHub (auto-deploys if connected)
+   - Or run `vercel --prod` via CLI
+
+### Deployment Configuration
+- Build adapter: `@sveltejs/adapter-auto` (auto-detects Vercel)
+- Build command: `npm run build`
+- Function timeout: 10 seconds (Hobby), 60 seconds (Pro)
+- Region: Auto (can be configured in `vercel.json`)
+
+### Monitoring
+- View logs: Vercel Dashboard → Deployments → [deployment] → Functions
+- Real-time logs: `vercel logs`
+- Analytics: Vercel Dashboard → Analytics
+
+### Important Notes
+- **Serverless Functions**: Each route handler runs in an isolated serverless function
+- **Cold Starts**: Neon database resumes from suspend in <500ms, minimal impact
+- **Job Persistence**: AI analysis jobs are stored in memory and lost on cold starts (acceptable for Hobby plan)
+- **Connection Pooling**: Neon's HTTP driver automatically manages connections for serverless
+- **Database Branching**: Neon supports database branches for preview deployments (available on paid plans)
 
 ## Important Implementation Details
 
@@ -163,3 +235,14 @@ Configuration in `ecosystem.config.cjs`:
 ### Session Management
 - Session IDs stored in sverdleResults for game tracking
 - Charts linked to sessions via zodiacResults table
+
+### Async AI Analysis Pattern
+- **Problem**: AI analysis can take >10 seconds, exceeding Vercel Hobby plan timeout
+- **Solution**: Background job pattern with client-side polling
+  1. Client calls analyze action → receives jobId
+  2. Background job processes AI analysis (no timeout limit)
+  3. Client polls `/api/analyze/status/[jobId]` every 2.5 seconds
+  4. Job status updates: pending → processing → completed/failed
+  5. Client displays result when completed
+- **Limitations**: Jobs stored in memory, lost on cold starts (acceptable tradeoff for Hobby plan)
+- **For Production**: Consider upgrading to Pro plan with Vercel KV for persistent job storage
