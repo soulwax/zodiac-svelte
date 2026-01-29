@@ -321,8 +321,8 @@ export function calculateMercurySign(
 ): ZodiacSign {
 	const date = new Date(Date.UTC(year, month - 1, day, hour, minute, 0));
 
-	// Get geocentric ecliptic longitude (EclipticLongitude returns heliocentric)
-	const geoVector = Astronomy.GeoVector(Astronomy.Body.Mercury, date, false);
+	// Get geocentric ecliptic longitude with aberration correction (apparent position)
+	const geoVector = Astronomy.GeoVector(Astronomy.Body.Mercury, date, true);
 	const ecliptic = Astronomy.Ecliptic(geoVector);
 	const longitude = ecliptic.elon;
 
@@ -343,8 +343,8 @@ export function calculateVenusSign(
 ): ZodiacSign {
 	const date = new Date(Date.UTC(year, month - 1, day, hour, minute, 0));
 
-	// Get geocentric ecliptic longitude (EclipticLongitude returns heliocentric)
-	const geoVector = Astronomy.GeoVector(Astronomy.Body.Venus, date, false);
+	// Get geocentric ecliptic longitude with aberration correction (apparent position)
+	const geoVector = Astronomy.GeoVector(Astronomy.Body.Venus, date, true);
 	const ecliptic = Astronomy.Ecliptic(geoVector);
 	const longitude = ecliptic.elon;
 
@@ -365,8 +365,8 @@ export function calculateMarsSign(
 ): ZodiacSign {
 	const date = new Date(Date.UTC(year, month - 1, day, hour, minute, 0));
 
-	// Get geocentric ecliptic longitude (EclipticLongitude returns heliocentric)
-	const geoVector = Astronomy.GeoVector(Astronomy.Body.Mars, date, false);
+	// Get geocentric ecliptic longitude with aberration correction (apparent position)
+	const geoVector = Astronomy.GeoVector(Astronomy.Body.Mars, date, true);
 	const ecliptic = Astronomy.Ecliptic(geoVector);
 	const longitude = ecliptic.elon;
 
@@ -384,8 +384,10 @@ export function calculateJupiterSign(
 ): ZodiacSign {
 	const date = new Date(Date.UTC(year, month - 1, day, 12, 0, 0));
 
-	// Get ecliptic longitude directly
-	const longitude = Astronomy.EclipticLongitude(Astronomy.Body.Jupiter, date);
+	// Get geocentric ecliptic longitude with aberration correction (apparent position)
+	const geoVector = Astronomy.GeoVector(Astronomy.Body.Jupiter, date, true);
+	const ecliptic = Astronomy.Ecliptic(geoVector);
+	const longitude = ecliptic.elon;
 
 	return longitudeToSign(longitude);
 }
@@ -401,8 +403,10 @@ export function calculateSaturnSign(
 ): ZodiacSign {
 	const date = new Date(Date.UTC(year, month - 1, day, 12, 0, 0));
 
-	// Get ecliptic longitude directly
-	const longitude = Astronomy.EclipticLongitude(Astronomy.Body.Saturn, date);
+	// Get geocentric ecliptic longitude with aberration correction (apparent position)
+	const geoVector = Astronomy.GeoVector(Astronomy.Body.Saturn, date, true);
+	const ecliptic = Astronomy.Ecliptic(geoVector);
+	const longitude = ecliptic.elon;
 
 	return longitudeToSign(longitude);
 }
@@ -418,8 +422,10 @@ export function calculateUranusSign(
 ): ZodiacSign {
 	const date = new Date(Date.UTC(year, month - 1, day, 12, 0, 0));
 
-	// Get ecliptic longitude directly
-	const longitude = Astronomy.EclipticLongitude(Astronomy.Body.Uranus, date);
+	// Get geocentric ecliptic longitude with aberration correction (apparent position)
+	const geoVector = Astronomy.GeoVector(Astronomy.Body.Uranus, date, true);
+	const ecliptic = Astronomy.Ecliptic(geoVector);
+	const longitude = ecliptic.elon;
 
 	return longitudeToSign(longitude);
 }
@@ -435,8 +441,10 @@ export function calculateNeptuneSign(
 ): ZodiacSign {
 	const date = new Date(Date.UTC(year, month - 1, day, 12, 0, 0));
 
-	// Get ecliptic longitude directly
-	const longitude = Astronomy.EclipticLongitude(Astronomy.Body.Neptune, date);
+	// Get geocentric ecliptic longitude with aberration correction (apparent position)
+	const geoVector = Astronomy.GeoVector(Astronomy.Body.Neptune, date, true);
+	const ecliptic = Astronomy.Ecliptic(geoVector);
+	const longitude = ecliptic.elon;
 
 	return longitudeToSign(longitude);
 }
@@ -452,8 +460,10 @@ export function calculatePlutoSign(
 ): ZodiacSign {
 	const date = new Date(Date.UTC(year, month - 1, day, 12, 0, 0));
 
-	// Get ecliptic longitude directly
-	const longitude = Astronomy.EclipticLongitude(Astronomy.Body.Pluto, date);
+	// Get geocentric ecliptic longitude with aberration correction (apparent position)
+	const geoVector = Astronomy.GeoVector(Astronomy.Body.Pluto, date, true);
+	const ecliptic = Astronomy.Ecliptic(geoVector);
+	const longitude = ecliptic.elon;
 
 	return longitudeToSign(longitude);
 }
@@ -562,14 +572,15 @@ export function getPlanetLongitude(
 			};
 			const body = bodyMap[planetName];
 			if (body) {
-				// Inner planets (Mercury, Venus, Mars) need geocentric coordinates
+				// All planets use geocentric coordinates with aberration correction
 				if (body === Astronomy.Body.Mercury || body === Astronomy.Body.Venus || body === Astronomy.Body.Mars) {
-					const geoVector = Astronomy.GeoVector(body, date, false);
+					const geoVector = Astronomy.GeoVector(body, date, true);
 					const ecliptic = Astronomy.Ecliptic(geoVector);
 					return ecliptic.elon;
 				} else {
-					// Outer planets: heliocentric ≈ geocentric (close enough)
-					return Astronomy.EclipticLongitude(body, date);
+					const geoVector = Astronomy.GeoVector(body, date, true);
+					const ecliptic = Astronomy.Ecliptic(geoVector);
+					return ecliptic.elon;
 				}
 			}
 		}
