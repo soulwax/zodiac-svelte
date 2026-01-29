@@ -13,6 +13,13 @@ export default defineConfig({
 	preview: {
 		port: Number(process.env.PORT) || 4332,
 		host: true,
-		allowedHosts: ['127.0.0.1', 'localhost', 'stars.soulwax.dev', '*.soulwax.dev']
+		allowedHosts: [
+			'127.0.0.1',
+			'localhost',
+			'stars.soulwax.dev',
+			'*.soulwax.dev',
+			'starseek.vercel.app',
+			'www.starseek.vercel.app'
+		]
 	}
 });
