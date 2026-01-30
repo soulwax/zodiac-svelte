@@ -497,32 +497,28 @@
 		let attempts = 0;
 
 		while (attempts < maxAttempts) {
-			try {
-				const response = await fetch(`/api/analyze/status/${jobId}`);
+			const response = await fetch(`/api/analyze/status/${jobId}`);
 
-				if (!response.ok) {
-					throw new Error('Failed to check job status');
-				}
-
-				const data = await response.json();
-
-				if (data.status === 'completed') {
-					if (data.result) {
-						aiAnalysis = data.result;
-					} else {
-						throw new Error('Analysis completed but no result returned');
-					}
-					return;
-				} else if (data.status === 'failed') {
-					throw new Error(data.error || 'Analysis failed');
-				}
-
-				// Still pending or processing, wait and try again
-				await new Promise((resolve) => setTimeout(resolve, 2500));
-				attempts++;
-			} catch (err) {
-				throw err;
+			if (!response.ok) {
+				throw new Error('Failed to check job status');
 			}
+
+			const data = await response.json();
+
+			if (data.status === 'completed') {
+				if (data.result) {
+					aiAnalysis = data.result;
+				} else {
+					throw new Error('Analysis completed but no result returned');
+				}
+				return;
+			} else if (data.status === 'failed') {
+				throw new Error(data.error || 'Analysis failed');
+			}
+
+			// Still pending or processing, wait and try again
+			await new Promise((resolve) => setTimeout(resolve, 2500));
+			attempts++;
 		}
 
 		throw new Error('Analysis timed out after 5 minutes');
@@ -591,7 +587,7 @@
 					} else {
 						result = parsed;
 					}
-				} catch (e) {
+				} catch {
 					result = responseData.data;
 				}
 			} else {

@@ -4,7 +4,7 @@ import { db } from '$lib/server/db';
 import { sverdleResults } from '$lib/server/db/schema';
 import { fail } from '@sveltejs/kit';
 import type { Actions, PageServerLoad } from './$types';
-import { Game } from './game.ts';
+import { Game } from './game';
 
 export const load = (({ cookies }) => {
 	const game = new Game(cookies.get('sverdle'));

@@ -107,7 +107,7 @@ function getTimezoneFallback(lat: number, lon: number): string | null {
 		const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 		return timeZone || null;
 	} catch (error) {
-		console.error('Fallback timezone error:', error);
+		console.error(`Intl timezone error: ${error}, at lat: ${lat}, lon: ${lon}`);
 	}
 	return null;
 }

@@ -303,6 +303,7 @@ When adding new features:
 
 ## Acknowledgments
 
+- [Swiss Ephemeris WASM](https://github.com/prolaxu/swisseph-wasm) - Gold-standard astronomical calculations for Ascendants and Houses
 - [astronomy-engine](https://github.com/cosinekitty/astronomy) - Precise astronomical calculations
 - [Astro-Databank](https://www.astro.com/astro-databank/) - Verified celebrity birth data
 - [Perplexity AI](https://www.perplexity.ai/) - Mystical analysis generation
