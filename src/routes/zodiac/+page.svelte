@@ -27,8 +27,14 @@
 	let { data }: { data: PageData } = $props();
 
 	// Initialize Swiss Ephemeris WASM on component mount
-	onMount(() => {
-		initSwissEph();
+	onMount(async () => {
+		try {
+			await initSwissEph();
+			sweInitialized = true;
+		} catch (err) {
+			console.error('Failed to initialize Swiss Ephemeris:', err);
+			error = 'Failed to initialize astronomical calculator. Please refresh the page.';
+		}
 	});
 
 	// Type definitions for planet data structures
@@ -122,6 +128,7 @@
 	let houses = $state<House[]>([]);
 	let planets = $state<PlanetPositions | null>(null);
 	let isLoading = $state(false);
+	let sweInitialized = $state(false);
 	let error = $state<string | null>(null);
 	let normalizedTime = $state<string | null>(null);
 	let isDST = $state<boolean | null>(null);
@@ -1137,8 +1144,8 @@
 				{/if}
 			</div>
 
-			<button type="submit" disabled={isLoading} class="button">
-				{isLoading ? 'Calculating...' : 'Calculate Chart'}
+			<button type="submit" disabled={isLoading || !sweInitialized} class="button">
+				{!sweInitialized ? 'Initializing...' : isLoading ? 'Calculating...' : 'Calculate Chart'}
 			</button>
 
 			{#if sunSign && ascendant && moonSign}
