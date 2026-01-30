@@ -1,6 +1,6 @@
 /* File: test-zodiac-complete.mjs */
+/* * */
 
-/**
  * Complete test suite for zodiac calculations using verified celebrity birth charts
  * Run with: node test-zodiac-complete.mjs
  *
@@ -71,11 +71,7 @@ function calculateGST(year, month, day, hour, minute) {
 	const d = jd - 2451545.0;
 	const T = d / 36525.0;
 
-	let gmst =
-		280.46061837 +
-		360.98564736629 * d +
-		0.000387933 * T * T -
-		T * T * T / 38710000.0;
+	let gmst = 280.46061837 + 360.98564736629 * d + 0.000387933 * T * T - (T * T * T) / 38710000.0;
 
 	gmst = gmst % 360;
 	if (gmst < 0) gmst += 360;
@@ -97,7 +93,10 @@ function calculateAscendant(year, month, day, hour, minute, latitude, longitude)
 	const obliquity = 23.43929111;
 	const obliquityRad = (obliquity * Math.PI) / 180;
 
-	const x = -(Math.sin(obliquityRad) * Math.tan(latRad) + Math.cos(obliquityRad) * Math.sin(ramcRad));
+	const x = -(
+		Math.sin(obliquityRad) * Math.tan(latRad) +
+		Math.cos(obliquityRad) * Math.sin(ramcRad)
+	);
 	const y = Math.cos(ramcRad);
 
 	let ascendantRad = Math.atan2(y, x);
@@ -111,28 +110,32 @@ function calculateAscendant(year, month, day, hour, minute, latitude, longitude)
 
 // Calculate all planets
 function calculateAllPlanets(year, month, day, hour = 12, minute = 0) {
-	// Use exact birth time for inner planets (Mercury, Venus, Mars)
-	const innerPlanetDate = new Date(Date.UTC(year, month - 1, day, hour, minute, 0));
-	// Use noon for outer planets (they don't change much over a day)
-	const outerPlanetDate = new Date(Date.UTC(year, month - 1, day, 12, 0, 0));
+	const date = new Date(Date.UTC(year, month - 1, day, hour, minute, 0));
 
-	// Inner planets need geocentric coordinates (EclipticLongitude returns heliocentric)
-	const mercuryGeo = Astronomy.GeoVector(Astronomy.Body.Mercury, innerPlanetDate, false);
-	const venusGeo = Astronomy.GeoVector(Astronomy.Body.Venus, innerPlanetDate, false);
-	const marsGeo = Astronomy.GeoVector(Astronomy.Body.Mars, innerPlanetDate, false);
-	const mercuryEcliptic = Astronomy.Ecliptic(mercuryGeo);
-	const venusEcliptic = Astronomy.Ecliptic(venusGeo);
-	const marsEcliptic = Astronomy.Ecliptic(marsGeo);
+	const mercuryEcliptic = Astronomy.Ecliptic(
+		Astronomy.GeoVector(Astronomy.Body.Mercury, date, true)
+	);
+	const venusEcliptic = Astronomy.Ecliptic(Astronomy.GeoVector(Astronomy.Body.Venus, date, true));
+	const marsEcliptic = Astronomy.Ecliptic(Astronomy.GeoVector(Astronomy.Body.Mars, date, true));
+	const jupiterEcliptic = Astronomy.Ecliptic(
+		Astronomy.GeoVector(Astronomy.Body.Jupiter, date, true)
+	);
+	const saturnEcliptic = Astronomy.Ecliptic(Astronomy.GeoVector(Astronomy.Body.Saturn, date, true));
+	const uranusEcliptic = Astronomy.Ecliptic(Astronomy.GeoVector(Astronomy.Body.Uranus, date, true));
+	const neptuneEcliptic = Astronomy.Ecliptic(
+		Astronomy.GeoVector(Astronomy.Body.Neptune, date, true)
+	);
+	const plutoEcliptic = Astronomy.Ecliptic(Astronomy.GeoVector(Astronomy.Body.Pluto, date, true));
 
 	return {
 		mercury: longitudeToSign(mercuryEcliptic.elon),
 		venus: longitudeToSign(venusEcliptic.elon),
 		mars: longitudeToSign(marsEcliptic.elon),
-		jupiter: longitudeToSign(Astronomy.EclipticLongitude(Astronomy.Body.Jupiter, outerPlanetDate)),
-		saturn: longitudeToSign(Astronomy.EclipticLongitude(Astronomy.Body.Saturn, outerPlanetDate)),
-		uranus: longitudeToSign(Astronomy.EclipticLongitude(Astronomy.Body.Uranus, outerPlanetDate)),
-		neptune: longitudeToSign(Astronomy.EclipticLongitude(Astronomy.Body.Neptune, outerPlanetDate)),
-		pluto: longitudeToSign(Astronomy.EclipticLongitude(Astronomy.Body.Pluto, outerPlanetDate))
+		jupiter: longitudeToSign(jupiterEcliptic.elon),
+		saturn: longitudeToSign(saturnEcliptic.elon),
+		uranus: longitudeToSign(uranusEcliptic.elon),
+		neptune: longitudeToSign(neptuneEcliptic.elon),
+		pluto: longitudeToSign(plutoEcliptic.elon)
 	};
 }
 
@@ -299,6 +302,114 @@ const testCases = [
 			neptune: 'Capricorn',
 			pluto: 'Scorpio'
 		}
+	},
+	{
+		name: 'Bobby Darin',
+		birthDate: { year: 1936, month: 5, day: 14, hour: 9, minute: 28 }, // 5:28 AM EDT = 09:28 UTC
+		location: { name: 'Manhattan, New York', latitude: 40.767, longitude: -73.983 },
+		expected: {
+			sun: 'Taurus',
+			moon: 'Aquarius',
+			ascendant: 'Taurus',
+			mercury: 'Gemini',
+			venus: 'Taurus',
+			mars: 'Gemini',
+			jupiter: 'Sagittarius',
+			saturn: 'Pisces',
+			uranus: 'Taurus',
+			neptune: 'Virgo',
+			pluto: 'Cancer'
+		}
+	},
+	{
+		name: 'Brad Renfro',
+		birthDate: { year: 1982, month: 7, day: 26, hour: 2, minute: 20 }, // 10:20 PM EDT = 02:20 UTC next day
+		location: { name: 'Knoxville, Tennessee', latitude: 35.967, longitude: -83.917 },
+		expected: {
+			sun: 'Leo',
+			moon: 'Libra',
+			ascendant: 'Pisces',
+			mercury: 'Leo',
+			venus: 'Cancer',
+			mars: 'Libra',
+			jupiter: 'Scorpio',
+			saturn: 'Libra',
+			uranus: 'Sagittarius',
+			neptune: 'Sagittarius',
+			pluto: 'Libra'
+		}
+	},
+	{
+		name: 'Ry Cooder',
+		birthDate: { year: 1947, month: 3, day: 15, hour: 10, minute: 5 }, // 2:05 AM PST = 10:05 UTC
+		location: { name: 'Los Angeles, California', latitude: 34.05, longitude: -118.25 },
+		expected: {
+			sun: 'Pisces',
+			moon: 'Capricorn',
+			ascendant: 'Capricorn',
+			mercury: 'Pisces',
+			venus: 'Aquarius',
+			mars: 'Pisces',
+			jupiter: 'Scorpio',
+			saturn: 'Leo',
+			uranus: 'Gemini',
+			neptune: 'Libra',
+			pluto: 'Leo'
+		}
+	},
+	{
+		name: 'Rod Serling',
+		birthDate: { year: 1924, month: 12, day: 25, hour: 8, minute: 7 }, // 3:07 AM EST = 08:07 UTC
+		location: { name: 'Syracuse, New York', latitude: 43.05, longitude: -76.15 },
+		expected: {
+			sun: 'Capricorn',
+			moon: 'Sagittarius',
+			ascendant: 'Scorpio',
+			mercury: 'Capricorn',
+			venus: 'Sagittarius',
+			mars: 'Aries',
+			jupiter: 'Capricorn',
+			saturn: 'Scorpio',
+			uranus: 'Pisces',
+			neptune: 'Leo',
+			pluto: 'Cancer'
+		}
+	},
+	{
+		name: 'Kenny Loggins',
+		birthDate: { year: 1948, month: 1, day: 7, hour: 21, minute: 20 }, // 1:20 PM PST = 21:20 UTC
+		location: { name: 'Everett, Washington', latitude: 47.983, longitude: -122.2 },
+		expected: {
+			sun: 'Capricorn',
+			moon: 'Sagittarius',
+			ascendant: 'Gemini',
+			mercury: 'Capricorn',
+			venus: 'Aquarius',
+			mars: 'Virgo',
+			jupiter: 'Sagittarius',
+			saturn: 'Leo',
+			uranus: 'Gemini',
+			neptune: 'Libra',
+			pluto: 'Leo'
+		}
+	},
+	{
+		name: 'Kenny Chesney',
+		birthDate: { year: 1968, month: 3, day: 26, hour: 20, minute: 55 }, // 3:55 PM EST = 20:55 UTC
+		location: { name: 'Knoxville, Tennessee', latitude: 35.967, longitude: -83.917 },
+		expected: {
+			sun: 'Aries',
+			moon: 'Pisces',
+			ascendant: 'Virgo',
+			mercury: 'Pisces',
+			venus: 'Pisces',
+			mars: 'Aries',
+			jupiter: 'Leo',
+			saturn: 'Aries',
+			uranus: 'Virgo',
+			neptune: 'Scorpio',
+			pluto: 'Virgo'
+		}
 	}
 ];
 
@@ -316,12 +427,18 @@ for (const testCase of testCases) {
 	console.log('='.repeat(60));
 	console.log(`TEST: ${testCase.name}`);
 	console.log('='.repeat(60));
-	console.log(`Birth: ${testCase.birthDate.month}/${testCase.birthDate.day}/${testCase.birthDate.year} at ${testCase.birthDate.hour}:${String(testCase.birthDate.minute).padStart(2, '0')} UTC`);
+	console.log(
+		`Birth: ${testCase.birthDate.month}/${testCase.birthDate.day}/${testCase.birthDate.year} at ${testCase.birthDate.hour}:${String(testCase.birthDate.minute).padStart(2, '0')} UTC`
+	);
 	console.log(`Location: ${testCase.location.name}\n`);
 
 	try {
 		// Calculate values
-		const sun = calculateSunSign(testCase.birthDate.month, testCase.birthDate.day, testCase.birthDate.year);
+		const sun = calculateSunSign(
+			testCase.birthDate.month,
+			testCase.birthDate.day,
+			testCase.birthDate.year
+		);
 		const moon = calculateMoonSign(
 			testCase.birthDate.year,
 			testCase.birthDate.month,
@@ -348,19 +465,25 @@ for (const testCase of testCases) {
 
 		// Check sun
 		const sunMatch = sun === testCase.expected.sun;
-		console.log(`☀️  Sun Sign:    Expected: ${testCase.expected.sun.padEnd(11)} | Actual: ${sun.padEnd(11)} | ${sunMatch ? '✅ PASS' : '❌ FAIL'}`);
+		console.log(
+			`☀️  Sun Sign:    Expected: ${testCase.expected.sun.padEnd(11)} | Actual: ${sun.padEnd(11)} | ${sunMatch ? '✅ PASS' : '❌ FAIL'}`
+		);
 		totalTests++;
 		if (sunMatch) passedTests++;
 
 		// Check moon
 		const moonMatch = moon === testCase.expected.moon;
-		console.log(`🌙 Moon Sign:   Expected: ${testCase.expected.moon.padEnd(11)} | Actual: ${moon.padEnd(11)} | ${moonMatch ? '✅ PASS' : '❌ FAIL'}`);
+		console.log(
+			`🌙 Moon Sign:   Expected: ${testCase.expected.moon.padEnd(11)} | Actual: ${moon.padEnd(11)} | ${moonMatch ? '✅ PASS' : '❌ FAIL'}`
+		);
 		totalTests++;
 		if (moonMatch) passedTests++;
 
 		// Check ascendant
 		const ascMatch = ascendant === testCase.expected.ascendant;
-		console.log(`⬆️  Ascendant:   Expected: ${testCase.expected.ascendant.padEnd(11)} | Actual: ${ascendant.padEnd(11)} | ${ascMatch ? '✅ PASS' : '❌ FAIL'}`);
+		console.log(
+			`⬆️  Ascendant:   Expected: ${testCase.expected.ascendant.padEnd(11)} | Actual: ${ascendant.padEnd(11)} | ${ascMatch ? '✅ PASS' : '❌ FAIL'}`
+		);
 		totalTests++;
 		if (ascMatch) passedTests++;
 
@@ -371,7 +494,9 @@ for (const testCase of testCases) {
 			const actualSign = planets[planet];
 			const match = expectedSign === actualSign;
 			const planetName = planet.charAt(0).toUpperCase() + planet.slice(1);
-			console.log(`   ${planetName.padEnd(8)}: Expected: ${expectedSign.padEnd(11)} | Actual: ${actualSign.padEnd(11)} | ${match ? '✅' : '❌'}`);
+			console.log(
+				`   ${planetName.padEnd(8)}: Expected: ${expectedSign.padEnd(11)} | Actual: ${actualSign.padEnd(11)} | ${match ? '✅' : '❌'}`
+			);
 			totalTests++;
 			if (match) passedTests++;
 		}

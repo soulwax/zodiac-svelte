@@ -8,10 +8,27 @@
 
 <header>
 	<div class="corner">
-		<div class="logo-container relative flex items-center justify-center" style="width: 120px; height: 120px;">
-			<div class="absolute inset-0 w-full h-full rounded-full border-2 animate-spin-slow" style="border-color: transparent; border-top-color: rgb(20, 184, 166); border-right-color: rgba(20, 184, 166, 0.3);"></div>
+		<div
+			class="logo-container relative flex items-center justify-center"
+			style="width: 120px; height: 120px;"
+		>
+			<div
+				class="absolute inset-0 w-full h-full rounded-full border-2 animate-spin-slow"
+				style="border-color: transparent; border-top-color: rgb(20, 184, 166); border-right-color: rgba(20, 184, 166, 0.3);"
+			></div>
 			<div class="relative z-10">
-				<svg xmlns="http://www.w3.org/2000/svg" width="66" height="66" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="text-teal-400">
+				<svg
+					xmlns="http://www.w3.org/2000/svg"
+					width="66"
+					height="66"
+					viewBox="0 0 100 100"
+					fill="none"
+					stroke="currentColor"
+					stroke-width="2.5"
+					stroke-linecap="round"
+					stroke-linejoin="round"
+					class="text-teal-400"
+				>
 					<path d="M 50 10 L 80 30 L 80 70 L 50 90 L 20 70 L 20 30 Z"></path>
 					<line x1="50" y1="20" x2="50" y2="80"></line>
 					<circle cx="50" cy="50" r="10"></circle>
@@ -19,7 +36,12 @@
 					<circle cx="50" cy="90" r="3" fill="currentColor"></circle>
 				</svg>
 			</div>
-			<div class="absolute -top-0.5 -right-0.5 text-teal-400 pointer-events-none opacity-60" style="font-size: 18px;">✨</div>
+			<div
+				class="absolute -top-0.5 -right-0.5 text-teal-400 pointer-events-none opacity-60"
+				style="font-size: 18px;"
+			>
+				✨
+			</div>
 		</div>
 	</div>
 

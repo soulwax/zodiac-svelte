@@ -1,6 +1,7 @@
 # Code Review
 
 Analyze the current file or selected code for:
+
 - Security vulnerabilities and potential exploits
 - Performance issues and optimization opportunities
 - Best practices violations

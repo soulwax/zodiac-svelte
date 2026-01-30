@@ -1,6 +1,6 @@
 /* File: test-zodiac-simple.mjs */
+/* * */
 
-/**
  * Simple test script for zodiac calculations
  * Run with: node test-zodiac-simple.mjs
  */
@@ -30,7 +30,6 @@ try {
 	console.log('Mercury ecliptic longitude:', mercuryLon, '°');
 
 	console.log('\n✅ All astronomy-engine functions are working!\n');
-
 } catch (error) {
 	console.error('\n❌ Error:', error);
 	process.exit(1);

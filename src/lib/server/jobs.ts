@@ -53,7 +53,10 @@ export function getJob(id: string): Job | undefined {
 	return jobs.get(id);
 }
 
-export function updateJob(id: string, updates: Partial<Omit<Job, 'id' | 'createdAt'>>): Job | undefined {
+export function updateJob(
+	id: string,
+	updates: Partial<Omit<Job, 'id' | 'createdAt'>>
+): Job | undefined {
 	const job = jobs.get(id);
 	if (!job) return undefined;
 

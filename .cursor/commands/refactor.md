@@ -1,6 +1,7 @@
 # Suggest Refactoring
 
 Analyze the current file and suggest:
+
 - Dead code removal
 - Extract functions/components
 - Simplify complex conditionals

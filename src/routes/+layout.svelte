@@ -16,7 +16,8 @@
 
 	<footer>
 		<p>
-			Visit <a href="https://github.com/soulwax/zodiac-svelte">github/soulwax/zodiac-svelte</a> to learn about this project. Copyright © 2025 Soulwax. All rights reserved.
+			Visit <a href="https://github.com/soulwax/zodiac-svelte">github/soulwax/zodiac-svelte</a> to learn
+			about this project. Copyright © 2025 Soulwax. All rights reserved.
 		</p>
 	</footer>
 </div>

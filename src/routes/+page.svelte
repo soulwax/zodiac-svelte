@@ -10,7 +10,7 @@
 		calculateSunSign
 	} from '$lib/zodiac';
 	import Chart from './zodiac/Chart.svelte';
-	
+
 	const siteUrl = $derived($page.url.origin);
 	const pageUrl = $derived($page.url.href);
 
@@ -22,37 +22,79 @@
 	const sampleHour = 12;
 	const sampleMinute = 0;
 	const sampleLat = 40.7128;
-	const sampleLon = -74.0060;
+	const sampleLon = -74.006;
 
 	// Calculate sample chart data
 	const sampleSunSign = calculateSunSign(sampleMonth, sampleDay, sampleYear);
-	const sampleMoonSign = calculateMoonSign(sampleYear, sampleMonth, sampleDay, sampleHour, sampleMinute);
-	const sampleAscendant = calculateAscendant(sampleYear, sampleMonth, sampleDay, sampleHour, sampleMinute, sampleLat, sampleLon);
-	const sampleHouses = calculateHouses(sampleYear, sampleMonth, sampleDay, sampleHour, sampleMinute, sampleLat, sampleLon);
-	const samplePlanets = calculateAllPlanets(sampleYear, sampleMonth, sampleDay, sampleHour, sampleMinute);
+	const sampleMoonSign = calculateMoonSign(
+		sampleYear,
+		sampleMonth,
+		sampleDay,
+		sampleHour,
+		sampleMinute
+	);
+	const sampleAscendant = calculateAscendant(
+		sampleYear,
+		sampleMonth,
+		sampleDay,
+		sampleHour,
+		sampleMinute,
+		sampleLat,
+		sampleLon
+	);
+	const sampleHouses = calculateHouses(
+		sampleYear,
+		sampleMonth,
+		sampleDay,
+		sampleHour,
+		sampleMinute,
+		sampleLat,
+		sampleLon
+	);
+	const samplePlanets = calculateAllPlanets(
+		sampleYear,
+		sampleMonth,
+		sampleDay,
+		sampleHour,
+		sampleMinute
+	);
 </script>
 
 <svelte:head>
-	<title>Zodiac Chart Calculator - Free Birth Chart Analysis | Discover Your Astrological Chart</title>
-	<meta name="description" content="Free zodiac birth chart calculator. Discover your sun sign, moon sign, ascendant, planetary positions, and astrological houses. Accurate and detailed astrological analysis." />
-	<meta name="keywords" content="zodiac chart, birth chart, astrology calculator, sun sign, moon sign, ascendant, natal chart, astrological chart, horoscope, planetary positions, free astrology" />
+	<title
+		>Zodiac Chart Calculator - Free Birth Chart Analysis | Discover Your Astrological Chart</title
+	>
+	<meta
+		name="description"
+		content="Free zodiac birth chart calculator. Discover your sun sign, moon sign, ascendant, planetary positions, and astrological houses. Accurate and detailed astrological analysis."
+	/>
+	<meta
+		name="keywords"
+		content="zodiac chart, birth chart, astrology calculator, sun sign, moon sign, ascendant, natal chart, astrological chart, horoscope, planetary positions, free astrology"
+	/>
 	<meta name="author" content="Soulwax" />
-	
+
 	<!-- Open Graph / Facebook -->
 	<meta property="og:type" content="website" />
 	<meta property="og:url" content={pageUrl} />
 	<meta property="og:title" content="Zodiac Chart Calculator - Free Birth Chart Analysis" />
-	<meta property="og:description" content="Calculate your complete zodiac birth chart with detailed astrological analysis. Discover your sun sign, moon sign, ascendant, planetary positions, and house placements." />
+	<meta
+		property="og:description"
+		content="Calculate your complete zodiac birth chart with detailed astrological analysis. Discover your sun sign, moon sign, ascendant, planetary positions, and house placements."
+	/>
 	<meta property="og:image" content={`${siteUrl}/favicon.png`} />
 	<meta property="og:site_name" content="Zodiac Chart Calculator" />
-	
+
 	<!-- Twitter -->
 	<meta name="twitter:card" content="summary_large_image" />
 	<meta name="twitter:url" content={pageUrl} />
 	<meta name="twitter:title" content="Zodiac Chart Calculator - Free Birth Chart Analysis" />
-	<meta name="twitter:description" content="Calculate your complete zodiac birth chart with detailed astrological analysis. Discover your sun sign, moon sign, ascendant, and more." />
+	<meta
+		name="twitter:description"
+		content="Calculate your complete zodiac birth chart with detailed astrological analysis. Discover your sun sign, moon sign, ascendant, and more."
+	/>
 	<meta name="twitter:image" content={`${siteUrl}/favicon.png`} />
-	
+
 	<!-- Additional SEO -->
 	<link rel="canonical" href={pageUrl} />
 	<meta name="robots" content="index, follow" />
@@ -66,10 +108,10 @@
 			Discover the cosmic blueprint of your birth chart with precise astrological calculations
 		</p>
 		<p class="hero-description">
-			Unlock the secrets of your astrological identity by calculating your complete birth chart. 
-			Our free calculator provides detailed insights into your sun sign, moon sign, ascendant (rising sign), 
-			planetary positions, and astrological houses. Each celestial body's placement reveals unique aspects 
-			of your personality, relationships, and life path.
+			Unlock the secrets of your astrological identity by calculating your complete birth chart. Our
+			free calculator provides detailed insights into your sun sign, moon sign, ascendant (rising
+			sign), planetary positions, and astrological houses. Each celestial body's placement reveals
+			unique aspects of your personality, relationships, and life path.
 		</p>
 		<div class="features">
 			<div class="feature">
@@ -109,9 +151,9 @@
 	<div class="sample-content">
 		<h2>Sample Planetary Constellation</h2>
 		<p class="sample-description">
-			Below is an example birth chart showing how planetary positions are displayed. 
-			This sample chart represents January 1, 2000 at 12:00 PM in New York City. 
-			Each planet's position in the zodiac signs and houses is calculated with astronomical precision.
+			Below is an example birth chart showing how planetary positions are displayed. This sample
+			chart represents January 1, 2000 at 12:00 PM in New York City. Each planet's position in the
+			zodiac signs and houses is calculated with astronomical precision.
 		</p>
 		<div class="sample-info">
 			<div class="sample-info-item">
@@ -124,17 +166,20 @@
 				<strong>Sample Location:</strong> New York City, USA
 			</div>
 			<div class="sample-info-item">
-				<strong>Sun Sign:</strong> {sampleSunSign}
+				<strong>Sun Sign:</strong>
+				{sampleSunSign}
 			</div>
 			<div class="sample-info-item">
-				<strong>Moon Sign:</strong> {sampleMoonSign}
+				<strong>Moon Sign:</strong>
+				{sampleMoonSign}
 			</div>
 			<div class="sample-info-item">
-				<strong>Ascendant:</strong> {sampleAscendant}
+				<strong>Ascendant:</strong>
+				{sampleAscendant}
 			</div>
 		</div>
 		<div class="chart-wrapper">
-			<Chart 
+			<Chart
 				sunSign={sampleSunSign}
 				ascendant={sampleAscendant}
 				moonSign={sampleMoonSign}
@@ -213,7 +258,9 @@
 		padding: 1rem;
 		background: var(--color-bg-1);
 		border-radius: 8px;
-		transition: transform 0.2s, box-shadow 0.2s;
+		transition:
+			transform 0.2s,
+			box-shadow 0.2s;
 	}
 
 	.feature:hover {

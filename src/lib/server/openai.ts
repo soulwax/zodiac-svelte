@@ -36,9 +36,10 @@ function getSignData(sign: string | null | undefined) {
 function getPlanetDescription(planet: string, sign: string | null | undefined) {
 	if (!sign) return null;
 	const signKey = sign.toLowerCase();
-	const planetData = planetsData.planetary_sign_details[planet as keyof typeof planetsData.planetary_sign_details];
+	const planetData =
+		planetsData.planetary_sign_details[planet as keyof typeof planetsData.planetary_sign_details];
 	if (!planetData || typeof planetData !== 'object') return null;
-	
+
 	const signData = (planetData as Record<string, unknown>)[signKey];
 	return signData || null;
 }
@@ -67,7 +68,9 @@ export async function generateMysticalAnalysis(chartData: ChartData): Promise<st
 	return result.analysisText;
 }
 
-export async function generateMysticalAnalysisDetailed(chartData: ChartData): Promise<AnalysisMetadata> {
+export async function generateMysticalAnalysisDetailed(
+	chartData: ChartData
+): Promise<AnalysisMetadata> {
 	// Build comprehensive chart information
 	const sunSignData = getSignData(chartData.sunSign);
 	const moonSignData = getSignData(chartData.moonSign);
@@ -75,19 +78,19 @@ export async function generateMysticalAnalysisDetailed(chartData: ChartData): Pr
 
 	// Build planet descriptions - include Sun and Moon
 	const planetDescriptions: string[] = [];
-	
+
 	// Add Sun
 	const sunDesc = getSignData(chartData.sunSign);
 	if (sunDesc?.sun) {
 		planetDescriptions.push(`Sun in ${chartData.sunSign}: ${sunDesc.sun.description}`);
 	}
-	
+
 	// Add Moon
 	const moonDesc = getSignData(chartData.moonSign);
 	if (moonDesc?.moon) {
 		planetDescriptions.push(`Moon in ${chartData.moonSign}: ${moonDesc.moon.description}`);
 	}
-	
+
 	// Add all other planets
 	for (const [planet, position] of Object.entries(chartData.planets)) {
 		if (!position || !position.sign) continue;
@@ -132,10 +135,10 @@ ${chartData.moonSign ? `- **Moon in ${chartData.moonSign}**: ${moonSignData?.moo
 ${chartData.ascendant ? `- **Ascendant (Rising) in ${chartData.ascendant}**: ${ascendantSignData?.ascendant?.description || 'The mask worn and first impressions.'}\n  Keywords: ${ascendantSignData?.ascendant?.keywords?.join(', ') || 'N/A'}` : ''}
 
 **THE PLANETARY COUNCIL - THE COSMIC INFLUENCES:**
-${planetDescriptions.length > 0 ? planetDescriptions.map(desc => `- ${desc}`).join('\n') : 'No planetary positions provided.'}
+${planetDescriptions.length > 0 ? planetDescriptions.map((desc) => `- ${desc}`).join('\n') : 'No planetary positions provided.'}
 
 **THE TWELVE HOUSES - THE LIFE'S STAGES:**
-${houseDescriptions.length > 0 ? houseDescriptions.map(desc => `- ${desc}`).join('\n') : 'No house information provided.'}
+${houseDescriptions.length > 0 ? houseDescriptions.map((desc) => `- ${desc}`).join('\n') : 'No house information provided.'}
 
 Now, weave together a profound, mystical, and deeply personal analysis. Write as if you are speaking directly to their soul, using poetic and evocative language that captures the magic and mystery of the cosmos. 
 
@@ -155,21 +158,29 @@ Write this analysis as if you are channeling the wisdom of the stars themselves.
 
 	// Check API key at runtime (not just module load)
 	// Debug: Log available env keys (without values for security)
-	const availableKeys = Object.keys(env).filter(k => k.includes('API') || k.includes('KEY')).join(', ');
+	const availableKeys = Object.keys(env)
+		.filter((k) => k.includes('API') || k.includes('KEY'))
+		.join(', ');
 	console.log('Available env keys:', availableKeys || 'none');
 	console.log('PERPLEXITY_API_KEY exists:', !!env.PERPLEXITY_API_KEY);
 	console.log('PERPLEXITY_API_KEY length:', env.PERPLEXITY_API_KEY?.length || 0);
-	
+
 	if (!env.PERPLEXITY_API_KEY) {
 		console.error('PERPLEXITY_API_KEY is not set in environment variables');
-		console.error('Make sure PERPLEXITY_API_KEY is in your .env file and restart PM2: pm2 restart stars-ssr-svelte-prod');
-		throw new Error('PERPLEXITY_API_KEY is not set. Please add it to your .env file and restart PM2.');
+		console.error(
+			'Make sure PERPLEXITY_API_KEY is in your .env file and restart PM2: pm2 restart stars-ssr-svelte-prod'
+		);
+		throw new Error(
+			'PERPLEXITY_API_KEY is not set. Please add it to your .env file and restart PM2.'
+		);
 	}
 
 	// Check if API key is empty or just whitespace
 	if (env.PERPLEXITY_API_KEY.trim().length === 0) {
 		console.error('PERPLEXITY_API_KEY is set but empty');
-		throw new Error('PERPLEXITY_API_KEY is set but empty. Please provide a valid API key in your .env file.');
+		throw new Error(
+			'PERPLEXITY_API_KEY is set but empty. Please provide a valid API key in your .env file.'
+		);
 	}
 
 	// Re-initialize Perplexity client if needed (in case env changed or wasn't set at module load)
@@ -180,10 +191,11 @@ Write this analysis as if you are channeling the wisdom of the stars themselves.
 		});
 	}
 
-	const systemMessage = 'You are a wise, mystical astrologer with deep knowledge of the cosmos and the human soul. You speak with poetic grace, profound insight, and a touch of ancient wisdom. Your readings are deeply personal, transformative, and written as if you are channeling the stars themselves.';
+	const systemMessage =
+		'You are a wise, mystical astrologer with deep knowledge of the cosmos and the human soul. You speak with poetic grace, profound insight, and a touch of ancient wisdom. Your readings are deeply personal, transformative, and written as if you are channeling the stars themselves.';
 	const model = 'sonar-pro'; // Perplexity model - advanced search model with 200k token context
 	const temperature = 0.8;
-	const maxTokens = 8000; 
+	const maxTokens = 8000;
 
 	try {
 		const completion = await perplexity.chat.completions.create({
@@ -231,13 +243,17 @@ Write this analysis as if you are channeling the wisdom of the stars themselves.
 			message: error instanceof Error ? error.message : String(error),
 			stack: error instanceof Error ? error.stack : undefined
 		});
-		
+
 		// Provide more specific error messages
 		if (error instanceof Error) {
 			const errorMessage = error.message.toLowerCase();
-			
+
 			// Check for common Perplexity API errors
-			if (errorMessage.includes('401') || errorMessage.includes('unauthorized') || errorMessage.includes('invalid api key')) {
+			if (
+				errorMessage.includes('401') ||
+				errorMessage.includes('unauthorized') ||
+				errorMessage.includes('invalid api key')
+			) {
 				console.error('Perplexity API authentication failed - invalid API key');
 				throw new Error('Invalid PERPLEXITY_API_KEY. Please check your API key in the .env file.');
 			}
@@ -249,12 +265,18 @@ Write this analysis as if you are channeling the wisdom of the stars themselves.
 				console.error('Perplexity API server error');
 				throw new Error('Perplexity API server error. Please try again later.');
 			}
-			if (errorMessage.includes('network') || errorMessage.includes('fetch') || errorMessage.includes('econnrefused')) {
+			if (
+				errorMessage.includes('network') ||
+				errorMessage.includes('fetch') ||
+				errorMessage.includes('econnrefused')
+			) {
 				console.error('Network error connecting to Perplexity API');
-				throw new Error('Network error connecting to Perplexity API. Please check your internet connection.');
+				throw new Error(
+					'Network error connecting to Perplexity API. Please check your internet connection.'
+				);
 			}
 		}
-		
+
 		// Re-throw with original message if it's already informative
 		throw error;
 	}

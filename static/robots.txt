@@ -1,5 +1,5 @@
 # File: static/robots.txt
-
 # allow crawling everything by default
+
 User-agent: *
 Disallow:

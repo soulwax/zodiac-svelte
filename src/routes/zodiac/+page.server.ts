@@ -32,7 +32,7 @@ export const actions = {
 
 			// Parse houses JSON
 			const houses = JSON.parse(housesJson);
-			
+
 			// Parse planets JSON (with default empty object if not provided)
 			const planets = planetsJson ? JSON.parse(planetsJson) : {};
 
@@ -99,13 +99,29 @@ export const actions = {
 				if (record.sunSign && !planetsWithHouses.sun) {
 					// Import functions to calculate planet houses
 					const { getPlanetLongitude, getPlanetHouse } = await import('$lib/zodiac');
-					const sunLon = getPlanetLongitude(record.sunSign, record.utcYear, record.utcMonth, record.utcDay, 'Sun', record.utcHour, record.utcMinute);
+					const sunLon = getPlanetLongitude(
+						record.sunSign,
+						record.utcYear,
+						record.utcMonth,
+						record.utcDay,
+						'Sun',
+						record.utcHour,
+						record.utcMinute
+					);
 					const sunHouse = getPlanetHouse(sunLon, houses);
 					planetsWithHouses.sun = { sign: record.sunSign, house: sunHouse };
 				}
 				if (record.moonSign && !planetsWithHouses.moon) {
 					const { getPlanetLongitude, getPlanetHouse } = await import('$lib/zodiac');
-					const moonLon = getPlanetLongitude(record.moonSign, record.utcYear, record.utcMonth, record.utcDay, 'Moon', record.utcHour, record.utcMinute);
+					const moonLon = getPlanetLongitude(
+						record.moonSign,
+						record.utcYear,
+						record.utcMonth,
+						record.utcDay,
+						'Moon',
+						record.utcHour,
+						record.utcMinute
+					);
 					const moonHouse = getPlanetHouse(moonLon, houses);
 					planetsWithHouses.moon = { sign: record.moonSign, house: moonHouse };
 				}
@@ -145,7 +161,8 @@ export const actions = {
 				if (!sunSign || !moonSign || !ascendant) {
 					return {
 						success: false,
-						error: 'Missing required chart data. Please ensure sun sign, moon sign, and ascendant are provided.'
+						error:
+							'Missing required chart data. Please ensure sun sign, moon sign, and ascendant are provided.'
 					};
 				}
 
@@ -161,21 +178,42 @@ export const actions = {
 
 				// Calculate Sun house
 				if (sunSign) {
-					const sunLon = getPlanetLongitude(sunSign, utcYear, utcMonth, utcDay, 'Sun', utcHour, utcMinute);
+					const sunLon = getPlanetLongitude(
+						sunSign,
+						utcYear,
+						utcMonth,
+						utcDay,
+						'Sun',
+						utcHour,
+						utcMinute
+					);
 					const sunHouse = getPlanetHouse(sunLon, houses);
 					planetsWithHouses.sun = { sign: sunSign, house: sunHouse };
 				}
 
 				// Calculate Moon house
 				if (moonSign) {
-					const moonLon = getPlanetLongitude(moonSign, utcYear, utcMonth, utcDay, 'Moon', utcHour, utcMinute);
+					const moonLon = getPlanetLongitude(
+						moonSign,
+						utcYear,
+						utcMonth,
+						utcDay,
+						'Moon',
+						utcHour,
+						utcMinute
+					);
 					const moonHouse = getPlanetHouse(moonLon, houses);
 					planetsWithHouses.moon = { sign: moonSign, house: moonHouse };
 				}
 
 				// Calculate houses for other planets if not already set
 				for (const [planet, position] of Object.entries(planets)) {
-					if (position && typeof position === 'object' && 'sign' in position && !('house' in position)) {
+					if (
+						position &&
+						typeof position === 'object' &&
+						'sign' in position &&
+						!('house' in position)
+					) {
 						const planetLon = getPlanetLongitude(
 							position.sign,
 							utcYear,
@@ -208,7 +246,8 @@ export const actions = {
 			if (!chartData.sunSign || !chartData.moonSign || !chartData.ascendant) {
 				return {
 					success: false,
-					error: 'Missing required chart data. Please ensure sun sign, moon sign, and ascendant are calculated.'
+					error:
+						'Missing required chart data. Please ensure sun sign, moon sign, and ascendant are calculated.'
 				};
 			}
 
@@ -217,7 +256,7 @@ export const actions = {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
-					'Cookie': request.headers.get('Cookie') || ''
+					Cookie: request.headers.get('Cookie') || ''
 				},
 				body: JSON.stringify(chartData)
 			});

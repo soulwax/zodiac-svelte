@@ -1,9 +1,11 @@
 # CONTEXT.md
 
 ## Project summary
+
 Zodiac Svelte is a full-stack SvelteKit app that calculates astrological birth charts using precise astronomical positions, renders an interactive chart, optionally generates AI-driven mystical analysis, and can export results to a PDF. It also includes a Sverdle (Wordle-style) game module. Results and analysis history can be persisted to Postgres via Drizzle ORM.
 
 ## Tech stack
+
 - Framework: SvelteKit (Svelte 5, Vite 7)
 - Styling: Tailwind CSS via `@tailwindcss/vite` and `layout.css`
 - Astronomy: `astronomy-engine`
@@ -13,6 +15,7 @@ Zodiac Svelte is a full-stack SvelteKit app that calculates astrological birth c
 - Hosting: adapter-node output (for Node/PM2), plus Vercel config
 
 ## Repo layout (high-signal)
+
 - `src/routes/`
   - `+layout.svelte`, `Header.svelte`, `layout.css`: global shell and styling.
   - `+page.svelte`: marketing home page with sample chart.
@@ -33,6 +36,7 @@ Zodiac Svelte is a full-stack SvelteKit app that calculates astrological birth c
 ## Core flows
 
 ### 1) Chart calculation (client)
+
 - UI: `src/routes/zodiac/+page.svelte`.
 - User inputs: name (optional), life trajectory (optional), birth date/time, place.
 - Place lookup: `searchPlaces()` calls Nominatim.
@@ -43,6 +47,7 @@ Zodiac Svelte is a full-stack SvelteKit app that calculates astrological birth c
 - Persistence: results POSTed to `?/save` action, which inserts into `zodiac_results`.
 
 ### 2) AI analysis (async)
+
 - Triggered from UI (`generateAnalysis()` in `+page.svelte`).
 - Calls `?/analyze` action in `src/routes/zodiac/+page.server.ts`.
 - The action delegates to `/api/analyze` to create an async job.
@@ -51,6 +56,7 @@ Zodiac Svelte is a full-stack SvelteKit app that calculates astrological birth c
 - On completion, analysis text is stored in `analysis_records` (and mirrored in `zodiac_results.aiAnalysis` for backward compat).
 
 ### 3) PDF export
+
 - Triggered from UI (`generatePDF()` in `+page.svelte`).
 - Uses `jsPDF` to render:
   - Birth info
@@ -61,12 +67,14 @@ Zodiac Svelte is a full-stack SvelteKit app that calculates astrological birth c
   - AI analysis (full text)
 
 ### 4) Sverdle game
+
 - `/sverdle` is a SvelteKit Wordle clone.
 - Server actions in `src/routes/sverdle/+page.server.ts` persist game results to `sverdle_results`.
 
 ## Key modules
 
 ### Astronomy and chart math
+
 - `src/lib/zodiac.ts`:
   - Converts ecliptic longitudes to zodiac signs.
   - Ascendant via GST/LST + trigonometric formula.
@@ -75,18 +83,21 @@ Zodiac Svelte is a full-stack SvelteKit app that calculates astrological birth c
   - Planet houses calculated by longitude vs. house cusps.
 
 ### Chart rendering
+
 - `src/routes/zodiac/Chart.svelte`:
   - Renders a 600x600 SVG chart.
   - Draws sign sectors, house cusps, planet positions, and aspects.
   - Calculates aspects (conjunction, opposition, trine, square, sextile) with orbs.
 
 ### AI integration
+
 - `src/lib/server/openai.ts`:
   - Uses `OpenAI` SDK with Perplexity base URL and `PERPLEXITY_API_KEY`.
   - `generateMysticalAnalysisDetailed()` builds a long-form prompt from chart data and static descriptions.
   - Records token usage metadata when available.
 
 ### DB + schema
+
 - `src/lib/server/db/index.ts` uses `drizzle-orm/neon-http` + `@neondatabase/serverless` and requires `DATABASE_URL` or `POSTGRES_URL`.
 - Schema in `src/lib/server/db/schema.ts`:
   - `zodiac_results`: main chart data + optional `aiAnalysis`.
@@ -94,6 +105,7 @@ Zodiac Svelte is a full-stack SvelteKit app that calculates astrological birth c
   - `sverdle_results`: Wordle-style game results.
 
 ## Environment variables
+
 - `.env.example` provides:
   - `PORT` (default 4332)
   - Postgres URLs (`DATABASE_URL`, `POSTGRES_URL`, etc.)
@@ -102,17 +114,20 @@ Zodiac Svelte is a full-stack SvelteKit app that calculates astrological birth c
 - `drizzle.config.ts` throws if `DATABASE_URL` is missing.
 
 ## Scripts (package.json)
+
 - `npm run dev` / `npm run build` / `npm run preview`
 - `npm run check` / `npm run lint` / `npm run format`
 - `npm run db:*` for Drizzle migrations
 - `npm run pm2:*` for PM2 lifecycle
 
 ## Deployment
+
 - `svelte.config.js` uses `@sveltejs/adapter-node` with output `build/`.
 - `ecosystem.config.cjs` runs `svelte-kit start` on port 4332 (or `PORT`).
 - `vercel.json` declares `sveltekit` framework for Vercel.
 
 ## Tests / validation
+
 - Custom zodiac test data in `src/lib/zodiac.test.ts` (celebrity chart checks).
 - Runners:
   - `node run-zodiac-tests.js`
@@ -120,8 +135,8 @@ Zodiac Svelte is a full-stack SvelteKit app that calculates astrological birth c
   - `node test-zodiac-simple.mjs`
 
 ## Notes and caveats
+
 - `src/lib/server/db/index.ts` imports `@neondatabase/serverless`, but this package is not listed in `package.json` deps; ensure it is installed if DB code is used in runtime.
 - AI jobs are stored in-memory; results are lost on cold starts or serverless restarts.
 - `getTimezoneFromCoords()` can return `null`; calculations fall back to treating input as UTC when timezone lookup fails.
 - `.env.example` does not mention `PERPLEXITY_API_KEY`, but AI features require it.
-

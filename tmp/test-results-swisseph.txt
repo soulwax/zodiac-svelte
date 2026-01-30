@@ -1,0 +1,2042 @@
+
+> stars-ssr-svelte@0.0.2 test:zodiac
+> tsx src/lib/zodiac.test.ts
+
+
+
+
+🔮🔮🔮🔮🔮🔮🔮🔮🔮🔮🔮🔮🔮🔮🔮🔮🔮🔮🔮🔮🔮🔮🔮🔮🔮🔮🔮🔮🔮🔮
+ZODIAC CALCULATION TEST SUITE
+🔮🔮🔮🔮🔮🔮🔮🔮🔮🔮🔮🔮🔮🔮🔮🔮🔮🔮🔮🔮🔮🔮🔮🔮🔮🔮🔮🔮🔮🔮
+
+Testing against verified celebrity birth charts...
+
+
+============================================================
+TEST: Princess Diana
+============================================================
+Birth: 7/1/1961 at 18:45 UTC
+Location: Sandringham, England
+Notes: Birth time confirmed by Queen's press secretary. Rodden Rating: AA
+
+☀️  Sun Sign:
+   Expected: Cancer
+   Actual:   Cancer
+   Status:   ✅ PASS
+
+🌙 Moon Sign:
+   Expected: Aquarius
+   Actual:   Aquarius
+   Status:   ✅ PASS
+
+⬆️  Ascendant (Rising Sign):
+   Expected: Sagittarius
+   Actual:   Sagittarius
+   Status:   ✅ PASS
+
+🪐 Planetary Positions:
+   Mercury:
+      Expected: Cancer
+      Actual:   Cancer
+      ✅
+   Venus:
+      Expected: Taurus
+      Actual:   Taurus
+      ✅
+   Mars:
+      Expected: Virgo
+      Actual:   Virgo
+      ✅
+   Jupiter:
+      Expected: Aquarius
+      Actual:   Aquarius
+      ✅
+   Saturn:
+      Expected: Capricorn
+      Actual:   Capricorn
+      ✅
+   Uranus:
+      Expected: Leo
+      Actual:   Leo
+      ✅
+   Neptune:
+      Expected: Scorpio
+      Actual:   Scorpio
+      ✅
+   Pluto:
+      Expected: Virgo
+      Actual:   Virgo
+      ✅
+
+📊 SUMMARY:
+   Core Points: 3/3
+   Planets: 8/8
+   Total: 11/11
+   Overall: ✅ ALL TESTS PASSED
+
+
+============================================================
+TEST: Barack Obama
+============================================================
+Birth: 8/5/1961 at 5:24 UTC
+Location: Honolulu, Hawaii
+Notes: Birth certificate verified. Rodden Rating: AA
+
+☀️  Sun Sign:
+   Expected: Leo
+   Actual:   Leo
+   Status:   ✅ PASS
+
+🌙 Moon Sign:
+   Expected: Gemini
+   Actual:   Gemini
+   Status:   ✅ PASS
+
+⬆️  Ascendant (Rising Sign):
+   Expected: Aquarius
+   Actual:   Aquarius
+   Status:   ✅ PASS
+
+🪐 Planetary Positions:
+   Mercury:
+      Expected: Leo
+      Actual:   Leo
+      ✅
+   Venus:
+      Expected: Cancer
+      Actual:   Cancer
+      ✅
+   Mars:
+      Expected: Virgo
+      Actual:   Virgo
+      ✅
+   Jupiter:
+      Expected: Aquarius
+      Actual:   Aquarius
+      ✅
+   Saturn:
+      Expected: Capricorn
+      Actual:   Capricorn
+      ✅
+   Uranus:
+      Expected: Leo
+      Actual:   Leo
+      ✅
+   Neptune:
+      Expected: Scorpio
+      Actual:   Scorpio
+      ✅
+   Pluto:
+      Expected: Virgo
+      Actual:   Virgo
+      ✅
+
+📊 SUMMARY:
+   Core Points: 3/3
+   Planets: 8/8
+   Total: 11/11
+   Overall: ✅ ALL TESTS PASSED
+
+
+============================================================
+TEST: Albert Einstein
+============================================================
+Birth: 3/14/1879 at 11:30 UTC
+Location: Ulm, Germany
+Notes: Historical birth record. Rodden Rating: AA from Astro.com
+
+☀️  Sun Sign:
+   Expected: Pisces
+   Actual:   Pisces
+   Status:   ✅ PASS
+
+🌙 Moon Sign:
+   Expected: Sagittarius
+   Actual:   Sagittarius
+   Status:   ✅ PASS
+
+⬆️  Ascendant (Rising Sign):
+   Expected: Cancer
+   Actual:   Cancer
+   Status:   ✅ PASS
+
+🪐 Planetary Positions:
+   Mercury:
+      Expected: Aries
+      Actual:   Aries
+      ✅
+   Venus:
+      Expected: Aries
+      Actual:   Aries
+      ✅
+   Mars:
+      Expected: Capricorn
+      Actual:   Capricorn
+      ✅
+   Jupiter:
+      Expected: Aquarius
+      Actual:   Aquarius
+      ✅
+   Saturn:
+      Expected: Aries
+      Actual:   Aries
+      ✅
+   Uranus:
+      Expected: Virgo
+      Actual:   Virgo
+      ✅
+   Neptune:
+      Expected: Taurus
+      Actual:   Taurus
+      ✅
+   Pluto:
+      Expected: Taurus
+      Actual:   Taurus
+      ✅
+
+📊 SUMMARY:
+   Core Points: 3/3
+   Planets: 8/8
+   Total: 11/11
+   Overall: ✅ ALL TESTS PASSED
+
+
+============================================================
+TEST: Marilyn Monroe
+============================================================
+Birth: 6/1/1926 at 17:30 UTC
+Location: Los Angeles, California
+Notes: Birth certificate verified. Rodden Rating: AA
+
+☀️  Sun Sign:
+   Expected: Gemini
+   Actual:   Gemini
+   Status:   ✅ PASS
+
+🌙 Moon Sign:
+   Expected: Aquarius
+   Actual:   Aquarius
+   Status:   ✅ PASS
+
+⬆️  Ascendant (Rising Sign):
+   Expected: Leo
+   Actual:   Leo
+   Status:   ✅ PASS
+
+🪐 Planetary Positions:
+   Mercury:
+      Expected: Gemini
+      Actual:   Gemini
+      ✅
+   Venus:
+      Expected: Aries
+      Actual:   Aries
+      ✅
+   Mars:
+      Expected: Pisces
+      Actual:   Pisces
+      ✅
+   Jupiter:
+      Expected: Aquarius
+      Actual:   Aquarius
+      ✅
+   Saturn:
+      Expected: Scorpio
+      Actual:   Scorpio
+      ✅
+   Uranus:
+      Expected: Pisces
+      Actual:   Pisces
+      ✅
+   Neptune:
+      Expected: Leo
+      Actual:   Leo
+      ✅
+   Pluto:
+      Expected: Cancer
+      Actual:   Cancer
+      ✅
+
+📊 SUMMARY:
+   Core Points: 3/3
+   Planets: 8/8
+   Total: 11/11
+   Overall: ✅ ALL TESTS PASSED
+
+
+============================================================
+TEST: Nicole Kidman
+============================================================
+Birth: 6/21/1967 at 1:15 UTC
+Location: Honolulu, Hawaii
+Notes: Verified birth data. Rodden Rating: AA
+
+☀️  Sun Sign:
+   Expected: Gemini
+   Actual:   Gemini
+   Status:   ✅ PASS
+
+🌙 Moon Sign:
+   Expected: Sagittarius
+   Actual:   Sagittarius
+   Status:   ✅ PASS
+
+⬆️  Ascendant (Rising Sign):
+   Expected: Scorpio
+   Actual:   Scorpio
+   Status:   ✅ PASS
+
+🪐 Planetary Positions:
+   Mercury:
+      Expected: Cancer
+      Actual:   Cancer
+      ✅
+   Venus:
+      Expected: Leo
+      Actual:   Leo
+      ✅
+   Mars:
+      Expected: Libra
+      Actual:   Libra
+      ✅
+   Jupiter:
+      Expected: Leo
+      Actual:   Leo
+      ✅
+   Saturn:
+      Expected: Aries
+      Actual:   Aries
+      ✅
+   Uranus:
+      Expected: Virgo
+      Actual:   Virgo
+      ✅
+   Neptune:
+      Expected: Scorpio
+      Actual:   Scorpio
+      ✅
+   Pluto:
+      Expected: Virgo
+      Actual:   Virgo
+      ✅
+
+📊 SUMMARY:
+   Core Points: 3/3
+   Planets: 8/8
+   Total: 11/11
+   Overall: ✅ ALL TESTS PASSED
+
+
+============================================================
+TEST: Brad Pitt
+============================================================
+Birth: 12/18/1963 at 6:31 UTC
+Location: Shawnee, Oklahoma
+Notes: Verified birth data. Rodden Rating: AA
+
+☀️  Sun Sign:
+   Expected: Sagittarius
+   Actual:   Sagittarius
+   Status:   ✅ PASS
+
+🌙 Moon Sign:
+   Expected: Capricorn
+   Actual:   Capricorn
+   Status:   ✅ PASS
+
+⬆️  Ascendant (Rising Sign):
+   Expected: Virgo
+   Actual:   Virgo
+   Status:   ✅ PASS
+
+🪐 Planetary Positions:
+   Mercury:
+      Expected: Capricorn
+      Actual:   Capricorn
+      ✅
+   Venus:
+      Expected: Capricorn
+      Actual:   Capricorn
+      ✅
+   Mars:
+      Expected: Capricorn
+      Actual:   Capricorn
+      ✅
+   Jupiter:
+      Expected: Aries
+      Actual:   Aries
+      ✅
+   Saturn:
+      Expected: Aquarius
+      Actual:   Aquarius
+      ✅
+   Uranus:
+      Expected: Virgo
+      Actual:   Virgo
+      ✅
+   Neptune:
+      Expected: Scorpio
+      Actual:   Scorpio
+      ✅
+   Pluto:
+      Expected: Virgo
+      Actual:   Virgo
+      ✅
+
+📊 SUMMARY:
+   Core Points: 3/3
+   Planets: 8/8
+   Total: 11/11
+   Overall: ✅ ALL TESTS PASSED
+
+
+============================================================
+TEST: Oprah Winfrey
+============================================================
+Birth: 1/29/1954 at 4:30 UTC
+Location: Kosciusko, Mississippi
+Notes: Verified birth data. Rodden Rating: AA
+
+☀️  Sun Sign:
+   Expected: Aquarius
+   Actual:   Aquarius
+   Status:   ✅ PASS
+
+🌙 Moon Sign:
+   Expected: Sagittarius
+   Actual:   Sagittarius
+   Status:   ✅ PASS
+
+⬆️  Ascendant (Rising Sign):
+   Expected: Libra
+   Actual:   Libra
+   Status:   ✅ PASS
+
+🪐 Planetary Positions:
+   Mercury:
+      Expected: Aquarius
+      Actual:   Aquarius
+      ✅
+   Venus:
+      Expected: Aquarius
+      Actual:   Aquarius
+      ✅
+   Mars:
+      Expected: Scorpio
+      Actual:   Scorpio
+      ✅
+   Jupiter:
+      Expected: Gemini
+      Actual:   Gemini
+      ✅
+   Saturn:
+      Expected: Scorpio
+      Actual:   Scorpio
+      ✅
+   Uranus:
+      Expected: Cancer
+      Actual:   Cancer
+      ✅
+   Neptune:
+      Expected: Libra
+      Actual:   Libra
+      ✅
+   Pluto:
+      Expected: Leo
+      Actual:   Leo
+      ✅
+
+📊 SUMMARY:
+   Core Points: 3/3
+   Planets: 8/8
+   Total: 11/11
+   Overall: ✅ ALL TESTS PASSED
+
+
+============================================================
+TEST: Leonardo DiCaprio
+============================================================
+Birth: 11/12/1974 at 2:47 UTC
+Location: Los Angeles, California
+Notes: Verified birth data. Rodden Rating: AA
+
+☀️  Sun Sign:
+   Expected: Scorpio
+   Actual:   Scorpio
+   Status:   ✅ PASS
+
+🌙 Moon Sign:
+   Expected: Libra
+   Actual:   Libra
+   Status:   ✅ PASS
+
+⬆️  Ascendant (Rising Sign):
+   Expected: Gemini
+   Actual:   Gemini
+   Status:   ✅ PASS
+
+🪐 Planetary Positions:
+   Mercury:
+      Expected: Scorpio
+      Actual:   Scorpio
+      ✅
+   Venus:
+      Expected: Scorpio
+      Actual:   Scorpio
+      ✅
+   Mars:
+      Expected: Scorpio
+      Actual:   Scorpio
+      ✅
+   Jupiter:
+      Expected: Pisces
+      Actual:   Pisces
+      ✅
+   Saturn:
+      Expected: Cancer
+      Actual:   Cancer
+      ✅
+   Uranus:
+      Expected: Libra
+      Actual:   Libra
+      ✅
+   Neptune:
+      Expected: Sagittarius
+      Actual:   Sagittarius
+      ✅
+   Pluto:
+      Expected: Libra
+      Actual:   Libra
+      ✅
+
+📊 SUMMARY:
+   Core Points: 3/3
+   Planets: 8/8
+   Total: 11/11
+   Overall: ✅ ALL TESTS PASSED
+
+
+============================================================
+TEST: Taylor Swift
+============================================================
+Birth: 12/14/1989 at 4:17 UTC
+Location: Reading, Pennsylvania
+Notes: Verified birth data. Rodden Rating: AA
+
+☀️  Sun Sign:
+   Expected: Sagittarius
+   Actual:   Sagittarius
+   Status:   ✅ PASS
+
+🌙 Moon Sign:
+   Expected: Cancer
+   Actual:   Cancer
+   Status:   ✅ PASS
+
+⬆️  Ascendant (Rising Sign):
+   Expected: Virgo
+   Actual:   Virgo
+   Status:   ✅ PASS
+
+🪐 Planetary Positions:
+   Mercury:
+      Expected: Capricorn
+      Actual:   Capricorn
+      ✅
+   Venus:
+      Expected: Aquarius
+      Actual:   Aquarius
+      ✅
+   Mars:
+      Expected: Scorpio
+      Actual:   Scorpio
+      ✅
+   Jupiter:
+      Expected: Cancer
+      Actual:   Cancer
+      ✅
+   Saturn:
+      Expected: Capricorn
+      Actual:   Capricorn
+      ✅
+   Uranus:
+      Expected: Capricorn
+      Actual:   Capricorn
+      ✅
+   Neptune:
+      Expected: Capricorn
+      Actual:   Capricorn
+      ✅
+   Pluto:
+      Expected: Scorpio
+      Actual:   Scorpio
+      ✅
+
+📊 SUMMARY:
+   Core Points: 3/3
+   Planets: 8/8
+   Total: 11/11
+   Overall: ✅ ALL TESTS PASSED
+
+
+============================================================
+TEST: Bobby Darin
+============================================================
+Birth: 5/14/1936 at 9:28 UTC
+Location: Manhattan, New York
+Notes: Birth certificate on file. Rodden Rating: AA
+
+☀️  Sun Sign:
+   Expected: Taurus
+   Actual:   Taurus
+   Status:   ✅ PASS
+
+🌙 Moon Sign:
+   Expected: Aquarius
+   Actual:   Aquarius
+   Status:   ✅ PASS
+
+⬆️  Ascendant (Rising Sign):
+   Expected: Taurus
+   Actual:   Taurus
+   Status:   ✅ PASS
+
+🪐 Planetary Positions:
+   Mercury:
+      Expected: Gemini
+      Actual:   Gemini
+      ✅
+   Venus:
+      Expected: Taurus
+      Actual:   Taurus
+      ✅
+   Mars:
+      Expected: Gemini
+      Actual:   Gemini
+      ✅
+   Jupiter:
+      Expected: Sagittarius
+      Actual:   Sagittarius
+      ✅
+   Saturn:
+      Expected: Pisces
+      Actual:   Pisces
+      ✅
+   Uranus:
+      Expected: Taurus
+      Actual:   Taurus
+      ✅
+   Neptune:
+      Expected: Virgo
+      Actual:   Virgo
+      ✅
+   Pluto:
+      Expected: Cancer
+      Actual:   Cancer
+      ✅
+
+📊 SUMMARY:
+   Core Points: 3/3
+   Planets: 8/8
+   Total: 11/11
+   Overall: ✅ ALL TESTS PASSED
+
+
+============================================================
+TEST: Brad Renfro
+============================================================
+Birth: 7/26/1982 at 2:20 UTC
+Location: Knoxville, Tennessee
+Notes: Birth certificate on file. Rodden Rating: AA
+
+☀️  Sun Sign:
+   Expected: Leo
+   Actual:   Leo
+   Status:   ✅ PASS
+
+🌙 Moon Sign:
+   Expected: Libra
+   Actual:   Libra
+   Status:   ✅ PASS
+
+⬆️  Ascendant (Rising Sign):
+   Expected: Pisces
+   Actual:   Pisces
+   Status:   ✅ PASS
+
+🪐 Planetary Positions:
+   Mercury:
+      Expected: Leo
+      Actual:   Leo
+      ✅
+   Venus:
+      Expected: Cancer
+      Actual:   Cancer
+      ✅
+   Mars:
+      Expected: Libra
+      Actual:   Libra
+      ✅
+   Jupiter:
+      Expected: Scorpio
+      Actual:   Scorpio
+      ✅
+   Saturn:
+      Expected: Libra
+      Actual:   Libra
+      ✅
+   Uranus:
+      Expected: Sagittarius
+      Actual:   Sagittarius
+      ✅
+   Neptune:
+      Expected: Sagittarius
+      Actual:   Sagittarius
+      ✅
+   Pluto:
+      Expected: Libra
+      Actual:   Libra
+      ✅
+
+📊 SUMMARY:
+   Core Points: 3/3
+   Planets: 8/8
+   Total: 11/11
+   Overall: ✅ ALL TESTS PASSED
+
+
+============================================================
+TEST: Ry Cooder
+============================================================
+Birth: 3/15/1947 at 10:05 UTC
+Location: Los Angeles, California
+Notes: Birth certificate on file. Rodden Rating: AA
+
+☀️  Sun Sign:
+   Expected: Pisces
+   Actual:   Pisces
+   Status:   ✅ PASS
+
+🌙 Moon Sign:
+   Expected: Capricorn
+   Actual:   Capricorn
+   Status:   ✅ PASS
+
+⬆️  Ascendant (Rising Sign):
+   Expected: Capricorn
+   Actual:   Capricorn
+   Status:   ✅ PASS
+
+🪐 Planetary Positions:
+   Mercury:
+      Expected: Pisces
+      Actual:   Pisces
+      ✅
+   Venus:
+      Expected: Aquarius
+      Actual:   Aquarius
+      ✅
+   Mars:
+      Expected: Pisces
+      Actual:   Pisces
+      ✅
+   Jupiter:
+      Expected: Scorpio
+      Actual:   Scorpio
+      ✅
+   Saturn:
+      Expected: Leo
+      Actual:   Leo
+      ✅
+   Uranus:
+      Expected: Gemini
+      Actual:   Gemini
+      ✅
+   Neptune:
+      Expected: Libra
+      Actual:   Libra
+      ✅
+   Pluto:
+      Expected: Leo
+      Actual:   Leo
+      ✅
+
+📊 SUMMARY:
+   Core Points: 3/3
+   Planets: 8/8
+   Total: 11/11
+   Overall: ✅ ALL TESTS PASSED
+
+
+============================================================
+TEST: Rod Serling
+============================================================
+Birth: 12/25/1924 at 8:07 UTC
+Location: Syracuse, New York
+Notes: Birth certificate on file. Rodden Rating: AA
+
+☀️  Sun Sign:
+   Expected: Capricorn
+   Actual:   Capricorn
+   Status:   ✅ PASS
+
+🌙 Moon Sign:
+   Expected: Sagittarius
+   Actual:   Sagittarius
+   Status:   ✅ PASS
+
+⬆️  Ascendant (Rising Sign):
+   Expected: Scorpio
+   Actual:   Scorpio
+   Status:   ✅ PASS
+
+🪐 Planetary Positions:
+   Mercury:
+      Expected: Capricorn
+      Actual:   Capricorn
+      ✅
+   Venus:
+      Expected: Sagittarius
+      Actual:   Sagittarius
+      ✅
+   Mars:
+      Expected: Aries
+      Actual:   Aries
+      ✅
+   Jupiter:
+      Expected: Capricorn
+      Actual:   Capricorn
+      ✅
+   Saturn:
+      Expected: Scorpio
+      Actual:   Scorpio
+      ✅
+   Uranus:
+      Expected: Pisces
+      Actual:   Pisces
+      ✅
+   Neptune:
+      Expected: Leo
+      Actual:   Leo
+      ✅
+   Pluto:
+      Expected: Cancer
+      Actual:   Cancer
+      ✅
+
+📊 SUMMARY:
+   Core Points: 3/3
+   Planets: 8/8
+   Total: 11/11
+   Overall: ✅ ALL TESTS PASSED
+
+
+============================================================
+TEST: Kenny Loggins
+============================================================
+Birth: 1/7/1948 at 21:20 UTC
+Location: Everett, Washington
+Notes: Birth certificate on file. Rodden Rating: AA
+
+☀️  Sun Sign:
+   Expected: Capricorn
+   Actual:   Capricorn
+   Status:   ✅ PASS
+
+🌙 Moon Sign:
+   Expected: Sagittarius
+   Actual:   Sagittarius
+   Status:   ✅ PASS
+
+⬆️  Ascendant (Rising Sign):
+   Expected: Gemini
+   Actual:   Gemini
+   Status:   ✅ PASS
+
+🪐 Planetary Positions:
+   Mercury:
+      Expected: Capricorn
+      Actual:   Capricorn
+      ✅
+   Venus:
+      Expected: Aquarius
+      Actual:   Aquarius
+      ✅
+   Mars:
+      Expected: Virgo
+      Actual:   Virgo
+      ✅
+   Jupiter:
+      Expected: Sagittarius
+      Actual:   Sagittarius
+      ✅
+   Saturn:
+      Expected: Leo
+      Actual:   Leo
+      ✅
+   Uranus:
+      Expected: Gemini
+      Actual:   Gemini
+      ✅
+   Neptune:
+      Expected: Libra
+      Actual:   Libra
+      ✅
+   Pluto:
+      Expected: Leo
+      Actual:   Leo
+      ✅
+
+📊 SUMMARY:
+   Core Points: 3/3
+   Planets: 8/8
+   Total: 11/11
+   Overall: ✅ ALL TESTS PASSED
+
+
+============================================================
+TEST: Kenny Chesney
+============================================================
+Birth: 3/26/1968 at 20:55 UTC
+Location: Knoxville, Tennessee
+Notes: Birth certificate on file. Rodden Rating: AA
+
+☀️  Sun Sign:
+   Expected: Aries
+   Actual:   Aries
+   Status:   ✅ PASS
+
+🌙 Moon Sign:
+   Expected: Pisces
+   Actual:   Pisces
+   Status:   ✅ PASS
+
+⬆️  Ascendant (Rising Sign):
+   Expected: Virgo
+   Actual:   Virgo
+   Status:   ✅ PASS
+
+🪐 Planetary Positions:
+   Mercury:
+      Expected: Pisces
+      Actual:   Pisces
+      ✅
+   Venus:
+      Expected: Pisces
+      Actual:   Pisces
+      ✅
+   Mars:
+      Expected: Aries
+      Actual:   Aries
+      ✅
+   Jupiter:
+      Expected: Leo
+      Actual:   Leo
+      ✅
+   Saturn:
+      Expected: Aries
+      Actual:   Aries
+      ✅
+   Uranus:
+      Expected: Virgo
+      Actual:   Virgo
+      ✅
+   Neptune:
+      Expected: Scorpio
+      Actual:   Scorpio
+      ✅
+   Pluto:
+      Expected: Virgo
+      Actual:   Virgo
+      ✅
+
+📊 SUMMARY:
+   Core Points: 3/3
+   Planets: 8/8
+   Total: 11/11
+   Overall: ✅ ALL TESTS PASSED
+
+
+============================================================
+TEST: Angelina Jolie
+============================================================
+Birth: 6/4/1975 at 16:09 UTC
+Location: Los Angeles, California
+Notes: Birth certificate verified. Rodden Rating: AA
+
+☀️  Sun Sign:
+   Expected: Gemini
+   Actual:   Gemini
+   Status:   ✅ PASS
+
+🌙 Moon Sign:
+   Expected: Aries
+   Actual:   Aries
+   Status:   ✅ PASS
+
+⬆️  Ascendant (Rising Sign):
+   Expected: Cancer
+   Actual:   Cancer
+   Status:   ✅ PASS
+
+🪐 Planetary Positions:
+   Mercury:
+      Expected: Gemini
+      Actual:   Gemini
+      ✅
+   Venus:
+      Expected: Cancer
+      Actual:   Cancer
+      ✅
+   Mars:
+      Expected: Aries
+      Actual:   Aries
+      ✅
+   Jupiter:
+      Expected: Aries
+      Actual:   Aries
+      ✅
+   Saturn:
+      Expected: Cancer
+      Actual:   Cancer
+      ✅
+   Uranus:
+      Expected: Libra
+      Actual:   Libra
+      ✅
+   Neptune:
+      Expected: Sagittarius
+      Actual:   Sagittarius
+      ✅
+   Pluto:
+      Expected: Libra
+      Actual:   Libra
+      ✅
+
+📊 SUMMARY:
+   Core Points: 3/3
+   Planets: 8/8
+   Total: 11/11
+   Overall: ✅ ALL TESTS PASSED
+
+
+============================================================
+TEST: Johnny Depp
+============================================================
+Birth: 6/9/1963 at 13:44 UTC
+Location: Owensboro, Kentucky
+Notes: Birth certificate verified. Rodden Rating: AA
+
+☀️  Sun Sign:
+   Expected: Gemini
+   Actual:   Gemini
+   Status:   ✅ PASS
+
+🌙 Moon Sign:
+   Expected: Capricorn
+   Actual:   Capricorn
+   Status:   ✅ PASS
+
+⬆️  Ascendant (Rising Sign):
+   Expected: Leo
+   Actual:   Leo
+   Status:   ✅ PASS
+
+🪐 Planetary Positions:
+   Mercury:
+      Expected: Taurus
+      Actual:   Taurus
+      ✅
+   Venus:
+      Expected: Taurus
+      Actual:   Taurus
+      ✅
+   Mars:
+      Expected: Virgo
+      Actual:   Virgo
+      ✅
+   Jupiter:
+      Expected: Aries
+      Actual:   Aries
+      ✅
+   Saturn:
+      Expected: Aquarius
+      Actual:   Aquarius
+      ✅
+   Uranus:
+      Expected: Virgo
+      Actual:   Virgo
+      ✅
+   Neptune:
+      Expected: Scorpio
+      Actual:   Scorpio
+      ✅
+   Pluto:
+      Expected: Virgo
+      Actual:   Virgo
+      ✅
+
+📊 SUMMARY:
+   Core Points: 3/3
+   Planets: 8/8
+   Total: 11/11
+   Overall: ✅ ALL TESTS PASSED
+
+
+============================================================
+TEST: Beyoncé
+============================================================
+Birth: 9/4/1981 at 15:00 UTC
+Location: Houston, Texas
+Notes: Birth time from mother. Rodden Rating: AA
+
+☀️  Sun Sign:
+   Expected: Virgo
+   Actual:   Virgo
+   Status:   ✅ PASS
+
+🌙 Moon Sign:
+   Expected: Scorpio
+   Actual:   Scorpio
+   Status:   ✅ PASS
+
+⬆️  Ascendant (Rising Sign):
+   Expected: Libra
+   Actual:   Libra
+   Status:   ✅ PASS
+
+🪐 Planetary Positions:
+   Mercury:
+      Expected: Virgo
+      Actual:   Libra
+      ❌
+   Venus:
+      Expected: Libra
+      Actual:   Libra
+      ✅
+   Mars:
+      Expected: Leo
+      Actual:   Leo
+      ✅
+   Jupiter:
+      Expected: Libra
+      Actual:   Libra
+      ✅
+   Saturn:
+      Expected: Libra
+      Actual:   Libra
+      ✅
+   Uranus:
+      Expected: Scorpio
+      Actual:   Scorpio
+      ✅
+   Neptune:
+      Expected: Sagittarius
+      Actual:   Sagittarius
+      ✅
+   Pluto:
+      Expected: Libra
+      Actual:   Libra
+      ✅
+
+📊 SUMMARY:
+   Core Points: 3/3
+   Planets: 7/8
+   Total: 10/11
+   Overall: ⚠️  SOME TESTS FAILED
+
+
+============================================================
+TEST: Lady Gaga
+============================================================
+Birth: 3/28/1986 at 14:53 UTC
+Location: New York City, New York
+Notes: Birth certificate verified. Rodden Rating: AA
+
+☀️  Sun Sign:
+   Expected: Aries
+   Actual:   Aries
+   Status:   ✅ PASS
+
+🌙 Moon Sign:
+   Expected: Scorpio
+   Actual:   Scorpio
+   Status:   ✅ PASS
+
+⬆️  Ascendant (Rising Sign):
+   Expected: Gemini
+   Actual:   Gemini
+   Status:   ✅ PASS
+
+🪐 Planetary Positions:
+   Mercury:
+      Expected: Aries
+      Actual:   Pisces
+      ❌
+   Venus:
+      Expected: Aries
+      Actual:   Aries
+      ✅
+   Mars:
+      Expected: Capricorn
+      Actual:   Capricorn
+      ✅
+   Jupiter:
+      Expected: Pisces
+      Actual:   Pisces
+      ✅
+   Saturn:
+      Expected: Sagittarius
+      Actual:   Sagittarius
+      ✅
+   Uranus:
+      Expected: Sagittarius
+      Actual:   Sagittarius
+      ✅
+   Neptune:
+      Expected: Capricorn
+      Actual:   Capricorn
+      ✅
+   Pluto:
+      Expected: Scorpio
+      Actual:   Scorpio
+      ✅
+
+📊 SUMMARY:
+   Core Points: 3/3
+   Planets: 7/8
+   Total: 10/11
+   Overall: ⚠️  SOME TESTS FAILED
+
+
+============================================================
+TEST: Tom Cruise
+============================================================
+Birth: 7/3/1962 at 19:06 UTC
+Location: Syracuse, New York
+Notes: Birth certificate verified. Rodden Rating: AA
+
+☀️  Sun Sign:
+   Expected: Cancer
+   Actual:   Cancer
+   Status:   ✅ PASS
+
+🌙 Moon Sign:
+   Expected: Leo
+   Actual:   Leo
+   Status:   ✅ PASS
+
+⬆️  Ascendant (Rising Sign):
+   Expected: Scorpio
+   Actual:   Scorpio
+   Status:   ✅ PASS
+
+🪐 Planetary Positions:
+   Mercury:
+      Expected: Cancer
+      Actual:   Gemini
+      ❌
+   Venus:
+      Expected: Leo
+      Actual:   Leo
+      ✅
+   Mars:
+      Expected: Taurus
+      Actual:   Taurus
+      ✅
+   Jupiter:
+      Expected: Pisces
+      Actual:   Pisces
+      ✅
+   Saturn:
+      Expected: Aquarius
+      Actual:   Aquarius
+      ✅
+   Uranus:
+      Expected: Leo
+      Actual:   Leo
+      ✅
+   Neptune:
+      Expected: Scorpio
+      Actual:   Scorpio
+      ✅
+   Pluto:
+      Expected: Virgo
+      Actual:   Virgo
+      ✅
+
+📊 SUMMARY:
+   Core Points: 3/3
+   Planets: 7/8
+   Total: 10/11
+   Overall: ⚠️  SOME TESTS FAILED
+
+
+============================================================
+TEST: Rihanna
+============================================================
+Birth: 2/20/1988 at 12:50 UTC
+Location: Saint Michael, Barbados
+Notes: Birth certificate verified. Rodden Rating: AA
+
+☀️  Sun Sign:
+   Expected: Pisces
+   Actual:   Pisces
+   Status:   ✅ PASS
+
+🌙 Moon Sign:
+   Expected: Aries
+   Actual:   Aries
+   Status:   ✅ PASS
+
+⬆️  Ascendant (Rising Sign):
+   Expected: Taurus
+   Actual:   Aries
+   Status:   ❌ FAIL
+
+🪐 Planetary Positions:
+   Mercury:
+      Expected: Pisces
+      Actual:   Aquarius
+      ❌
+   Venus:
+      Expected: Aries
+      Actual:   Aries
+      ✅
+   Mars:
+      Expected: Sagittarius
+      Actual:   Sagittarius
+      ✅
+   Jupiter:
+      Expected: Taurus
+      Actual:   Aries
+      ❌
+   Saturn:
+      Expected: Sagittarius
+      Actual:   Capricorn
+      ❌
+   Uranus:
+      Expected: Capricorn
+      Actual:   Capricorn
+      ✅
+   Neptune:
+      Expected: Capricorn
+      Actual:   Capricorn
+      ✅
+   Pluto:
+      Expected: Scorpio
+      Actual:   Scorpio
+      ✅
+
+📊 SUMMARY:
+   Core Points: 2/3
+   Planets: 5/8
+   Total: 7/11
+   Overall: ⚠️  SOME TESTS FAILED
+
+
+============================================================
+TEST: Kanye West
+============================================================
+Birth: 6/8/1977 at 13:45 UTC
+Location: Atlanta, Georgia
+Notes: Birth certificate verified. Rodden Rating: AA
+
+☀️  Sun Sign:
+   Expected: Gemini
+   Actual:   Gemini
+   Status:   ✅ PASS
+
+🌙 Moon Sign:
+   Expected: Pisces
+   Actual:   Pisces
+   Status:   ✅ PASS
+
+⬆️  Ascendant (Rising Sign):
+   Expected: Cancer
+   Actual:   Leo
+   Status:   ❌ FAIL
+
+🪐 Planetary Positions:
+   Mercury:
+      Expected: Taurus
+      Actual:   Taurus
+      ✅
+   Venus:
+      Expected: Taurus
+      Actual:   Taurus
+      ✅
+   Mars:
+      Expected: Taurus
+      Actual:   Taurus
+      ✅
+   Jupiter:
+      Expected: Gemini
+      Actual:   Gemini
+      ✅
+   Saturn:
+      Expected: Leo
+      Actual:   Leo
+      ✅
+   Uranus:
+      Expected: Scorpio
+      Actual:   Scorpio
+      ✅
+   Neptune:
+      Expected: Sagittarius
+      Actual:   Sagittarius
+      ✅
+   Pluto:
+      Expected: Libra
+      Actual:   Libra
+      ✅
+
+📊 SUMMARY:
+   Core Points: 2/3
+   Planets: 8/8
+   Total: 10/11
+   Overall: ⚠️  SOME TESTS FAILED
+
+
+============================================================
+TEST: Madonna
+============================================================
+Birth: 8/16/1958 at 12:05 UTC
+Location: Bay City, Michigan
+Notes: Birth certificate verified. Rodden Rating: AA
+
+☀️  Sun Sign:
+   Expected: Leo
+   Actual:   Leo
+   Status:   ✅ PASS
+
+🌙 Moon Sign:
+   Expected: Virgo
+   Actual:   Virgo
+   Status:   ✅ PASS
+
+⬆️  Ascendant (Rising Sign):
+   Expected: Virgo
+   Actual:   Virgo
+   Status:   ✅ PASS
+
+🪐 Planetary Positions:
+   Mercury:
+      Expected: Virgo
+      Actual:   Virgo
+      ✅
+   Venus:
+      Expected: Leo
+      Actual:   Leo
+      ✅
+   Mars:
+      Expected: Taurus
+      Actual:   Taurus
+      ✅
+   Jupiter:
+      Expected: Libra
+      Actual:   Libra
+      ✅
+   Saturn:
+      Expected: Sagittarius
+      Actual:   Sagittarius
+      ✅
+   Uranus:
+      Expected: Leo
+      Actual:   Leo
+      ✅
+   Neptune:
+      Expected: Scorpio
+      Actual:   Scorpio
+      ✅
+   Pluto:
+      Expected: Virgo
+      Actual:   Virgo
+      ✅
+
+📊 SUMMARY:
+   Core Points: 3/3
+   Planets: 8/8
+   Total: 11/11
+   Overall: ✅ ALL TESTS PASSED
+
+
+============================================================
+TEST: Prince
+============================================================
+Birth: 6/8/1958 at 0:17 UTC
+Location: Minneapolis, Minnesota
+Notes: Birth certificate verified. Rodden Rating: AA
+
+☀️  Sun Sign:
+   Expected: Gemini
+   Actual:   Gemini
+   Status:   ✅ PASS
+
+🌙 Moon Sign:
+   Expected: Pisces
+   Actual:   Pisces
+   Status:   ✅ PASS
+
+⬆️  Ascendant (Rising Sign):
+   Expected: Scorpio
+   Actual:   Scorpio
+   Status:   ✅ PASS
+
+🪐 Planetary Positions:
+   Mercury:
+      Expected: Gemini
+      Actual:   Gemini
+      ✅
+   Venus:
+      Expected: Cancer
+      Actual:   Taurus
+      ❌
+   Mars:
+      Expected: Aries
+      Actual:   Aries
+      ✅
+   Jupiter:
+      Expected: Libra
+      Actual:   Libra
+      ✅
+   Saturn:
+      Expected: Sagittarius
+      Actual:   Sagittarius
+      ✅
+   Uranus:
+      Expected: Leo
+      Actual:   Leo
+      ✅
+   Neptune:
+      Expected: Scorpio
+      Actual:   Scorpio
+      ✅
+   Pluto:
+      Expected: Virgo
+      Actual:   Leo
+      ❌
+
+📊 SUMMARY:
+   Core Points: 3/3
+   Planets: 6/8
+   Total: 9/11
+   Overall: ⚠️  SOME TESTS FAILED
+
+
+============================================================
+TEST: Britney Spears
+============================================================
+Birth: 12/2/1981 at 6:30 UTC
+Location: McComb, Mississippi
+Notes: Birth certificate verified. Rodden Rating: AA
+
+☀️  Sun Sign:
+   Expected: Sagittarius
+   Actual:   Sagittarius
+   Status:   ✅ PASS
+
+🌙 Moon Sign:
+   Expected: Aquarius
+   Actual:   Aquarius
+   Status:   ✅ PASS
+
+⬆️  Ascendant (Rising Sign):
+   Expected: Virgo
+   Actual:   Virgo
+   Status:   ✅ PASS
+
+🪐 Planetary Positions:
+   Mercury:
+      Expected: Sagittarius
+      Actual:   Sagittarius
+      ✅
+   Venus:
+      Expected: Capricorn
+      Actual:   Capricorn
+      ✅
+   Mars:
+      Expected: Virgo
+      Actual:   Virgo
+      ✅
+   Jupiter:
+      Expected: Scorpio
+      Actual:   Scorpio
+      ✅
+   Saturn:
+      Expected: Libra
+      Actual:   Libra
+      ✅
+   Uranus:
+      Expected: Sagittarius
+      Actual:   Sagittarius
+      ✅
+   Neptune:
+      Expected: Sagittarius
+      Actual:   Sagittarius
+      ✅
+   Pluto:
+      Expected: Libra
+      Actual:   Libra
+      ✅
+
+📊 SUMMARY:
+   Core Points: 3/3
+   Planets: 8/8
+   Total: 11/11
+   Overall: ✅ ALL TESTS PASSED
+
+
+============================================================
+TEST: Steve Jobs
+============================================================
+Birth: 2/24/1955 at 19:15 UTC
+Location: San Francisco, California
+Notes: Birth certificate verified. Rodden Rating: AA
+
+☀️  Sun Sign:
+   Expected: Pisces
+   Actual:   Pisces
+   Status:   ✅ PASS
+
+🌙 Moon Sign:
+   Expected: Aries
+   Actual:   Aries
+   Status:   ✅ PASS
+
+⬆️  Ascendant (Rising Sign):
+   Expected: Gemini
+   Actual:   Gemini
+   Status:   ✅ PASS
+
+🪐 Planetary Positions:
+   Mercury:
+      Expected: Aquarius
+      Actual:   Aquarius
+      ✅
+   Venus:
+      Expected: Capricorn
+      Actual:   Capricorn
+      ✅
+   Mars:
+      Expected: Aries
+      Actual:   Aries
+      ✅
+   Jupiter:
+      Expected: Cancer
+      Actual:   Cancer
+      ✅
+   Saturn:
+      Expected: Scorpio
+      Actual:   Scorpio
+      ✅
+   Uranus:
+      Expected: Cancer
+      Actual:   Cancer
+      ✅
+   Neptune:
+      Expected: Libra
+      Actual:   Libra
+      ✅
+   Pluto:
+      Expected: Leo
+      Actual:   Leo
+      ✅
+
+📊 SUMMARY:
+   Core Points: 3/3
+   Planets: 8/8
+   Total: 11/11
+   Overall: ✅ ALL TESTS PASSED
+
+
+============================================================
+TEST: Martin Luther King Jr.
+============================================================
+Birth: 1/15/1929 at 18:00 UTC
+Location: Atlanta, Georgia
+Notes: Birth certificate verified. Rodden Rating: AA
+
+☀️  Sun Sign:
+   Expected: Capricorn
+   Actual:   Capricorn
+   Status:   ✅ PASS
+
+🌙 Moon Sign:
+   Expected: Pisces
+   Actual:   Pisces
+   Status:   ✅ PASS
+
+⬆️  Ascendant (Rising Sign):
+   Expected: Taurus
+   Actual:   Taurus
+   Status:   ✅ PASS
+
+🪐 Planetary Positions:
+   Mercury:
+      Expected: Aquarius
+      Actual:   Aquarius
+      ✅
+   Venus:
+      Expected: Pisces
+      Actual:   Pisces
+      ✅
+   Mars:
+      Expected: Gemini
+      Actual:   Gemini
+      ✅
+   Jupiter:
+      Expected: Taurus
+      Actual:   Taurus
+      ✅
+   Saturn:
+      Expected: Sagittarius
+      Actual:   Sagittarius
+      ✅
+   Uranus:
+      Expected: Aries
+      Actual:   Aries
+      ✅
+   Neptune:
+      Expected: Leo
+      Actual:   Virgo
+      ❌
+   Pluto:
+      Expected: Cancer
+      Actual:   Cancer
+      ✅
+
+📊 SUMMARY:
+   Core Points: 3/3
+   Planets: 7/8
+   Total: 10/11
+   Overall: ⚠️  SOME TESTS FAILED
+
+
+============================================================
+TEST: Freddie Mercury
+============================================================
+Birth: 9/5/1946 at 6:15 UTC
+Location: Stone Town, Zanzibar
+Notes: Birth certificate verified. Rodden Rating: AA
+
+☀️  Sun Sign:
+   Expected: Virgo
+   Actual:   Virgo
+   Status:   ✅ PASS
+
+🌙 Moon Sign:
+   Expected: Sagittarius
+   Actual:   Sagittarius
+   Status:   ✅ PASS
+
+⬆️  Ascendant (Rising Sign):
+   Expected: Scorpio
+   Actual:   Scorpio
+   Status:   ✅ PASS
+
+🪐 Planetary Positions:
+   Mercury:
+      Expected: Virgo
+      Actual:   Virgo
+      ✅
+   Venus:
+      Expected: Libra
+      Actual:   Libra
+      ✅
+   Mars:
+      Expected: Cancer
+      Actual:   Libra
+      ❌
+   Jupiter:
+      Expected: Libra
+      Actual:   Libra
+      ✅
+   Saturn:
+      Expected: Cancer
+      Actual:   Leo
+      ❌
+   Uranus:
+      Expected: Gemini
+      Actual:   Gemini
+      ✅
+   Neptune:
+      Expected: Libra
+      Actual:   Libra
+      ✅
+   Pluto:
+      Expected: Leo
+      Actual:   Leo
+      ✅
+
+📊 SUMMARY:
+   Core Points: 3/3
+   Planets: 6/8
+   Total: 9/11
+   Overall: ⚠️  SOME TESTS FAILED
+
+
+============================================================
+TEST: Adele
+============================================================
+Birth: 5/5/1988 at 8:20 UTC
+Location: Tottenham, London
+Notes: Birth certificate verified. Rodden Rating: AA
+
+☀️  Sun Sign:
+   Expected: Taurus
+   Actual:   Taurus
+   Status:   ✅ PASS
+
+🌙 Moon Sign:
+   Expected: Sagittarius
+   Actual:   Sagittarius
+   Status:   ✅ PASS
+
+⬆️  Ascendant (Rising Sign):
+   Expected: Cancer
+   Actual:   Cancer
+   Status:   ✅ PASS
+
+🪐 Planetary Positions:
+   Mercury:
+      Expected: Taurus
+      Actual:   Gemini
+      ❌
+   Venus:
+      Expected: Gemini
+      Actual:   Gemini
+      ✅
+   Mars:
+      Expected: Aquarius
+      Actual:   Aquarius
+      ✅
+   Jupiter:
+      Expected: Taurus
+      Actual:   Taurus
+      ✅
+   Saturn:
+      Expected: Sagittarius
+      Actual:   Capricorn
+      ❌
+   Uranus:
+      Expected: Capricorn
+      Actual:   Capricorn
+      ✅
+   Neptune:
+      Expected: Capricorn
+      Actual:   Capricorn
+      ✅
+   Pluto:
+      Expected: Scorpio
+      Actual:   Scorpio
+      ✅
+
+📊 SUMMARY:
+   Core Points: 3/3
+   Planets: 6/8
+   Total: 9/11
+   Overall: ⚠️  SOME TESTS FAILED
+
+
+============================================================
+TEST: David Bowie
+============================================================
+Birth: 1/8/1947 at 9:00 UTC
+Location: Brixton, London
+Notes: Birth certificate verified. Rodden Rating: AA
+
+☀️  Sun Sign:
+   Expected: Capricorn
+   Actual:   Capricorn
+   Status:   ✅ PASS
+
+🌙 Moon Sign:
+   Expected: Leo
+   Actual:   Leo
+   Status:   ✅ PASS
+
+⬆️  Ascendant (Rising Sign):
+   Expected: Aquarius
+   Actual:   Aquarius
+   Status:   ✅ PASS
+
+🪐 Planetary Positions:
+   Mercury:
+      Expected: Capricorn
+      Actual:   Capricorn
+      ✅
+   Venus:
+      Expected: Sagittarius
+      Actual:   Sagittarius
+      ✅
+   Mars:
+      Expected: Scorpio
+      Actual:   Capricorn
+      ❌
+   Jupiter:
+      Expected: Scorpio
+      Actual:   Scorpio
+      ✅
+   Saturn:
+      Expected: Leo
+      Actual:   Leo
+      ✅
+   Uranus:
+      Expected: Gemini
+      Actual:   Gemini
+      ✅
+   Neptune:
+      Expected: Libra
+      Actual:   Libra
+      ✅
+   Pluto:
+      Expected: Leo
+      Actual:   Leo
+      ✅
+
+📊 SUMMARY:
+   Core Points: 3/3
+   Planets: 7/8
+   Total: 10/11
+   Overall: ⚠️  SOME TESTS FAILED
+
+
+============================================================
+TEST: Meryl Streep
+============================================================
+Birth: 6/22/1949 at 12:05 UTC
+Location: Summit, New Jersey
+Notes: Birth certificate verified. Rodden Rating: AA
+
+☀️  Sun Sign:
+   Expected: Cancer
+   Actual:   Cancer
+   Status:   ✅ PASS
+
+🌙 Moon Sign:
+   Expected: Taurus
+   Actual:   Taurus
+   Status:   ✅ PASS
+
+⬆️  Ascendant (Rising Sign):
+   Expected: Leo
+   Actual:   Leo
+   Status:   ✅ PASS
+
+🪐 Planetary Positions:
+   Mercury:
+      Expected: Gemini
+      Actual:   Gemini
+      ✅
+   Venus:
+      Expected: Cancer
+      Actual:   Cancer
+      ✅
+   Mars:
+      Expected: Taurus
+      Actual:   Gemini
+      ❌
+   Jupiter:
+      Expected: Capricorn
+      Actual:   Aquarius
+      ❌
+   Saturn:
+      Expected: Virgo
+      Actual:   Virgo
+      ✅
+   Uranus:
+      Expected: Cancer
+      Actual:   Cancer
+      ✅
+   Neptune:
+      Expected: Libra
+      Actual:   Libra
+      ✅
+   Pluto:
+      Expected: Leo
+      Actual:   Leo
+      ✅
+
+📊 SUMMARY:
+   Core Points: 3/3
+   Planets: 6/8
+   Total: 9/11
+   Overall: ⚠️  SOME TESTS FAILED
+
+
+============================================================
+TEST: Billie Eilish
+============================================================
+Birth: 12/18/2001 at 19:30 UTC
+Location: Los Angeles, California
+Notes: Birth data from family. Rodden Rating: AA
+
+☀️  Sun Sign:
+   Expected: Sagittarius
+   Actual:   Sagittarius
+   Status:   ✅ PASS
+
+🌙 Moon Sign:
+   Expected: Aquarius
+   Actual:   Aquarius
+   Status:   ✅ PASS
+
+⬆️  Ascendant (Rising Sign):
+   Expected: Pisces
+   Actual:   Pisces
+   Status:   ✅ PASS
+
+🪐 Planetary Positions:
+   Mercury:
+      Expected: Sagittarius
+      Actual:   Capricorn
+      ❌
+   Venus:
+      Expected: Capricorn
+      Actual:   Sagittarius
+      ❌
+   Mars:
+      Expected: Pisces
+      Actual:   Pisces
+      ✅
+   Jupiter:
+      Expected: Cancer
+      Actual:   Cancer
+      ✅
+   Saturn:
+      Expected: Gemini
+      Actual:   Gemini
+      ✅
+   Uranus:
+      Expected: Aquarius
+      Actual:   Aquarius
+      ✅
+   Neptune:
+      Expected: Aquarius
+      Actual:   Aquarius
+      ✅
+   Pluto:
+      Expected: Sagittarius
+      Actual:   Sagittarius
+      ✅
+
+📊 SUMMARY:
+   Core Points: 3/3
+   Planets: 6/8
+   Total: 9/11
+   Overall: ⚠️  SOME TESTS FAILED
+
+
+
+============================================================
+FINAL TEST SUMMARY
+============================================================
+Total Test Cases: 32
+Total Calculations: 352
+Passed: 332
+Failed: 20
+Success Rate: 94.3%
+============================================================
+
+

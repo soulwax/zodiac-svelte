@@ -1,6 +1,10 @@
 // File: src/lib/zodiac.ts
 
-import * as Astronomy from 'astronomy-engine';
+import * as AstronomyModule from 'astronomy-engine';
+
+// Handle both ESM and CommonJS imports
+// @ts-ignore - Handle module interop
+const Astronomy = AstronomyModule.default || AstronomyModule;
 
 export type ZodiacSign =
 	| 'Aries'
@@ -84,7 +88,13 @@ export interface House {
  * Calculates Greenwich Sidereal Time (GST) in hours for a given UTC date/time
  * Uses the standard IAU formula for GMST
  */
-function calculateGST(year: number, month: number, day: number, hour: number, minute: number): number {
+function calculateGST(
+	year: number,
+	month: number,
+	day: number,
+	hour: number,
+	minute: number
+): number {
 	// Convert to Julian Day Number
 	const a = Math.floor((14 - month) / 12);
 	const y = year + 4800 - a;
@@ -108,11 +118,7 @@ function calculateGST(year: number, month: number, day: number, hour: number, mi
 	const T = d / 36525.0;
 
 	// Calculate GMST in degrees using IAU 2006 formula
-	let gmst =
-		280.46061837 +
-		360.98564736629 * d +
-		0.000387933 * T * T -
-		T * T * T / 38710000.0;
+	let gmst = 280.46061837 + 360.98564736629 * d + 0.000387933 * T * T - (T * T * T) / 38710000.0;
 
 	// Normalize to 0-360 degrees
 	gmst = gmst % 360;
@@ -193,7 +199,10 @@ export function calculateAscendant(
 	// x = -(sin(ε) × tan(φ) + cos(ε) × sin(RAMC))
 	// y = cos(RAMC)
 
-	const x = -(Math.sin(obliquityRad) * Math.tan(latRad) + Math.cos(obliquityRad) * Math.sin(ramcRad));
+	const x = -(
+		Math.sin(obliquityRad) * Math.tan(latRad) +
+		Math.cos(obliquityRad) * Math.sin(ramcRad)
+	);
 	const y = Math.cos(ramcRad);
 
 	// Calculate ascendant in radians
@@ -245,7 +254,10 @@ export function calculateHouses(
 	const obliquityRad = (obliquity * Math.PI) / 180;
 
 	// Calculate ascendant degree position
-	const x = -(Math.sin(obliquityRad) * Math.tan(latRad) + Math.cos(obliquityRad) * Math.sin(ramcRad));
+	const x = -(
+		Math.sin(obliquityRad) * Math.tan(latRad) +
+		Math.cos(obliquityRad) * Math.sin(ramcRad)
+	);
 	const y = Math.cos(ramcRad);
 	let ascendantDeg = (Math.atan2(y, x) * 180) / Math.PI;
 	if (ascendantDeg < 0) ascendantDeg += 360;
@@ -377,11 +389,7 @@ export function calculateMarsSign(
  * Calculates Jupiter sign using astronomy-engine
  * Jupiter has an orbital period of ~12 years
  */
-export function calculateJupiterSign(
-	year: number,
-	month: number,
-	day: number
-): ZodiacSign {
+export function calculateJupiterSign(year: number, month: number, day: number): ZodiacSign {
 	const date = new Date(Date.UTC(year, month - 1, day, 12, 0, 0));
 
 	// Get geocentric ecliptic longitude with aberration correction (apparent position)
@@ -396,11 +404,7 @@ export function calculateJupiterSign(
  * Calculates Saturn sign using astronomy-engine
  * Saturn has an orbital period of ~29.5 years
  */
-export function calculateSaturnSign(
-	year: number,
-	month: number,
-	day: number
-): ZodiacSign {
+export function calculateSaturnSign(year: number, month: number, day: number): ZodiacSign {
 	const date = new Date(Date.UTC(year, month - 1, day, 12, 0, 0));
 
 	// Get geocentric ecliptic longitude with aberration correction (apparent position)
@@ -415,11 +419,7 @@ export function calculateSaturnSign(
  * Calculates Uranus sign using astronomy-engine
  * Uranus has an orbital period of ~84 years
  */
-export function calculateUranusSign(
-	year: number,
-	month: number,
-	day: number
-): ZodiacSign {
+export function calculateUranusSign(year: number, month: number, day: number): ZodiacSign {
 	const date = new Date(Date.UTC(year, month - 1, day, 12, 0, 0));
 
 	// Get geocentric ecliptic longitude with aberration correction (apparent position)
@@ -434,11 +434,7 @@ export function calculateUranusSign(
  * Calculates Neptune sign using astronomy-engine
  * Neptune has an orbital period of ~165 years
  */
-export function calculateNeptuneSign(
-	year: number,
-	month: number,
-	day: number
-): ZodiacSign {
+export function calculateNeptuneSign(year: number, month: number, day: number): ZodiacSign {
 	const date = new Date(Date.UTC(year, month - 1, day, 12, 0, 0));
 
 	// Get geocentric ecliptic longitude with aberration correction (apparent position)
@@ -453,11 +449,7 @@ export function calculateNeptuneSign(
  * Calculates Pluto sign using astronomy-engine
  * Pluto has an orbital period of ~248 years
  */
-export function calculatePlutoSign(
-	year: number,
-	month: number,
-	day: number
-): ZodiacSign {
+export function calculatePlutoSign(year: number, month: number, day: number): ZodiacSign {
 	const date = new Date(Date.UTC(year, month - 1, day, 12, 0, 0));
 
 	// Get geocentric ecliptic longitude with aberration correction (apparent position)
@@ -573,7 +565,11 @@ export function getPlanetLongitude(
 			const body = bodyMap[planetName];
 			if (body) {
 				// All planets use geocentric coordinates with aberration correction
-				if (body === Astronomy.Body.Mercury || body === Astronomy.Body.Venus || body === Astronomy.Body.Mars) {
+				if (
+					body === Astronomy.Body.Mercury ||
+					body === Astronomy.Body.Venus ||
+					body === Astronomy.Body.Mars
+				) {
 					const geoVector = Astronomy.GeoVector(body, date, true);
 					const ecliptic = Astronomy.Ecliptic(geoVector);
 					return ecliptic.elon;

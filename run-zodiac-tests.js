@@ -13,11 +13,7 @@ import { spawnSync } from 'node:child_process';
 import { existsSync } from 'node:fs';
 import { resolve } from 'node:path';
 
-const tsxBin = resolve(
-	'node_modules',
-	'.bin',
-	process.platform === 'win32' ? 'tsx.cmd' : 'tsx'
-);
+const tsxBin = resolve('node_modules', '.bin', process.platform === 'win32' ? 'tsx.cmd' : 'tsx');
 const testFile = resolve('src', 'lib', 'zodiac.test.ts');
 
 console.log('Starting Zodiac Calculation Tests (TypeScript)...\n');

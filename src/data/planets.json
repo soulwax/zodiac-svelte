@@ -1,175 +1,320 @@
 {
-    "planetary_sign_details": {
-      "mercury": {
-        "aries": { "keywords": ["direct", "rapid", "debate"], "description": "Thinking is intuitive and decisive. Communicates with frankness and often lacks patience for details." },
-        "taurus": { "keywords": ["deliberate", "practical", "stubborn"], "description": "Thoughts are grounded and constructive. Learns slowly but retains everything; prefers tangible ideas over abstract theory." },
-        "gemini": { "keywords": ["witty", "versatile", "scattered"], "description": "The mind is quick, curious, and adaptable. Thrives on variety and conversation but may lack focus." },
-        "cancer": { "keywords": ["intuitive", "memory-based", "sentimental"], "description": "Communication is colored by emotion. exceptional memory and learns best through feeling and connection." },
-        "leo": { "keywords": ["dramatic", "persuasive", "confident"], "description": "expresses ideas with warmth and authority. Thinking is creative and often centered around self-expression." },
-        "virgo": { "keywords": ["analytical", "precise", "critical"], "description": "The mind is logical and detail-oriented. Excellent at discernment and organizing information efficiently." },
-        "libra": { "keywords": ["diplomatic", "balanced", "indecisive"], "description": "Communicates with charm and tact. Weighs all sides of an issue, often leading to hesitation in decision-making." },
-        "scorpio": { "keywords": ["probing", "intense", "secretive"], "description": "Thinking is investigative and penetrating. Interested in hidden truths and communicates with calculated depth." },
-        "sagittarius": { "keywords": ["philosophical", "blunt", "optimistic"], "description": "The mind is broad and visionary. Interested in big ideas and truth, often overlooking details or social niceties." },
-        "capricorn": { "keywords": ["structured", "cautious", "methodical"], "description": "Thinking is disciplined and result-oriented. values precision and plans for the long term." },
-        "aquarius": { "keywords": ["original", "detached", "progressive"], "description": "The mind is innovative and objective. Thrives on abstract concepts and future-oriented thinking." },
-        "pisces": { "keywords": ["poetic", "visual", "impressionable"], "description": "Thinking is imaginative and non-linear. Communicates through symbols and feelings rather than cold logic." }
-      },
-      "venus": {
-        "aries": { "keywords": ["passionate", "impulsive", "chasing"], "description": "Loves the thrill of the chase. Expresses affection directly and forcefully but may lose interest quickly." },
-        "taurus": { "keywords": ["sensual", "loyal", "possessive"], "description": "Values physical touch, comfort, and stability. Love is expressed through tangible gifts and consistent presence." },
-        "gemini": { "keywords": ["flirtatious", "playful", "intellectual"], "description": "Needs mental stimulation in relationships. Values conversation and variety over deep emotional heaviness." },
-        "cancer": { "keywords": ["caring", "protective", "clinging"], "description": "Love is nurturing and deeply attached. Seeks safety and emotional bonding, often treating partners like family." },
-        "leo": { "keywords": ["generous", "theatrical", "demanding"], "description": "loves to be adored and to show off their partner. Affection is warm, grand, and centered on loyalty." },
-        "virgo": { "keywords": ["devoted", "helpful", "critical"], "description": "Expresses love through acts of service and attention to detail. Can be reserved and seeks a practical partnership." },
-        "libra": { "keywords": ["romantic", "harmonious", "aesthetic"], "description": "Values partnership above all. Seeks beauty, peace, and intellectual connection in relationships." },
-        "scorpio": { "keywords": ["intense", "possessive", "transformative"], "description": "Love is all-or-nothing. Seeks deep soul fusion and absolute loyalty; prone to jealousy but intensely devoted." },
-        "sagittarius": { "keywords": ["adventurous", "free", "honest"], "description": "Needs freedom in relationships. Bonds through shared travel, philosophy, and humor rather than clinginess." },
-        "capricorn": { "keywords": ["serious", "committed", "status-conscious"], "description": "Approaches relationships with responsibility. Values longevity, respect, and traditional structures in love." },
-        "aquarius": { "keywords": ["unconventional", "friendly", "detached"], "description": "Values friendship and intellectual rapport. Needs personal space and dislikes traditional relationship rules." },
-        "pisces": { "keywords": ["idealistic", "sacrificial", "dreamy"], "description": "Loves with compassion and boundlessness. Prone to idealizing partners and merging emotionally." }
-      },
-      "mars": {
-        "aries": { "keywords": ["explosive", "initiating", "competitive"], "description": "Energy is high and easily triggered. Acts on impulse and enjoys a challenge." },
-        "taurus": { "keywords": ["steady", "stubborn", "enduring"], "description": "Action is slow to start but unstoppable once moving. Anger is rare but formidable." },
-        "gemini": { "keywords": ["restless", "verbal", "scattered"], "description": "Energy is mental and nervous. Fights with words and scatters energy across many projects." },
-        "cancer": { "keywords": ["defensive", "emotional", "indirect"], "description": "Acts to protect self and others. Anger is expressed through moodiness or passive-aggression." },
-        "leo": { "keywords": ["dramatic", "authoritative", "proud"], "description": "Driven by the need for recognition. Actions are grand and confident; anger comes from wounded pride." },
-        "virgo": { "keywords": ["precise", "busy", "critical"], "description": "Energy is focused on work and perfection. Expresses irritation through criticism and nervousness." },
-        "libra": { "keywords": ["diplomatic", "procrastinating", "social"], "description": "Action is weighed carefully to avoid conflict. often indecisive but fights for fairness." },
-        "scorpio": { "keywords": ["focused", "relentless", "strategic"], "description": "Energy is controlled and intense. Acts with lethal precision and holds grudges; power-driven." },
-        "sagittarius": { "keywords": ["impulsive", "enthusiastic", "preachy"], "description": "Driven by ideals and adventure. Actions are bold and sometimes reckless; anger flares and vanishes quickly." },
-        "capricorn": { "keywords": ["disciplined", "controlled", "ambitious"], "description": "Energy is directed toward goals. calculating and persistent; suppresses anger for professional gain." },
-        "aquarius": { "keywords": ["erratic", "intellectual", "rebellious"], "description": "Acts in unpredictable bursts. Driven by freedom and reform; fights for causes rather than personal slights." },
-        "pisces": { "keywords": ["fluid", "passive", "escapist"], "description": "Energy fluctuates with mood. often struggles with direct confrontation, preferring to flow around obstacles." }
-      },
-      "jupiter": {
-        "generic_formula": "Grows and finds luck through [Sign Quality]",
-        "entries": {
-          "aries": "self-assertion and courage",
-          "taurus": "building tangible resources and patience",
-          "gemini": "learning, networking, and curiosity",
-          "cancer": "nurturing, home, and emotional connection",
-          "leo": "creativity, performance, and inspiring others",
-          "virgo": "service, skill-building, and details",
-          "libra": "partnership, art, and mediation",
-          "scorpio": "transformation, psychological depth, and investments",
-          "sagittarius": "travel, philosophy, and optimism (Rulership)",
-          "capricorn": "structure, ambition, and discipline",
-          "aquarius": "innovation, community, and social change",
-          "pisces": "spirituality, compassion, and imagination"
-        }
-      },
-      "saturn": {
-        "generic_formula": "Faces challenges and builds mastery in [Sign Quality]",
-        "entries": {
-          "aries": "self-reliance and leadership",
-          "taurus": "financial security and material values",
-          "gemini": "communication and intellectual discipline",
-          "cancer": "emotional security and family roots",
-          "leo": "creative self-expression and ego",
-          "virgo": "perfectionism and work routines",
-          "libra": "relationships and cooperation",
-          "scorpio": "trust, intimacy, and power dynamics",
-          "sagittarius": "beliefs, higher education, and dogma",
-          "capricorn": "career, authority, and public status (Rulership)",
-          "aquarius": "social structures and group dynamics",
-          "pisces": "boundaries and spiritual grounding"
-        }
-      },
-      "outer_planets": {
-        "uranus": { "description": "The generational style of rebellion and innovation. (Changes every 7 years)" },
-        "neptune": { "description": "The generational style of dreams, spirituality, and illusions. (Changes every 14 years)" },
-        "pluto": { "description": "The generational style of power, transformation, and deep psychology. (Changes every 12-30 years)" }
-      }
-    },
-    "house_placement_descriptions": {
-      "sun_in_house": {
-        "1": "Vitality is tied to self-image. Needs to be seen as a leader or pioneer.",
-        "2": "Identity is built on wealth and values. Seeks security through material accumulation.",
-        "3": "Shines through communication and learning. Identifies as a messenger or thinker.",
-        "4": "Identity is private. Focuses energy on home, family, and emotional roots.",
-        "5": "Radiates energy through creativity, romance, and children. Needs to perform.",
-        "6": "Finds purpose in work, service, and health routines. Identifies as a problem-solver.",
-        "7": "Identity is mirrored in others. vitalized by partnerships and one-on-one connection.",
-        "8": "Shines in hidden realms. Drawn to crisis, transformation, and deep psychology.",
-        "9": "Identity is linked to beliefs and travel. Seeks meaning and expansive experiences.",
-        "10": "Vitality is channeled into career. Needs public recognition and authority.",
-        "11": "Shines in groups. Identifies with friends, social causes, and the future.",
-        "12": "Identity is hidden or spiritual. Needs solitude and works best behind the scenes."
-      },
-      "moon_in_house": {
-        "1": "Emotions are worn on the sleeve. Sensitive to environment and immediate reactions.",
-        "2": "Emotional security depends on financial stability and possessions.",
-        "3": "Finds comfort in talking and learning. Emotions are intellectualized.",
-        "4": "Deeply attached to home and family. Needs a sanctuary to feel safe.",
-        "5": "Emotional needs met through play, romance, and creative self-expression.",
-        "6": "Finds comfort in routine and being useful. Worries affect health.",
-        "7": "Emotional security comes from having a partner. Dislikes being alone.",
-        "8": "Needs intense emotional merging. Finds safety in digging into secrets and taboos.",
-        "9": "Finds comfort in freedom, travel, and philosophy. Restless if fenced in.",
-        "10": "Emotions are public. Needs to feel respected and successful to feel safe.",
-        "11": "Finds emotional safety in friendship and belonging to a group.",
-        "12": "Emotions are private and often hidden. Needs retreat to process feelings."
-      },
-      "saturn_in_house": {
-        "1": "Reserved and serious demeanor. Lessons in self-confidence and identity.",
-        "2": "Fears regarding money. Lessons in building tangible value through hard work.",
-        "3": "Serious thinker. Lessons in communication and overcoming speech/learning hurdles.",
-        "4": "Heavy childhood atmosphere. Lessons in building one's own emotional foundation.",
-        "5": "Blocked creativity or heavy approach to fun. Lessons in finding joy.",
-        "6": "Hard worker. Lessons in health, daily service, and perfectionism.",
-        "7": "Delayed marriage or mature partners. Lessons in commitment and boundaries.",
-        "8": "Fear of intimacy. Lessons in trust, shared resources, and psychological depth.",
-        "9": "Conservative beliefs. Lessons in higher education and defining one's own truth.",
-        "10": "Ambitions are delayed but enduring. Lessons in authority and public reputation.",
-        "11": "Few but loyal friends. Lessons in social integration and long-term goals.",
-        "12": "Hidden fears. Lessons in solitude, spirituality, and dissolving the ego."
-      }
-    },
-    "aspect_library": {
-      "definitions": {
-        "conjunction": { "angle": 0, "orb": 8, "nature": "Fusion", "description": "Two planets blend their energies together. Can be positive or intense depending on the planets." },
-        "opposition": { "angle": 180, "orb": 8, "nature": "Tension", "description": "Two planets are at odds, creating a 'tug-of-war'. Requires balance and compromise." },
-        "trine": { "angle": 120, "orb": 8, "nature": "Harmony", "description": "Energy flows effortlessly between planets. Represents natural talents and luck." },
-        "square": { "angle": 90, "orb": 8, "nature": "Friction", "description": "Internal conflict that generates action. The engine of growth and achievement." },
-        "sextile": { "angle": 60, "orb": 6, "nature": "Opportunity", "description": "Planets support each other, but require conscious effort to activate the benefit." }
-      },
-      "key_interpretations": {
-        "sun_moon": {
-          "conjunction": "Single-minded focus; ego and emotions are aligned.",
-          "square": "Internal struggle between wants (Sun) and needs (Moon).",
-          "opposition": "Pull between career/self and home/family. Born near a full moon.",
-          "trine": "Inner harmony; naturally comfortable with oneself."
-        },
-        "venus_mars": {
-          "conjunction": "Charismatic and passionate. Love and desire are fused.",
-          "square": "Volatile relationships. Intense passion that can turn into conflict.",
-          "trine": "Easy sexual and romantic flow. Naturally attracts others.",
-          "opposition": "Attraction to polar opposites. Relationships are a seesaw of passion."
-        },
-        "mercury_saturn": {
-          "conjunction": "Serious mind. Excellent for concentration but prone to pessimism.",
-          "square": "Mental blockages or harsh self-criticism. Needs to work to trust one's voice.",
-          "trine": "Disciplined thinking. Good for mathematics, architecture, and planning."
-        }
-      }
-    },
-    "special_points": {
-      "angles": {
-        "mc": { "name": "Midheaven", "meaning": "Career, public reputation, status, and life goal." },
-        "ic": { "name": "Imum Coeli", "meaning": "Roots, home, ancestry, and the private self." },
-        "descendant": { "name": "Descendant", "meaning": "The shadow self; qualities we seek in partners." }
-      },
-      "nodes": {
-        "north_node": { "meaning": "Karmic destiny. The direction the soul is evolving toward; feels unfamiliar." },
-        "south_node": { "meaning": "Karmic past. Talents and habits brought from the past; feels comfortable but stagnant." }
-      },
-      "chiron": {
-        "name": "Chiron",
-        "meaning": "The Wounded Healer. Represents a deep spiritual wound we must heal in ourselves to heal others.",
-        "sign_impact": "Shows the *nature* of the wound (e.g., Aries = wound to self-worth).",
-        "house_impact": "Shows the *area of life* where the wound plays out."
-      }
-    }
-  }
-  
+	"planetary_sign_details": {
+		"mercury": {
+			"aries": {
+				"keywords": ["direct", "rapid", "debate"],
+				"description": "Thinking is intuitive and decisive. Communicates with frankness and often lacks patience for details."
+			},
+			"taurus": {
+				"keywords": ["deliberate", "practical", "stubborn"],
+				"description": "Thoughts are grounded and constructive. Learns slowly but retains everything; prefers tangible ideas over abstract theory."
+			},
+			"gemini": {
+				"keywords": ["witty", "versatile", "scattered"],
+				"description": "The mind is quick, curious, and adaptable. Thrives on variety and conversation but may lack focus."
+			},
+			"cancer": {
+				"keywords": ["intuitive", "memory-based", "sentimental"],
+				"description": "Communication is colored by emotion. exceptional memory and learns best through feeling and connection."
+			},
+			"leo": {
+				"keywords": ["dramatic", "persuasive", "confident"],
+				"description": "expresses ideas with warmth and authority. Thinking is creative and often centered around self-expression."
+			},
+			"virgo": {
+				"keywords": ["analytical", "precise", "critical"],
+				"description": "The mind is logical and detail-oriented. Excellent at discernment and organizing information efficiently."
+			},
+			"libra": {
+				"keywords": ["diplomatic", "balanced", "indecisive"],
+				"description": "Communicates with charm and tact. Weighs all sides of an issue, often leading to hesitation in decision-making."
+			},
+			"scorpio": {
+				"keywords": ["probing", "intense", "secretive"],
+				"description": "Thinking is investigative and penetrating. Interested in hidden truths and communicates with calculated depth."
+			},
+			"sagittarius": {
+				"keywords": ["philosophical", "blunt", "optimistic"],
+				"description": "The mind is broad and visionary. Interested in big ideas and truth, often overlooking details or social niceties."
+			},
+			"capricorn": {
+				"keywords": ["structured", "cautious", "methodical"],
+				"description": "Thinking is disciplined and result-oriented. values precision and plans for the long term."
+			},
+			"aquarius": {
+				"keywords": ["original", "detached", "progressive"],
+				"description": "The mind is innovative and objective. Thrives on abstract concepts and future-oriented thinking."
+			},
+			"pisces": {
+				"keywords": ["poetic", "visual", "impressionable"],
+				"description": "Thinking is imaginative and non-linear. Communicates through symbols and feelings rather than cold logic."
+			}
+		},
+		"venus": {
+			"aries": {
+				"keywords": ["passionate", "impulsive", "chasing"],
+				"description": "Loves the thrill of the chase. Expresses affection directly and forcefully but may lose interest quickly."
+			},
+			"taurus": {
+				"keywords": ["sensual", "loyal", "possessive"],
+				"description": "Values physical touch, comfort, and stability. Love is expressed through tangible gifts and consistent presence."
+			},
+			"gemini": {
+				"keywords": ["flirtatious", "playful", "intellectual"],
+				"description": "Needs mental stimulation in relationships. Values conversation and variety over deep emotional heaviness."
+			},
+			"cancer": {
+				"keywords": ["caring", "protective", "clinging"],
+				"description": "Love is nurturing and deeply attached. Seeks safety and emotional bonding, often treating partners like family."
+			},
+			"leo": {
+				"keywords": ["generous", "theatrical", "demanding"],
+				"description": "loves to be adored and to show off their partner. Affection is warm, grand, and centered on loyalty."
+			},
+			"virgo": {
+				"keywords": ["devoted", "helpful", "critical"],
+				"description": "Expresses love through acts of service and attention to detail. Can be reserved and seeks a practical partnership."
+			},
+			"libra": {
+				"keywords": ["romantic", "harmonious", "aesthetic"],
+				"description": "Values partnership above all. Seeks beauty, peace, and intellectual connection in relationships."
+			},
+			"scorpio": {
+				"keywords": ["intense", "possessive", "transformative"],
+				"description": "Love is all-or-nothing. Seeks deep soul fusion and absolute loyalty; prone to jealousy but intensely devoted."
+			},
+			"sagittarius": {
+				"keywords": ["adventurous", "free", "honest"],
+				"description": "Needs freedom in relationships. Bonds through shared travel, philosophy, and humor rather than clinginess."
+			},
+			"capricorn": {
+				"keywords": ["serious", "committed", "status-conscious"],
+				"description": "Approaches relationships with responsibility. Values longevity, respect, and traditional structures in love."
+			},
+			"aquarius": {
+				"keywords": ["unconventional", "friendly", "detached"],
+				"description": "Values friendship and intellectual rapport. Needs personal space and dislikes traditional relationship rules."
+			},
+			"pisces": {
+				"keywords": ["idealistic", "sacrificial", "dreamy"],
+				"description": "Loves with compassion and boundlessness. Prone to idealizing partners and merging emotionally."
+			}
+		},
+		"mars": {
+			"aries": {
+				"keywords": ["explosive", "initiating", "competitive"],
+				"description": "Energy is high and easily triggered. Acts on impulse and enjoys a challenge."
+			},
+			"taurus": {
+				"keywords": ["steady", "stubborn", "enduring"],
+				"description": "Action is slow to start but unstoppable once moving. Anger is rare but formidable."
+			},
+			"gemini": {
+				"keywords": ["restless", "verbal", "scattered"],
+				"description": "Energy is mental and nervous. Fights with words and scatters energy across many projects."
+			},
+			"cancer": {
+				"keywords": ["defensive", "emotional", "indirect"],
+				"description": "Acts to protect self and others. Anger is expressed through moodiness or passive-aggression."
+			},
+			"leo": {
+				"keywords": ["dramatic", "authoritative", "proud"],
+				"description": "Driven by the need for recognition. Actions are grand and confident; anger comes from wounded pride."
+			},
+			"virgo": {
+				"keywords": ["precise", "busy", "critical"],
+				"description": "Energy is focused on work and perfection. Expresses irritation through criticism and nervousness."
+			},
+			"libra": {
+				"keywords": ["diplomatic", "procrastinating", "social"],
+				"description": "Action is weighed carefully to avoid conflict. often indecisive but fights for fairness."
+			},
+			"scorpio": {
+				"keywords": ["focused", "relentless", "strategic"],
+				"description": "Energy is controlled and intense. Acts with lethal precision and holds grudges; power-driven."
+			},
+			"sagittarius": {
+				"keywords": ["impulsive", "enthusiastic", "preachy"],
+				"description": "Driven by ideals and adventure. Actions are bold and sometimes reckless; anger flares and vanishes quickly."
+			},
+			"capricorn": {
+				"keywords": ["disciplined", "controlled", "ambitious"],
+				"description": "Energy is directed toward goals. calculating and persistent; suppresses anger for professional gain."
+			},
+			"aquarius": {
+				"keywords": ["erratic", "intellectual", "rebellious"],
+				"description": "Acts in unpredictable bursts. Driven by freedom and reform; fights for causes rather than personal slights."
+			},
+			"pisces": {
+				"keywords": ["fluid", "passive", "escapist"],
+				"description": "Energy fluctuates with mood. often struggles with direct confrontation, preferring to flow around obstacles."
+			}
+		},
+		"jupiter": {
+			"generic_formula": "Grows and finds luck through [Sign Quality]",
+			"entries": {
+				"aries": "self-assertion and courage",
+				"taurus": "building tangible resources and patience",
+				"gemini": "learning, networking, and curiosity",
+				"cancer": "nurturing, home, and emotional connection",
+				"leo": "creativity, performance, and inspiring others",
+				"virgo": "service, skill-building, and details",
+				"libra": "partnership, art, and mediation",
+				"scorpio": "transformation, psychological depth, and investments",
+				"sagittarius": "travel, philosophy, and optimism (Rulership)",
+				"capricorn": "structure, ambition, and discipline",
+				"aquarius": "innovation, community, and social change",
+				"pisces": "spirituality, compassion, and imagination"
+			}
+		},
+		"saturn": {
+			"generic_formula": "Faces challenges and builds mastery in [Sign Quality]",
+			"entries": {
+				"aries": "self-reliance and leadership",
+				"taurus": "financial security and material values",
+				"gemini": "communication and intellectual discipline",
+				"cancer": "emotional security and family roots",
+				"leo": "creative self-expression and ego",
+				"virgo": "perfectionism and work routines",
+				"libra": "relationships and cooperation",
+				"scorpio": "trust, intimacy, and power dynamics",
+				"sagittarius": "beliefs, higher education, and dogma",
+				"capricorn": "career, authority, and public status (Rulership)",
+				"aquarius": "social structures and group dynamics",
+				"pisces": "boundaries and spiritual grounding"
+			}
+		},
+		"outer_planets": {
+			"uranus": {
+				"description": "The generational style of rebellion and innovation. (Changes every 7 years)"
+			},
+			"neptune": {
+				"description": "The generational style of dreams, spirituality, and illusions. (Changes every 14 years)"
+			},
+			"pluto": {
+				"description": "The generational style of power, transformation, and deep psychology. (Changes every 12-30 years)"
+			}
+		}
+	},
+	"house_placement_descriptions": {
+		"sun_in_house": {
+			"1": "Vitality is tied to self-image. Needs to be seen as a leader or pioneer.",
+			"2": "Identity is built on wealth and values. Seeks security through material accumulation.",
+			"3": "Shines through communication and learning. Identifies as a messenger or thinker.",
+			"4": "Identity is private. Focuses energy on home, family, and emotional roots.",
+			"5": "Radiates energy through creativity, romance, and children. Needs to perform.",
+			"6": "Finds purpose in work, service, and health routines. Identifies as a problem-solver.",
+			"7": "Identity is mirrored in others. vitalized by partnerships and one-on-one connection.",
+			"8": "Shines in hidden realms. Drawn to crisis, transformation, and deep psychology.",
+			"9": "Identity is linked to beliefs and travel. Seeks meaning and expansive experiences.",
+			"10": "Vitality is channeled into career. Needs public recognition and authority.",
+			"11": "Shines in groups. Identifies with friends, social causes, and the future.",
+			"12": "Identity is hidden or spiritual. Needs solitude and works best behind the scenes."
+		},
+		"moon_in_house": {
+			"1": "Emotions are worn on the sleeve. Sensitive to environment and immediate reactions.",
+			"2": "Emotional security depends on financial stability and possessions.",
+			"3": "Finds comfort in talking and learning. Emotions are intellectualized.",
+			"4": "Deeply attached to home and family. Needs a sanctuary to feel safe.",
+			"5": "Emotional needs met through play, romance, and creative self-expression.",
+			"6": "Finds comfort in routine and being useful. Worries affect health.",
+			"7": "Emotional security comes from having a partner. Dislikes being alone.",
+			"8": "Needs intense emotional merging. Finds safety in digging into secrets and taboos.",
+			"9": "Finds comfort in freedom, travel, and philosophy. Restless if fenced in.",
+			"10": "Emotions are public. Needs to feel respected and successful to feel safe.",
+			"11": "Finds emotional safety in friendship and belonging to a group.",
+			"12": "Emotions are private and often hidden. Needs retreat to process feelings."
+		},
+		"saturn_in_house": {
+			"1": "Reserved and serious demeanor. Lessons in self-confidence and identity.",
+			"2": "Fears regarding money. Lessons in building tangible value through hard work.",
+			"3": "Serious thinker. Lessons in communication and overcoming speech/learning hurdles.",
+			"4": "Heavy childhood atmosphere. Lessons in building one's own emotional foundation.",
+			"5": "Blocked creativity or heavy approach to fun. Lessons in finding joy.",
+			"6": "Hard worker. Lessons in health, daily service, and perfectionism.",
+			"7": "Delayed marriage or mature partners. Lessons in commitment and boundaries.",
+			"8": "Fear of intimacy. Lessons in trust, shared resources, and psychological depth.",
+			"9": "Conservative beliefs. Lessons in higher education and defining one's own truth.",
+			"10": "Ambitions are delayed but enduring. Lessons in authority and public reputation.",
+			"11": "Few but loyal friends. Lessons in social integration and long-term goals.",
+			"12": "Hidden fears. Lessons in solitude, spirituality, and dissolving the ego."
+		}
+	},
+	"aspect_library": {
+		"definitions": {
+			"conjunction": {
+				"angle": 0,
+				"orb": 8,
+				"nature": "Fusion",
+				"description": "Two planets blend their energies together. Can be positive or intense depending on the planets."
+			},
+			"opposition": {
+				"angle": 180,
+				"orb": 8,
+				"nature": "Tension",
+				"description": "Two planets are at odds, creating a 'tug-of-war'. Requires balance and compromise."
+			},
+			"trine": {
+				"angle": 120,
+				"orb": 8,
+				"nature": "Harmony",
+				"description": "Energy flows effortlessly between planets. Represents natural talents and luck."
+			},
+			"square": {
+				"angle": 90,
+				"orb": 8,
+				"nature": "Friction",
+				"description": "Internal conflict that generates action. The engine of growth and achievement."
+			},
+			"sextile": {
+				"angle": 60,
+				"orb": 6,
+				"nature": "Opportunity",
+				"description": "Planets support each other, but require conscious effort to activate the benefit."
+			}
+		},
+		"key_interpretations": {
+			"sun_moon": {
+				"conjunction": "Single-minded focus; ego and emotions are aligned.",
+				"square": "Internal struggle between wants (Sun) and needs (Moon).",
+				"opposition": "Pull between career/self and home/family. Born near a full moon.",
+				"trine": "Inner harmony; naturally comfortable with oneself."
+			},
+			"venus_mars": {
+				"conjunction": "Charismatic and passionate. Love and desire are fused.",
+				"square": "Volatile relationships. Intense passion that can turn into conflict.",
+				"trine": "Easy sexual and romantic flow. Naturally attracts others.",
+				"opposition": "Attraction to polar opposites. Relationships are a seesaw of passion."
+			},
+			"mercury_saturn": {
+				"conjunction": "Serious mind. Excellent for concentration but prone to pessimism.",
+				"square": "Mental blockages or harsh self-criticism. Needs to work to trust one's voice.",
+				"trine": "Disciplined thinking. Good for mathematics, architecture, and planning."
+			}
+		}
+	},
+	"special_points": {
+		"angles": {
+			"mc": { "name": "Midheaven", "meaning": "Career, public reputation, status, and life goal." },
+			"ic": { "name": "Imum Coeli", "meaning": "Roots, home, ancestry, and the private self." },
+			"descendant": {
+				"name": "Descendant",
+				"meaning": "The shadow self; qualities we seek in partners."
+			}
+		},
+		"nodes": {
+			"north_node": {
+				"meaning": "Karmic destiny. The direction the soul is evolving toward; feels unfamiliar."
+			},
+			"south_node": {
+				"meaning": "Karmic past. Talents and habits brought from the past; feels comfortable but stagnant."
+			}
+		},
+		"chiron": {
+			"name": "Chiron",
+			"meaning": "The Wounded Healer. Represents a deep spiritual wound we must heal in ourselves to heal others.",
+			"sign_impact": "Shows the *nature* of the wound (e.g., Aries = wound to self-worth).",
+			"house_impact": "Shows the *area of life* where the wound plays out."
+		}
+	}
+}

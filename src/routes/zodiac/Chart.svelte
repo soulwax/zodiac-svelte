@@ -18,10 +18,10 @@
 		utcMinute?: number;
 	}
 
-	let { 
-		sunSign, 
-		ascendant, 
-		moonSign, 
+	let {
+		sunSign,
+		ascendant,
+		moonSign,
 		houses,
 		planets = null,
 		utcYear = 2000,
@@ -70,11 +70,25 @@
 	// Get planet positions with their longitudes
 	const planetPositions = $derived(() => {
 		if (!planets) return [];
-		
-		const positions: Array<{ planet: Planet; symbol: string; longitude: number; sign: ZodiacSign; angle: number }> = [];
-		
+
+		const positions: Array<{
+			planet: Planet;
+			symbol: string;
+			longitude: number;
+			sign: ZodiacSign;
+			angle: number;
+		}> = [];
+
 		// Sun
-		const sunLon = getPlanetLongitude(sunSign, utcYear, utcMonth, utcDay, 'Sun', utcHour, utcMinute);
+		const sunLon = getPlanetLongitude(
+			sunSign,
+			utcYear,
+			utcMonth,
+			utcDay,
+			'Sun',
+			utcHour,
+			utcMinute
+		);
 		positions.push({
 			planet: Planet.Sun,
 			symbol: getPlanetarySymbol(Planet.Sun),
@@ -82,9 +96,17 @@
 			sign: sunSign,
 			angle: longitudeToAngle(sunLon)
 		});
-		
+
 		// Moon
-		const moonLon = getPlanetLongitude(moonSign, utcYear, utcMonth, utcDay, 'Moon', utcHour, utcMinute);
+		const moonLon = getPlanetLongitude(
+			moonSign,
+			utcYear,
+			utcMonth,
+			utcDay,
+			'Moon',
+			utcHour,
+			utcMinute
+		);
 		positions.push({
 			planet: Planet.Moon,
 			symbol: getPlanetarySymbol(Planet.Moon),
@@ -92,10 +114,18 @@
 			sign: moonSign,
 			angle: longitudeToAngle(moonLon)
 		});
-		
+
 		// Mercury
 		if (planets.mercury) {
-			const mercuryLon = getPlanetLongitude(planets.mercury, utcYear, utcMonth, utcDay, 'Mercury', utcHour, utcMinute);
+			const mercuryLon = getPlanetLongitude(
+				planets.mercury,
+				utcYear,
+				utcMonth,
+				utcDay,
+				'Mercury',
+				utcHour,
+				utcMinute
+			);
 			positions.push({
 				planet: Planet.Mercury,
 				symbol: getPlanetarySymbol(Planet.Mercury),
@@ -104,10 +134,18 @@
 				angle: longitudeToAngle(mercuryLon)
 			});
 		}
-		
+
 		// Venus
 		if (planets.venus) {
-			const venusLon = getPlanetLongitude(planets.venus, utcYear, utcMonth, utcDay, 'Venus', utcHour, utcMinute);
+			const venusLon = getPlanetLongitude(
+				planets.venus,
+				utcYear,
+				utcMonth,
+				utcDay,
+				'Venus',
+				utcHour,
+				utcMinute
+			);
 			positions.push({
 				planet: Planet.Venus,
 				symbol: getPlanetarySymbol(Planet.Venus),
@@ -116,10 +154,18 @@
 				angle: longitudeToAngle(venusLon)
 			});
 		}
-		
+
 		// Mars
 		if (planets.mars) {
-			const marsLon = getPlanetLongitude(planets.mars, utcYear, utcMonth, utcDay, 'Mars', utcHour, utcMinute);
+			const marsLon = getPlanetLongitude(
+				planets.mars,
+				utcYear,
+				utcMonth,
+				utcDay,
+				'Mars',
+				utcHour,
+				utcMinute
+			);
 			positions.push({
 				planet: Planet.Mars,
 				symbol: getPlanetarySymbol(Planet.Mars),
@@ -128,10 +174,18 @@
 				angle: longitudeToAngle(marsLon)
 			});
 		}
-		
+
 		// Jupiter
 		if (planets.jupiter) {
-			const jupiterLon = getPlanetLongitude(planets.jupiter, utcYear, utcMonth, utcDay, 'Jupiter', utcHour, utcMinute);
+			const jupiterLon = getPlanetLongitude(
+				planets.jupiter,
+				utcYear,
+				utcMonth,
+				utcDay,
+				'Jupiter',
+				utcHour,
+				utcMinute
+			);
 			positions.push({
 				planet: Planet.Jupiter,
 				symbol: getPlanetarySymbol(Planet.Jupiter),
@@ -140,10 +194,18 @@
 				angle: longitudeToAngle(jupiterLon)
 			});
 		}
-		
+
 		// Saturn
 		if (planets.saturn) {
-			const saturnLon = getPlanetLongitude(planets.saturn, utcYear, utcMonth, utcDay, 'Saturn', utcHour, utcMinute);
+			const saturnLon = getPlanetLongitude(
+				planets.saturn,
+				utcYear,
+				utcMonth,
+				utcDay,
+				'Saturn',
+				utcHour,
+				utcMinute
+			);
 			positions.push({
 				planet: Planet.Saturn,
 				symbol: getPlanetarySymbol(Planet.Saturn),
@@ -152,10 +214,18 @@
 				angle: longitudeToAngle(saturnLon)
 			});
 		}
-		
+
 		// Uranus
 		if (planets.uranus) {
-			const uranusLon = getPlanetLongitude(planets.uranus, utcYear, utcMonth, utcDay, 'Uranus', utcHour, utcMinute);
+			const uranusLon = getPlanetLongitude(
+				planets.uranus,
+				utcYear,
+				utcMonth,
+				utcDay,
+				'Uranus',
+				utcHour,
+				utcMinute
+			);
 			positions.push({
 				planet: Planet.Uranus,
 				symbol: getPlanetarySymbol(Planet.Uranus),
@@ -164,10 +234,18 @@
 				angle: longitudeToAngle(uranusLon)
 			});
 		}
-		
+
 		// Neptune
 		if (planets.neptune) {
-			const neptuneLon = getPlanetLongitude(planets.neptune, utcYear, utcMonth, utcDay, 'Neptune', utcHour, utcMinute);
+			const neptuneLon = getPlanetLongitude(
+				planets.neptune,
+				utcYear,
+				utcMonth,
+				utcDay,
+				'Neptune',
+				utcHour,
+				utcMinute
+			);
 			positions.push({
 				planet: Planet.Neptune,
 				symbol: getPlanetarySymbol(Planet.Neptune),
@@ -176,10 +254,18 @@
 				angle: longitudeToAngle(neptuneLon)
 			});
 		}
-		
+
 		// Pluto
 		if (planets.pluto) {
-			const plutoLon = getPlanetLongitude(planets.pluto, utcYear, utcMonth, utcDay, 'Pluto', utcHour, utcMinute);
+			const plutoLon = getPlanetLongitude(
+				planets.pluto,
+				utcYear,
+				utcMonth,
+				utcDay,
+				'Pluto',
+				utcHour,
+				utcMinute
+			);
 			positions.push({
 				planet: Planet.Pluto,
 				symbol: getPlanetarySymbol(Planet.Pluto),
@@ -188,7 +274,7 @@
 				angle: longitudeToAngle(plutoLon)
 			});
 		}
-		
+
 		return positions;
 	});
 
@@ -263,8 +349,16 @@
 	});
 
 	// Get aspect color and style
-	function getAspectStyle(aspect: AspectType): { color: string; dashArray: string; width: number; opacity: number } {
-		const styles: Record<AspectType, { color: string; dashArray: string; width: number; opacity: number }> = {
+	function getAspectStyle(aspect: AspectType): {
+		color: string;
+		dashArray: string;
+		width: number;
+		opacity: number;
+	} {
+		const styles: Record<
+			AspectType,
+			{ color: string; dashArray: string; width: number; opacity: number }
+		> = {
 			conjunction: { color: '#FFD700', dashArray: '0', width: 2, opacity: 0.8 },
 			opposition: { color: '#DC143C', dashArray: '5,5', width: 1.5, opacity: 0.6 },
 			trine: { color: '#00C853', dashArray: '0', width: 1.5, opacity: 0.5 },
@@ -278,7 +372,15 @@
 <div class="chart-container">
 	<svg viewBox="0 0 600 600" class="chart-svg">
 		<!-- Outer circle -->
-		<circle cx="300" cy="300" r="290" fill="none" stroke="currentColor" stroke-width="1" opacity="0.3" />
+		<circle
+			cx="300"
+			cy="300"
+			r="290"
+			fill="none"
+			stroke="currentColor"
+			stroke-width="1"
+			opacity="0.3"
+		/>
 
 		<!-- Draw 12 sectors for zodiac signs -->
 		{#each zodiacSigns as sign, index (sign)}
@@ -291,7 +393,9 @@
 
 			<!-- Sector background -->
 			<path
-				d="M 300 300 L {300 + 280 * Math.cos(angle)} {300 + 280 * Math.sin(angle)} A 280 280 0 0 1 {300 + 280 * Math.cos(nextAngle)} {300 + 280 * Math.sin(nextAngle)} Z"
+				d="M 300 300 L {300 + 280 * Math.cos(angle)} {300 +
+					280 * Math.sin(angle)} A 280 280 0 0 1 {300 + 280 * Math.cos(nextAngle)} {300 +
+					280 * Math.sin(nextAngle)} Z"
 				fill={isAscendant ? 'rgba(0, 120, 212, 0.1)' : 'transparent'}
 				stroke="currentColor"
 				stroke-width="1"
@@ -301,8 +405,8 @@
 
 			<!-- Zodiac symbol -->
 			<text
-				x={300 + 200 * Math.cos(angle + (Math.PI / 12))}
-				y={300 + 200 * Math.sin(angle + (Math.PI / 12))}
+				x={300 + 200 * Math.cos(angle + Math.PI / 12)}
+				y={300 + 200 * Math.sin(angle + Math.PI / 12)}
 				font-size="32"
 				text-anchor="middle"
 				dominant-baseline="middle"
@@ -314,8 +418,8 @@
 
 			<!-- Sign name -->
 			<text
-				x={300 + 240 * Math.cos(angle + (Math.PI / 12))}
-				y={300 + 240 * Math.sin(angle + (Math.PI / 12))}
+				x={300 + 240 * Math.cos(angle + Math.PI / 12)}
+				y={300 + 240 * Math.sin(angle + Math.PI / 12)}
 				font-size="12"
 				text-anchor="middle"
 				dominant-baseline="middle"
@@ -327,8 +431,8 @@
 			<!-- House number -->
 			{#if houseNum > 0}
 				<text
-					x={300 + 150 * Math.cos(angle + (Math.PI / 12))}
-					y={300 + 150 * Math.sin(angle + (Math.PI / 12))}
+					x={300 + 150 * Math.cos(angle + Math.PI / 12)}
+					y={300 + 150 * Math.sin(angle + Math.PI / 12)}
 					font-size="14"
 					font-weight="bold"
 					text-anchor="middle"
@@ -392,10 +496,10 @@
 			{@const style = getAspectStyle(aspect.type)}
 
 			<line
-				x1={x1}
-				y1={y1}
-				x2={x2}
-				y2={y2}
+				{x1}
+				{y1}
+				{x2}
+				{y2}
 				stroke={style.color}
 				stroke-width={style.width}
 				stroke-dasharray={style.dashArray}
@@ -405,7 +509,15 @@
 		{/each}
 
 		<!-- Planet orbit ring -->
-		<circle cx="300" cy="300" r="120" fill="none" stroke="currentColor" stroke-width="1.5" opacity="0.3" />
+		<circle
+			cx="300"
+			cy="300"
+			r="120"
+			fill="none"
+			stroke="currentColor"
+			stroke-width="1.5"
+			opacity="0.3"
+		/>
 
 		<!-- Draw planets at their positions -->
 		{#each planetPositions() as planetPos}
@@ -415,8 +527,13 @@
 			{@const y = 300 + radius * Math.sin(planetPos.angle)}
 			{@const labelX = 300 + (radius + offsetRadius) * Math.cos(planetPos.angle)}
 			{@const labelY = 300 + (radius + offsetRadius) * Math.sin(planetPos.angle)}
-			{@const isPersonal = planetPos.planet === Planet.Sun || planetPos.planet === Planet.Moon || planetPos.planet === Planet.Mercury || planetPos.planet === Planet.Venus || planetPos.planet === Planet.Mars}
-			
+			{@const isPersonal =
+				planetPos.planet === Planet.Sun ||
+				planetPos.planet === Planet.Moon ||
+				planetPos.planet === Planet.Mercury ||
+				planetPos.planet === Planet.Venus ||
+				planetPos.planet === Planet.Mars}
+
 			<!-- Planet marker circle -->
 			<circle
 				cx={x}
@@ -429,12 +546,12 @@
 				class:personal-planet={isPersonal}
 				class:outer-planet={!isPersonal}
 			/>
-			
+
 			<!-- Planet symbol -->
 			<text
-				x={x}
+				{x}
 				y={y + 4}
-				font-size={isPersonal ? "14" : "12"}
+				font-size={isPersonal ? '14' : '12'}
 				text-anchor="middle"
 				dominant-baseline="middle"
 				fill="var(--color-bg-1)"
@@ -443,7 +560,7 @@
 			>
 				{planetPos.symbol}
 			</text>
-			
+
 			<!-- Planet label -->
 			<text
 				x={labelX}
@@ -456,7 +573,7 @@
 			>
 				{planetPos.planet}
 			</text>
-			
+
 			<!-- Degree marker -->
 			<text
 				x={labelX}
@@ -472,8 +589,15 @@
 		{/each}
 
 		<!-- Central circle -->
-		<circle cx="300" cy="300" r="50" fill="var(--color-bg-2)" stroke="currentColor" stroke-width="2" />
-		
+		<circle
+			cx="300"
+			cy="300"
+			r="50"
+			fill="var(--color-bg-2)"
+			stroke="currentColor"
+			stroke-width="2"
+		/>
+
 		<!-- Central indicators -->
 		<text x="300" y="290" font-size="14" text-anchor="middle" class="indicator-label">
 			{astrologicalSymbols.Ascendant}
@@ -491,7 +615,16 @@
 			<text x="135" y="560" font-size="8" fill="currentColor">Conjunction</text>
 
 			<!-- Opposition -->
-			<line x1="210" y1="556" x2="240" y2="556" stroke="#DC143C" stroke-width="1.5" stroke-dasharray="5,5" opacity="0.6" />
+			<line
+				x1="210"
+				y1="556"
+				x2="240"
+				y2="556"
+				stroke="#DC143C"
+				stroke-width="1.5"
+				stroke-dasharray="5,5"
+				opacity="0.6"
+			/>
 			<text x="245" y="560" font-size="8" fill="currentColor">Opposition</text>
 
 			<!-- Trine -->
@@ -499,11 +632,29 @@
 			<text x="355" y="560" font-size="8" fill="currentColor">Trine</text>
 
 			<!-- Square -->
-			<line x1="405" y1="556" x2="435" y2="556" stroke="#FF6B6B" stroke-width="1.5" stroke-dasharray="3,3" opacity="0.5" />
+			<line
+				x1="405"
+				y1="556"
+				x2="435"
+				y2="556"
+				stroke="#FF6B6B"
+				stroke-width="1.5"
+				stroke-dasharray="3,3"
+				opacity="0.5"
+			/>
 			<text x="440" y="560" font-size="8" fill="currentColor">Square</text>
 
 			<!-- Sextile -->
-			<line x1="490" y1="556" x2="520" y2="556" stroke="#4FC3F7" stroke-width="1" stroke-dasharray="2,2" opacity="0.4" />
+			<line
+				x1="490"
+				y1="556"
+				x2="520"
+				y2="556"
+				stroke="#4FC3F7"
+				stroke-width="1"
+				stroke-dasharray="2,2"
+				opacity="0.4"
+			/>
 			<text x="525" y="560" font-size="8" fill="currentColor">Sextile</text>
 		</g>
 	</svg>
@@ -534,7 +685,9 @@
 
 	.zodiac-symbol {
 		fill: currentColor;
-		transition: transform 0.2s ease, opacity 0.2s ease;
+		transition:
+			transform 0.2s ease,
+			opacity 0.2s ease;
 	}
 
 	.zodiac-symbol.highlight {
@@ -558,7 +711,9 @@
 	}
 
 	.planet-marker {
-		transition: transform 0.2s ease, opacity 0.2s ease;
+		transition:
+			transform 0.2s ease,
+			opacity 0.2s ease;
 		cursor: pointer;
 	}
 
@@ -600,7 +755,9 @@
 
 	.aspect-line {
 		pointer-events: none;
-		transition: opacity 0.3s ease, stroke-width 0.3s ease;
+		transition:
+			opacity 0.3s ease,
+			stroke-width 0.3s ease;
 	}
 
 	.aspect-line:hover {

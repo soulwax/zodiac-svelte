@@ -1,24 +1,41 @@
 zodiac-svelte
+├───.annot8_backup.json
 ├───.env.example
 ├───.gitignore
 ├───.npmrc
 ├───.prettierignore
 ├───.prettierrc
+├───analyze-quadrants.mjs
+├───ASCENDANT_CALCULATION_FINDINGS.md
+├───CHANGELOG.md
 ├───CLAUDE.md
+├───CONTEXT.md
+├───debug-multiple-ascendants.mjs
 ├───drizzle.config.ts
 ├───ecosystem.config.cjs
 ├───eslint.config.js
+├───generate-correct-ascendants.mjs
 ├───package.json
 ├───pnpm-lock.yaml
 ├───pnpm-workspace.yaml
 ├───README.md
 ├───run-zodiac-tests.js
 ├───svelte.config.js
+├───SWISS_EPHEMERIS_INTEGRATION.md
+├───test-all-with-swisseph.mjs
+├───test-ascendant-debug.mjs
+├───test-ascendant-variations.mjs
+├───test-proper-ascendant.mjs
+├───test-swisseph.mjs
 ├───test-zodiac-complete.mjs
 ├───test-zodiac-simple.mjs
 ├───TEST_RESULTS.md
+├───tree.txt
 ├───tsconfig.json
+├───update-all-ascendants.mjs
+├───update-test-ascendants.mjs
 ├───vercel.json
+├───verify-ascendant-fix.mjs
 ├───vite.config.ts
 ├───.claude/
 │   └───settings.local.json
@@ -163,7 +180,7 @@ zodiac-svelte
 │   │   │       ├───version.json
 │   │   │       └───immutable/
 │   │   │           ├───assets/
-│   │   │           │   ├───0.L-9AXGNW.css
+│   │   │           │   ├───0.9vrmM4dU.css
 │   │   │           │   ├───2.COsVWyq4.css
 │   │   │           │   ├───3.BERWdqeB.css
 │   │   │           │   ├───4.C7uEq_1w.css
@@ -183,40 +200,41 @@ zodiac-svelte
 │   │   │           │   ├───fira-mono-latin-ext-400-normal.B2gPvaNr.woff2
 │   │   │           │   ├───fira-mono-latin-ext-400-normal.CbD3vWRE.woff
 │   │   │           │   ├───fira-mono-symbols2-400-normal.C6JptOil.woff2
-│   │   │           │   └───fira-mono-symbols2-400-normal.CpeG9ob9.woff
+│   │   │           │   ├───fira-mono-symbols2-400-normal.CpeG9ob9.woff
+│   │   │           │   └───swisseph.CTDYKFq2.wasm
 │   │   │           ├───chunks/
-│   │   │           │   ├───B4E1rfGg.js
-│   │   │           │   ├───BFsmEqma.js
-│   │   │           │   ├───BIWxRItj.js
-│   │   │           │   ├───BNLIUOAx.js
-│   │   │           │   ├───BooA7heZ.js
-│   │   │           │   ├───BsvsdUEb.js
-│   │   │           │   ├───BYV8N5bF.js
+│   │   │           │   ├───4aj8jzFY.js
+│   │   │           │   ├───60H-5wnv.js
+│   │   │           │   ├───B9d5KARQ.js
+│   │   │           │   ├───b_7LxrDm.js
+│   │   │           │   ├───BIHI7g3E.js
+│   │   │           │   ├───Bp0gfV4f.js
+│   │   │           │   ├───BW9J3H5w.js
 │   │   │           │   ├───Bzr520pe.js
-│   │   │           │   ├───C6751teb.js
-│   │   │           │   ├───CEk1jBEJ.js
-│   │   │           │   ├───CgMgjUw2.js
-│   │   │           │   ├───D3ONGup0.js
-│   │   │           │   ├───DCjqB64a.js
-│   │   │           │   ├───DHivxRFs.js
-│   │   │           │   ├───DQ5NcBaK.js
+│   │   │           │   ├───C8kDteyl.js
+│   │   │           │   ├───Cbs-j00q.js
+│   │   │           │   ├───CHA3PNum.js
+│   │   │           │   ├───CmqXEQpL.js
+│   │   │           │   ├───DE99vJ8U.js
+│   │   │           │   ├───DMY94O92.js
+│   │   │           │   ├───Dqpbwch4.js
+│   │   │           │   ├───DsFOzdMu.js
 │   │   │           │   ├───DsnmJJEf.js
-│   │   │           │   ├───DYclPLdh.js
-│   │   │           │   ├───Ge7aVWlp.js
-│   │   │           │   ├───kKsBUBxj.js
+│   │   │           │   ├───DXEQVQnt.js
+│   │   │           │   ├───LYh_Irav.js
 │   │   │           │   ├───PPVm8Dsz.js
-│   │   │           │   └───RRqGf15f.js
+│   │   │           │   └───vOwc0-CR.js
 │   │   │           ├───entry/
-│   │   │           │   ├───app.COtpdK07.js
-│   │   │           │   └───start.DzpJww8g.js
+│   │   │           │   ├───app.e4eZNdSk.js
+│   │   │           │   └───start.ctQadgG-.js
 │   │   │           └───nodes/
-│   │   │               ├───0.RY9qV762.js
-│   │   │               ├───1.BA8tfuWR.js
-│   │   │               ├───2.Bj3R86Ek.js
-│   │   │               ├───3.z5VnMf6s.js
-│   │   │               ├───4.D-6mtNOq.js
-│   │   │               ├───5.DT6dWaVg.js
-│   │   │               └───6.Cf_9BRIj.js
+│   │   │               ├───0.6lHMTm_T.js
+│   │   │               ├───1.C17p6GlS.js
+│   │   │               ├───2.uXBnWiW7.js
+│   │   │               ├───3.DNiDqDBM.js
+│   │   │               ├───4.ksAb4YEV.js
+│   │   │               ├───5.CjEb66zG.js
+│   │   │               └───6.DDKRLJoF.js
 │   │   ├───prerendered/
 │   │   │   └───pages/
 │   │   │       ├───about.html
@@ -234,7 +252,7 @@ zodiac-svelte
 │   │       ├───_app/
 │   │       │   └───immutable/
 │   │       │       └───assets/
-│   │       │           ├───_layout.CM4zzeqt.css
+│   │       │           ├───_layout.DwqJp_SD.css
 │   │       │           ├───_page.BERWdqeB.css
 │   │       │           ├───_page.C7uEq_1w.css
 │   │       │           ├───_page.coQmJpy9.css
@@ -262,12 +280,14 @@ zodiac-svelte
 │   │       │   ├───exports.js
 │   │       │   ├───false.js
 │   │       │   ├───general.js
+│   │       │   ├───hooks.server.js
 │   │       │   ├───index.js
 │   │       │   ├───index2.js
 │   │       │   ├───index3.js
 │   │       │   ├───index4.js
 │   │       │   ├───index5.js
 │   │       │   ├───internal.js
+│   │       │   ├───jobs.js
 │   │       │   ├───routing.js
 │   │       │   ├───server.js
 │   │       │   ├───server2.js
@@ -278,6 +298,13 @@ zodiac-svelte
 │   │       │   ├───utils.js
 │   │       │   └───zodiac.js
 │   │       ├───entries/
+│   │       │   ├───endpoints/
+│   │       │   │   └───api/
+│   │       │   │       └───analyze/
+│   │       │   │           ├───_server.ts.js
+│   │       │   │           └───status/
+│   │       │   │               └───_jobId_/
+│   │       │   │                   └───_server.ts.js
 │   │       │   ├───fallbacks/
 │   │       │   │   └───error.svelte.js
 │   │       │   └───pages/
@@ -313,6 +340,12 @@ zodiac-svelte
 │               ├───$types.d.ts
 │               ├───about/
 │               │   └───$types.d.ts
+│               ├───api/
+│               │   └───analyze/
+│               │       ├───$types.d.ts
+│               │       └───status/
+│               │           └───[jobId]/
+│               │               └───$types.d.ts
 │               ├───sverdle/
 │               │   ├───$types.d.ts
 │               │   └───how-to-play/
@@ -346,6 +379,7 @@ zodiac-svelte
 │   │   └───planets.json
 │   ├───lib/
 │   │   ├───geocoding.ts
+│   │   ├───swisseph.ts
 │   │   ├───symbols.ts
 │   │   ├───zodiac.test.ts
 │   │   ├───zodiac.ts
@@ -389,7 +423,12 @@ zodiac-svelte
 │           ├───+page.svelte
 │           ├───+page.ts
 │           └───Chart.svelte
-└───static/
-    ├───favicon.png
-    ├───favicon_svelte.svg
-    └───robots.txt
+├───static/
+│   ├───favicon.png
+│   ├───favicon_svelte.svg
+│   └───robots.txt
+└───tmp/
+    ├───ascendant-corrections.json
+    ├───test-results-final.txt
+    ├───test-results-swisseph.txt
+    └───test-results.txt

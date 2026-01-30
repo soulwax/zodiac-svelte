@@ -1,380 +1,391 @@
 {
-    "info": {
-      "houses": {
-        "1": {
-          "name": "First House",
-          "alias": "House of Self",
-          "keywords": ["identity", "appearance", "first impressions", "beginnings", "vitality"],
-          "description": "Represents the self, physical appearance, first impressions, and how one instinctively approaches life. The sign on the 1st house cusp is the Ascendant (rising sign) and colors a person's overall style, energy, and way of initiating action."
-        },
-        "2": {
-          "name": "Second House",
-          "alias": "House of Values and Possessions",
-          "keywords": ["money", "income", "resources", "self-worth", "stability"],
-          "description": "Relates to personal finances, material possessions, and the way one earns and manages resources. Also describes one's sense of self-worth, security, and what is considered valuable or worth investing in."
-        },
-        "3": {
-          "name": "Third House",
-          "alias": "House of Communication",
-          "keywords": ["communication", "thinking", "siblings", "learning", "short trips"],
-          "description": "Covers thinking style, everyday communication, and information exchange. Connected to siblings, neighbors, local environment, early education, and short-distance travel."
-        },
-        "4": {
-          "name": "Fourth House",
-          "alias": "House of Home and Roots",
-          "keywords": ["home", "family", "roots", "foundation", "private life"],
-          "description": "Represents home life, family, roots, ancestry, and emotional foundations. Indicates one's need for safety and privacy, relationship to parents, and the sense of belonging."
-        },
-        "5": {
-          "name": "Fifth House",
-          "alias": "House of Creativity and Pleasure",
-          "keywords": ["creativity", "romance", "children", "fun", "self-expression"],
-          "description": "Concerns joy, play, romance, hobbies, artistic expression, and children. Shows how a person seeks pleasure, takes creative risks, and shines in a playful or romantic way."
-        },
-        "6": {
-          "name": "Sixth House",
-          "alias": "House of Work and Health",
-          "keywords": ["work", "service", "health", "routines", "habits"],
-          "description": "Rules daily work, service to others, routines, and practical skills. Connected to physical health, lifestyle, diet, and organization in everyday life."
-        },
-        "7": {
-          "name": "Seventh House",
-          "alias": "House of Partnerships",
-          "keywords": ["partnerships", "marriage", "contracts", "balance", "one-to-one relationships"],
-          "description": "Describes committed partnerships of all kinds: romantic, business, and legal. Indicates how one relates to significant others, seeks balance, and mirrors themselves through close relationships."
-        },
-        "8": {
-          "name": "Eighth House",
-          "alias": "House of Transformation",
-          "keywords": ["intimacy", "shared resources", "transformation", "taboos", "death and rebirth"],
-          "description": "Relates to deep bonding, psychological transformation, sexuality, and shared resources such as joint finances, inheritances, and debts. Connected to loss, regeneration, and confronting taboos."
-        },
-        "9": {
-          "name": "Ninth House",
-          "alias": "House of Expansion",
-          "keywords": ["higher learning", "beliefs", "travel", "philosophy", "vision"],
-          "description": "Covers higher education, philosophy, spirituality, law, and long-distance travel. Represents the search for meaning, broader perspectives, and experiences that expand horizons."
-        },
-        "10": {
-          "name": "Tenth House",
-          "alias": "House of Career and Status",
-          "keywords": ["career", "public image", "authority", "achievement", "legacy"],
-          "description": "Represents vocation, public role, reputation, and long-term ambitions. Shows how one appears in the public eye, interacts with authority, and pursues recognition and mastery."
-        },
-        "11": {
-          "name": "Eleventh House",
-          "alias": "House of Community and Future",
-          "keywords": ["friends", "community", "networks", "goals", "innovation"],
-          "description": "Relates to friendships, communities, social networks, and collective causes. Describes future-oriented goals, hopes, and broader contributions to society."
-        },
-        "12": {
-          "name": "Twelfth House",
-          "alias": "House of the Unconscious",
-          "keywords": ["endings", "solitude", "subconscious", "healing", "spirituality"],
-          "description": "Connects with the unconscious, dreams, retreat, and hidden aspects of life. Linked to endings, release, spiritual practices, isolation, and deep healing."
-        }
-      },
-      "core_points": {
-        "sun": {
-          "name": "Sun",
-          "role": "Core Self and Life Purpose",
-          "keywords": ["identity", "ego", "will", "purpose", "vitality"],
-          "description": "The Sun represents core identity, willpower, and the central storyline of a life. Its sign shows how a person expresses their essence, while the house shows where this energy radiates most strongly."
-        },
-        "moon": {
-          "name": "Moon",
-          "role": "Emotions and Inner World",
-          "keywords": ["emotions", "needs", "instincts", "habits", "nurturing"],
-          "description": "The Moon represents emotional nature, instinctive reactions, and what feels safe. Its sign shows how a person feels and self-soothes, while the house points to where deep needs are most active."
-        },
-        "ascendant": {
-          "name": "Ascendant",
-          "alias": "Rising Sign",
-          "role": "Mask and Approach to Life",
-          "keywords": ["first impression", "approach", "style", "body", "orientation"],
-          "description": "The Ascendant is the sign rising on the eastern horizon at birth. It shapes the house system and describes how a person approaches situations and appears to others."
-        }
-      },
-      "planets": {
-        "sun": {
-          "name": "Sun",
-          "category": "personal",
-          "keywords": ["identity", "ego", "purpose", "vitality"],
-          "description": "Symbolizes core self, ego, and creative life force. Shows how a person shines and seeks purpose."
-        },
-        "moon": {
-          "name": "Moon",
-          "category": "personal",
-          "keywords": ["emotions", "habits", "intuition", "nurturing"],
-          "description": "Represents emotional landscape, intuition, and instinctive patterns."
-        },
-        "mercury": {
-          "name": "Mercury",
-          "category": "personal",
-          "keywords": ["communication", "thinking", "learning", "logic"],
-          "description": "Rules the mind, language, and information exchange. Describes thinking style and communication."
-        },
-        "venus": {
-          "name": "Venus",
-          "category": "personal",
-          "keywords": ["love", "relationships", "beauty", "pleasure", "values"],
-          "description": "Governs attraction, affection, aesthetics, and personal values."
-        },
-        "mars": {
-          "name": "Mars",
-          "category": "personal",
-          "keywords": ["drive", "action", "desire", "assertion", "conflict"],
-          "description": "Represents raw energy, desire, and how a person acts and defends themselves."
-        },
-        "jupiter": {
-          "name": "Jupiter",
-          "category": "social",
-          "keywords": ["expansion", "growth", "abundance", "wisdom", "faith"],
-          "description": "Symbolizes optimism, growth, and opportunity."
-        },
-        "saturn": {
-          "name": "Saturn",
-          "category": "social",
-          "keywords": ["structure", "discipline", "limits", "responsibility", "time"],
-          "description": "Represents boundaries, effort, and long-term mastery."
-        },
-        "uranus": {
-          "name": "Uranus",
-          "category": "outer",
-          "keywords": ["change", "innovation", "rebellion", "freedom"],
-          "description": "Embodies sudden change, originality, and freedom."
-        },
-        "neptune": {
-          "name": "Neptune",
-          "category": "outer",
-          "keywords": ["dreams", "spirituality", "imagination", "illusion"],
-          "description": "Relates to dreams, ideals, and spiritual sensitivity."
-        },
-        "pluto": {
-          "name": "Pluto",
-          "category": "outer",
-          "keywords": ["power", "transformation", "depth", "rebirth"],
-          "description": "Symbolizes deep transformation and psychological intensity."
-        }
-      }
-    },
-    "zodiac_signs": {
-      "aries": {
-        "name": "Aries",
-        "element": "fire",
-        "modality": "cardinal",
-        "ruler": "Mars",
-        "sun": {
-          "keywords": ["pioneer", "direct", "assertive", "independent"],
-          "description": "Sun in Aries expresses as bold, energetic, and pioneering."
-        },
-        "moon": {
-          "keywords": ["impulsive emotions", "quick reactions", "need for excitement"],
-          "description": "Moon in Aries feels intensely and seeks quick, honest emotional expression."
-        },
-        "ascendant": {
-          "keywords": ["dynamic presence", "fast", "competitive", "straightforward"],
-          "description": "Aries rising appears bold, direct, and energetic."
-        }
-      },
-      "taurus": {
-        "name": "Taurus",
-        "element": "earth",
-        "modality": "fixed",
-        "ruler": "Venus",
-        "sun": {
-          "keywords": ["steady", "sensual", "persistent", "grounded"],
-          "description": "Sun in Taurus values stability, comfort, and tangible results."
-        },
-        "moon": {
-          "keywords": ["emotional stability", "sensory comfort", "loyalty"],
-          "description": "Moon in Taurus needs reliability, comfort, and calm surroundings."
-        },
-        "ascendant": {
-          "keywords": ["calm exterior", "deliberate", "solid", "reliable"],
-          "description": "Taurus rising appears grounded, steady, and unhurried."
-        }
-      },
-      "gemini": {
-        "name": "Gemini",
-        "element": "air",
-        "modality": "mutable",
-        "ruler": "Mercury",
-        "sun": {
-          "keywords": ["curious", "versatile", "communicative"],
-          "description": "Sun in Gemini thrives on ideas, conversation, and variety."
-        },
-        "moon": {
-          "keywords": ["mental stimulation", "restless emotions", "verbal processing"],
-          "description": "Moon in Gemini needs communication and mental engagement."
-        },
-        "ascendant": {
-          "keywords": ["lively", "talkative", "adaptable", "youthful"],
-          "description": "Gemini rising appears quick, curious, and social."
-        }
-      },
-      "cancer": {
-        "name": "Cancer",
-        "element": "water",
-        "modality": "cardinal",
-        "ruler": "Moon",
-        "sun": {
-          "keywords": ["protective", "intuitive", "nurturing"],
-          "description": "Sun in Cancer expresses emotional sensitivity and devotion to home."
-        },
-        "moon": {
-          "keywords": ["deep feelings", "empathy", "moodiness", "bonding"],
-          "description": "Moon in Cancer forms deep attachments and responds instinctively."
-        },
-        "ascendant": {
-          "keywords": ["soft presence", "cautious", "gentle", "receptive"],
-          "description": "Cancer rising appears caring, sensitive, and quietly protective."
-        }
-      },
-      "leo": {
-        "name": "Leo",
-        "element": "fire",
-        "modality": "fixed",
-        "ruler": "Sun",
-        "sun": {
-          "keywords": ["expressive", "proud", "creative", "warm"],
-          "description": "Sun in Leo seeks recognition, creativity, and heartfelt expression."
-        },
-        "moon": {
-          "keywords": ["dramatic feelings", "need for appreciation", "playfulness"],
-          "description": "Moon in Leo seeks warmth, loyalty, and emotional validation. This placement expresses feelings dramatically and craves genuine appreciation from close connections."
-        },
-        "ascendant": {
-          "keywords": ["radiant", "confident", "charismatic", "dramatic"],
-          "description": "Leo rising appears warm, expressive, and noticeable. Others experience an aura of confidence, creativity, and generous presence."
-        }
-      },
-      "virgo": {
-        "name": "Virgo",
-        "element": "earth",
-        "modality": "mutable",
-        "ruler": "Mercury",
-        "sun": {
-          "keywords": ["analytical", "practical", "methodical", "helpful"],
-          "description": "Sun in Virgo expresses through precision, improvement, and service."
-        },
-        "moon": {
-          "keywords": ["need for order", "practical emotions", "carefulness"],
-          "description": "Moon in Virgo feels secure through routines, clarity, and usefulness."
-        },
-        "ascendant": {
-          "keywords": ["observant", "precise", "reserved", "clean"],
-          "description": "Virgo rising appears attentive, orderly, and subtly analytical."
-        }
-      },
-      "libra": {
-        "name": "Libra",
-        "element": "air",
-        "modality": "cardinal",
-        "ruler": "Venus",
-        "sun": {
-          "keywords": ["diplomatic", "harmonizing", "graceful"],
-          "description": "Sun in Libra seeks balance, beauty, and meaningful partnerships."
-        },
-        "moon": {
-          "keywords": ["relational needs", "peace-seeking", "sensitivity to harmony"],
-          "description": "Moon in Libra feels safe in balanced, aesthetically pleasing environments."
-        },
-        "ascendant": {
-          "keywords": ["charming", "balanced", "pleasant", "graceful"],
-          "description": "Libra rising appears kind, fair, and socially refined."
-        }
-      },
-      "scorpio": {
-        "name": "Scorpio",
-        "element": "water",
-        "modality": "fixed",
-        "ruler": "Pluto",
-        "sun": {
-          "keywords": ["intense", "deep", "strategic", "transformative"],
-          "description": "Sun in Scorpio expresses depth, emotional power, and persistence."
-        },
-        "moon": {
-          "keywords": ["intense emotions", "loyalty", "privacy", "intuition"],
-          "description": "Moon in Scorpio feels profoundly and seeks emotional truth."
-        },
-        "ascendant": {
-          "keywords": ["enigmatic", "strong-willed", "penetrating"],
-          "description": "Scorpio rising appears magnetic, private, and observant."
-        }
-      },
-      "sagittarius": {
-        "name": "Sagittarius",
-        "element": "fire",
-        "modality": "mutable",
-        "ruler": "Jupiter",
-        "sun": {
-          "keywords": ["explorer", "optimistic", "philosophical"],
-          "description": "Sun in Sagittarius seeks growth, adventure, and wisdom."
-        },
-        "moon": {
-          "keywords": ["restless emotions", "need for freedom", "hopeful"],
-          "description": "Moon in Sagittarius needs space, honesty, and inspiration."
-        },
-        "ascendant": {
-          "keywords": ["open", "energetic", "enthusiastic"],
-          "description": "Sagittarius rising appears expansive, curious, and spirited."
-        }
-      },
-      "capricorn": {
-        "name": "Capricorn",
-        "element": "earth",
-        "modality": "cardinal",
-        "ruler": "Saturn",
-        "sun": {
-          "keywords": ["disciplined", "ambitious", "practical"],
-          "description": "Sun in Capricorn focuses on structure, goals, and long-term success."
-        },
-        "moon": {
-          "keywords": ["reserved emotions", "responsibility", "steadiness"],
-          "description": "Moon in Capricorn feels safe when in control and managing duties well."
-        },
-        "ascendant": {
-          "keywords": ["serious", "structured", "determined"],
-          "description": "Capricorn rising appears focused, composed, and self-disciplined."
-        }
-      },
-      "aquarius": {
-        "name": "Aquarius",
-        "element": "air",
-        "modality": "fixed",
-        "ruler": "Uranus",
-        "sun": {
-          "keywords": ["innovative", "independent", "idealistic"],
-          "description": "Sun in Aquarius expresses originality, intellect, and future-oriented vision."
-        },
-        "moon": {
-          "keywords": ["detached emotions", "need for freedom", "idealism"],
-          "description": "Moon in Aquarius seeks independence and intellectual connection."
-        },
-        "ascendant": {
-          "keywords": ["unique", "cool", "unconventional"],
-          "description": "Aquarius rising appears original, inventive, and socially aware."
-        }
-      },
-      "pisces": {
-        "name": "Pisces",
-        "element": "water",
-        "modality": "mutable",
-        "ruler": "Neptune",
-        "sun": {
-          "keywords": ["sensitive", "imaginative", "empathetic"],
-          "description": "Sun in Pisces expresses compassion, fluidity, and creativity."
-        },
-        "moon": {
-          "keywords": ["emotional openness", "intuition", "dreaminess"],
-          "description": "Moon in Pisces feels deeply and senses subtle emotional undercurrents."
-        },
-        "ascendant": {
-          "keywords": ["soft", "mystical", "gentle", "receptive"],
-          "description": "Pisces rising appears dreamy, empathetic, and intuitive."
-        }
-      }
-    }
-  }
-  
+	"info": {
+		"houses": {
+			"1": {
+				"name": "First House",
+				"alias": "House of Self",
+				"keywords": ["identity", "appearance", "first impressions", "beginnings", "vitality"],
+				"description": "Represents the self, physical appearance, first impressions, and how one instinctively approaches life. The sign on the 1st house cusp is the Ascendant (rising sign) and colors a person's overall style, energy, and way of initiating action."
+			},
+			"2": {
+				"name": "Second House",
+				"alias": "House of Values and Possessions",
+				"keywords": ["money", "income", "resources", "self-worth", "stability"],
+				"description": "Relates to personal finances, material possessions, and the way one earns and manages resources. Also describes one's sense of self-worth, security, and what is considered valuable or worth investing in."
+			},
+			"3": {
+				"name": "Third House",
+				"alias": "House of Communication",
+				"keywords": ["communication", "thinking", "siblings", "learning", "short trips"],
+				"description": "Covers thinking style, everyday communication, and information exchange. Connected to siblings, neighbors, local environment, early education, and short-distance travel."
+			},
+			"4": {
+				"name": "Fourth House",
+				"alias": "House of Home and Roots",
+				"keywords": ["home", "family", "roots", "foundation", "private life"],
+				"description": "Represents home life, family, roots, ancestry, and emotional foundations. Indicates one's need for safety and privacy, relationship to parents, and the sense of belonging."
+			},
+			"5": {
+				"name": "Fifth House",
+				"alias": "House of Creativity and Pleasure",
+				"keywords": ["creativity", "romance", "children", "fun", "self-expression"],
+				"description": "Concerns joy, play, romance, hobbies, artistic expression, and children. Shows how a person seeks pleasure, takes creative risks, and shines in a playful or romantic way."
+			},
+			"6": {
+				"name": "Sixth House",
+				"alias": "House of Work and Health",
+				"keywords": ["work", "service", "health", "routines", "habits"],
+				"description": "Rules daily work, service to others, routines, and practical skills. Connected to physical health, lifestyle, diet, and organization in everyday life."
+			},
+			"7": {
+				"name": "Seventh House",
+				"alias": "House of Partnerships",
+				"keywords": [
+					"partnerships",
+					"marriage",
+					"contracts",
+					"balance",
+					"one-to-one relationships"
+				],
+				"description": "Describes committed partnerships of all kinds: romantic, business, and legal. Indicates how one relates to significant others, seeks balance, and mirrors themselves through close relationships."
+			},
+			"8": {
+				"name": "Eighth House",
+				"alias": "House of Transformation",
+				"keywords": [
+					"intimacy",
+					"shared resources",
+					"transformation",
+					"taboos",
+					"death and rebirth"
+				],
+				"description": "Relates to deep bonding, psychological transformation, sexuality, and shared resources such as joint finances, inheritances, and debts. Connected to loss, regeneration, and confronting taboos."
+			},
+			"9": {
+				"name": "Ninth House",
+				"alias": "House of Expansion",
+				"keywords": ["higher learning", "beliefs", "travel", "philosophy", "vision"],
+				"description": "Covers higher education, philosophy, spirituality, law, and long-distance travel. Represents the search for meaning, broader perspectives, and experiences that expand horizons."
+			},
+			"10": {
+				"name": "Tenth House",
+				"alias": "House of Career and Status",
+				"keywords": ["career", "public image", "authority", "achievement", "legacy"],
+				"description": "Represents vocation, public role, reputation, and long-term ambitions. Shows how one appears in the public eye, interacts with authority, and pursues recognition and mastery."
+			},
+			"11": {
+				"name": "Eleventh House",
+				"alias": "House of Community and Future",
+				"keywords": ["friends", "community", "networks", "goals", "innovation"],
+				"description": "Relates to friendships, communities, social networks, and collective causes. Describes future-oriented goals, hopes, and broader contributions to society."
+			},
+			"12": {
+				"name": "Twelfth House",
+				"alias": "House of the Unconscious",
+				"keywords": ["endings", "solitude", "subconscious", "healing", "spirituality"],
+				"description": "Connects with the unconscious, dreams, retreat, and hidden aspects of life. Linked to endings, release, spiritual practices, isolation, and deep healing."
+			}
+		},
+		"core_points": {
+			"sun": {
+				"name": "Sun",
+				"role": "Core Self and Life Purpose",
+				"keywords": ["identity", "ego", "will", "purpose", "vitality"],
+				"description": "The Sun represents core identity, willpower, and the central storyline of a life. Its sign shows how a person expresses their essence, while the house shows where this energy radiates most strongly."
+			},
+			"moon": {
+				"name": "Moon",
+				"role": "Emotions and Inner World",
+				"keywords": ["emotions", "needs", "instincts", "habits", "nurturing"],
+				"description": "The Moon represents emotional nature, instinctive reactions, and what feels safe. Its sign shows how a person feels and self-soothes, while the house points to where deep needs are most active."
+			},
+			"ascendant": {
+				"name": "Ascendant",
+				"alias": "Rising Sign",
+				"role": "Mask and Approach to Life",
+				"keywords": ["first impression", "approach", "style", "body", "orientation"],
+				"description": "The Ascendant is the sign rising on the eastern horizon at birth. It shapes the house system and describes how a person approaches situations and appears to others."
+			}
+		},
+		"planets": {
+			"sun": {
+				"name": "Sun",
+				"category": "personal",
+				"keywords": ["identity", "ego", "purpose", "vitality"],
+				"description": "Symbolizes core self, ego, and creative life force. Shows how a person shines and seeks purpose."
+			},
+			"moon": {
+				"name": "Moon",
+				"category": "personal",
+				"keywords": ["emotions", "habits", "intuition", "nurturing"],
+				"description": "Represents emotional landscape, intuition, and instinctive patterns."
+			},
+			"mercury": {
+				"name": "Mercury",
+				"category": "personal",
+				"keywords": ["communication", "thinking", "learning", "logic"],
+				"description": "Rules the mind, language, and information exchange. Describes thinking style and communication."
+			},
+			"venus": {
+				"name": "Venus",
+				"category": "personal",
+				"keywords": ["love", "relationships", "beauty", "pleasure", "values"],
+				"description": "Governs attraction, affection, aesthetics, and personal values."
+			},
+			"mars": {
+				"name": "Mars",
+				"category": "personal",
+				"keywords": ["drive", "action", "desire", "assertion", "conflict"],
+				"description": "Represents raw energy, desire, and how a person acts and defends themselves."
+			},
+			"jupiter": {
+				"name": "Jupiter",
+				"category": "social",
+				"keywords": ["expansion", "growth", "abundance", "wisdom", "faith"],
+				"description": "Symbolizes optimism, growth, and opportunity."
+			},
+			"saturn": {
+				"name": "Saturn",
+				"category": "social",
+				"keywords": ["structure", "discipline", "limits", "responsibility", "time"],
+				"description": "Represents boundaries, effort, and long-term mastery."
+			},
+			"uranus": {
+				"name": "Uranus",
+				"category": "outer",
+				"keywords": ["change", "innovation", "rebellion", "freedom"],
+				"description": "Embodies sudden change, originality, and freedom."
+			},
+			"neptune": {
+				"name": "Neptune",
+				"category": "outer",
+				"keywords": ["dreams", "spirituality", "imagination", "illusion"],
+				"description": "Relates to dreams, ideals, and spiritual sensitivity."
+			},
+			"pluto": {
+				"name": "Pluto",
+				"category": "outer",
+				"keywords": ["power", "transformation", "depth", "rebirth"],
+				"description": "Symbolizes deep transformation and psychological intensity."
+			}
+		}
+	},
+	"zodiac_signs": {
+		"aries": {
+			"name": "Aries",
+			"element": "fire",
+			"modality": "cardinal",
+			"ruler": "Mars",
+			"sun": {
+				"keywords": ["pioneer", "direct", "assertive", "independent"],
+				"description": "Sun in Aries expresses as bold, energetic, and pioneering."
+			},
+			"moon": {
+				"keywords": ["impulsive emotions", "quick reactions", "need for excitement"],
+				"description": "Moon in Aries feels intensely and seeks quick, honest emotional expression."
+			},
+			"ascendant": {
+				"keywords": ["dynamic presence", "fast", "competitive", "straightforward"],
+				"description": "Aries rising appears bold, direct, and energetic."
+			}
+		},
+		"taurus": {
+			"name": "Taurus",
+			"element": "earth",
+			"modality": "fixed",
+			"ruler": "Venus",
+			"sun": {
+				"keywords": ["steady", "sensual", "persistent", "grounded"],
+				"description": "Sun in Taurus values stability, comfort, and tangible results."
+			},
+			"moon": {
+				"keywords": ["emotional stability", "sensory comfort", "loyalty"],
+				"description": "Moon in Taurus needs reliability, comfort, and calm surroundings."
+			},
+			"ascendant": {
+				"keywords": ["calm exterior", "deliberate", "solid", "reliable"],
+				"description": "Taurus rising appears grounded, steady, and unhurried."
+			}
+		},
+		"gemini": {
+			"name": "Gemini",
+			"element": "air",
+			"modality": "mutable",
+			"ruler": "Mercury",
+			"sun": {
+				"keywords": ["curious", "versatile", "communicative"],
+				"description": "Sun in Gemini thrives on ideas, conversation, and variety."
+			},
+			"moon": {
+				"keywords": ["mental stimulation", "restless emotions", "verbal processing"],
+				"description": "Moon in Gemini needs communication and mental engagement."
+			},
+			"ascendant": {
+				"keywords": ["lively", "talkative", "adaptable", "youthful"],
+				"description": "Gemini rising appears quick, curious, and social."
+			}
+		},
+		"cancer": {
+			"name": "Cancer",
+			"element": "water",
+			"modality": "cardinal",
+			"ruler": "Moon",
+			"sun": {
+				"keywords": ["protective", "intuitive", "nurturing"],
+				"description": "Sun in Cancer expresses emotional sensitivity and devotion to home."
+			},
+			"moon": {
+				"keywords": ["deep feelings", "empathy", "moodiness", "bonding"],
+				"description": "Moon in Cancer forms deep attachments and responds instinctively."
+			},
+			"ascendant": {
+				"keywords": ["soft presence", "cautious", "gentle", "receptive"],
+				"description": "Cancer rising appears caring, sensitive, and quietly protective."
+			}
+		},
+		"leo": {
+			"name": "Leo",
+			"element": "fire",
+			"modality": "fixed",
+			"ruler": "Sun",
+			"sun": {
+				"keywords": ["expressive", "proud", "creative", "warm"],
+				"description": "Sun in Leo seeks recognition, creativity, and heartfelt expression."
+			},
+			"moon": {
+				"keywords": ["dramatic feelings", "need for appreciation", "playfulness"],
+				"description": "Moon in Leo seeks warmth, loyalty, and emotional validation. This placement expresses feelings dramatically and craves genuine appreciation from close connections."
+			},
+			"ascendant": {
+				"keywords": ["radiant", "confident", "charismatic", "dramatic"],
+				"description": "Leo rising appears warm, expressive, and noticeable. Others experience an aura of confidence, creativity, and generous presence."
+			}
+		},
+		"virgo": {
+			"name": "Virgo",
+			"element": "earth",
+			"modality": "mutable",
+			"ruler": "Mercury",
+			"sun": {
+				"keywords": ["analytical", "practical", "methodical", "helpful"],
+				"description": "Sun in Virgo expresses through precision, improvement, and service."
+			},
+			"moon": {
+				"keywords": ["need for order", "practical emotions", "carefulness"],
+				"description": "Moon in Virgo feels secure through routines, clarity, and usefulness."
+			},
+			"ascendant": {
+				"keywords": ["observant", "precise", "reserved", "clean"],
+				"description": "Virgo rising appears attentive, orderly, and subtly analytical."
+			}
+		},
+		"libra": {
+			"name": "Libra",
+			"element": "air",
+			"modality": "cardinal",
+			"ruler": "Venus",
+			"sun": {
+				"keywords": ["diplomatic", "harmonizing", "graceful"],
+				"description": "Sun in Libra seeks balance, beauty, and meaningful partnerships."
+			},
+			"moon": {
+				"keywords": ["relational needs", "peace-seeking", "sensitivity to harmony"],
+				"description": "Moon in Libra feels safe in balanced, aesthetically pleasing environments."
+			},
+			"ascendant": {
+				"keywords": ["charming", "balanced", "pleasant", "graceful"],
+				"description": "Libra rising appears kind, fair, and socially refined."
+			}
+		},
+		"scorpio": {
+			"name": "Scorpio",
+			"element": "water",
+			"modality": "fixed",
+			"ruler": "Pluto",
+			"sun": {
+				"keywords": ["intense", "deep", "strategic", "transformative"],
+				"description": "Sun in Scorpio expresses depth, emotional power, and persistence."
+			},
+			"moon": {
+				"keywords": ["intense emotions", "loyalty", "privacy", "intuition"],
+				"description": "Moon in Scorpio feels profoundly and seeks emotional truth."
+			},
+			"ascendant": {
+				"keywords": ["enigmatic", "strong-willed", "penetrating"],
+				"description": "Scorpio rising appears magnetic, private, and observant."
+			}
+		},
+		"sagittarius": {
+			"name": "Sagittarius",
+			"element": "fire",
+			"modality": "mutable",
+			"ruler": "Jupiter",
+			"sun": {
+				"keywords": ["explorer", "optimistic", "philosophical"],
+				"description": "Sun in Sagittarius seeks growth, adventure, and wisdom."
+			},
+			"moon": {
+				"keywords": ["restless emotions", "need for freedom", "hopeful"],
+				"description": "Moon in Sagittarius needs space, honesty, and inspiration."
+			},
+			"ascendant": {
+				"keywords": ["open", "energetic", "enthusiastic"],
+				"description": "Sagittarius rising appears expansive, curious, and spirited."
+			}
+		},
+		"capricorn": {
+			"name": "Capricorn",
+			"element": "earth",
+			"modality": "cardinal",
+			"ruler": "Saturn",
+			"sun": {
+				"keywords": ["disciplined", "ambitious", "practical"],
+				"description": "Sun in Capricorn focuses on structure, goals, and long-term success."
+			},
+			"moon": {
+				"keywords": ["reserved emotions", "responsibility", "steadiness"],
+				"description": "Moon in Capricorn feels safe when in control and managing duties well."
+			},
+			"ascendant": {
+				"keywords": ["serious", "structured", "determined"],
+				"description": "Capricorn rising appears focused, composed, and self-disciplined."
+			}
+		},
+		"aquarius": {
+			"name": "Aquarius",
+			"element": "air",
+			"modality": "fixed",
+			"ruler": "Uranus",
+			"sun": {
+				"keywords": ["innovative", "independent", "idealistic"],
+				"description": "Sun in Aquarius expresses originality, intellect, and future-oriented vision."
+			},
+			"moon": {
+				"keywords": ["detached emotions", "need for freedom", "idealism"],
+				"description": "Moon in Aquarius seeks independence and intellectual connection."
+			},
+			"ascendant": {
+				"keywords": ["unique", "cool", "unconventional"],
+				"description": "Aquarius rising appears original, inventive, and socially aware."
+			}
+		},
+		"pisces": {
+			"name": "Pisces",
+			"element": "water",
+			"modality": "mutable",
+			"ruler": "Neptune",
+			"sun": {
+				"keywords": ["sensitive", "imaginative", "empathetic"],
+				"description": "Sun in Pisces expresses compassion, fluidity, and creativity."
+			},
+			"moon": {
+				"keywords": ["emotional openness", "intuition", "dreaminess"],
+				"description": "Moon in Pisces feels deeply and senses subtle emotional undercurrents."
+			},
+			"ascendant": {
+				"keywords": ["soft", "mystical", "gentle", "receptive"],
+				"description": "Pisces rising appears dreamy, empathetic, and intuitive."
+			}
+		}
+	}
+}

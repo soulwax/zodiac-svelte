@@ -54,6 +54,7 @@
 		"@neondatabase/serverless": "^0.10.4",
 		"astronomy-engine": "^2.1.19",
 		"jspdf": "^3.0.4",
-		"openai": "^6.15.0"
+		"openai": "^6.15.0",
+		"swisseph-wasm": "^0.0.4"
 	}
 }

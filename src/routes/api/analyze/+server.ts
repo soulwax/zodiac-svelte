@@ -17,7 +17,8 @@ export const POST: RequestHandler = async ({ request, cookies }) => {
 			return json(
 				{
 					success: false,
-					error: 'Missing required chart data. Please ensure sun sign, moon sign, and ascendant are provided.'
+					error:
+						'Missing required chart data. Please ensure sun sign, moon sign, and ascendant are provided.'
 				},
 				{ status: 400 }
 			);

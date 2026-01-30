@@ -1,11 +1,10 @@
 <!-- File: src/routes/zodiac/+page.svelte -->
 
 <script lang="ts">
+	import { onMount } from 'svelte';
 	import { getTimezoneFromCoords, searchPlaces, type Place } from '$lib/geocoding';
 	import {
 		calculateAllPlanets,
-		calculateAscendant,
-		calculateHouses,
 		calculateMoonSign,
 		calculateSunSign,
 		getPlanetHouse,
@@ -14,6 +13,11 @@
 		type PlanetPositions,
 		type ZodiacSign
 	} from '$lib/zodiac';
+	import {
+		calculateAscendantSwissEph,
+		calculateHousesSwissEph,
+		initSwissEph
+	} from '$lib/swisseph';
 	import generalData from '../../data/general.json';
 	import planetsData from '../../data/planets.json';
 	import type { PageData } from './$types';
@@ -21,6 +25,11 @@
 	import { jsPDF } from 'jspdf';
 
 	let { data }: { data: PageData } = $props();
+
+	// Initialize Swiss Ephemeris WASM on component mount
+	onMount(() => {
+		initSwissEph();
+	});
 
 	// Type definitions for planet data structures
 	type PlanetSignData = {
@@ -49,7 +58,10 @@
 	}
 
 	// Get description for a sign in a specific placement (sun, moon, ascendant)
-	function getSignDescription(sign: ZodiacSign | null, placement: 'sun' | 'moon' | 'ascendant'): string {
+	function getSignDescription(
+		sign: ZodiacSign | null,
+		placement: 'sun' | 'moon' | 'ascendant'
+	): string {
 		if (!sign) return '';
 		const signData = getSignData(sign);
 		if (!signData || !signData[placement]) return '';
@@ -57,7 +69,10 @@
 	}
 
 	// Get keywords for a sign in a specific placement
-	function getSignKeywords(sign: ZodiacSign | null, placement: 'sun' | 'moon' | 'ascendant'): string[] {
+	function getSignKeywords(
+		sign: ZodiacSign | null,
+		placement: 'sun' | 'moon' | 'ascendant'
+	): string[] {
 		if (!sign) return [];
 		const signData = getSignData(sign);
 		if (!signData || !signData[placement]) return [];
@@ -119,7 +134,7 @@
 	let isGeneratingPDF = $state(false);
 
 	let debounceTimer: ReturnType<typeof setTimeout> | null = null;
-	
+
 	// AI Analysis state
 	let aiAnalysis = $state<string | null>(null);
 	let isGeneratingAnalysis = $state(false);
@@ -131,12 +146,16 @@
 	const ascendantSignData = $derived(ascendant ? getSignData(ascendant) : null);
 
 	// Get planet description from planets.json
-	function getPlanetDescription(planet: string, sign: ZodiacSign | null): { keywords: string[]; description: string } | null {
+	function getPlanetDescription(
+		planet: string,
+		sign: ZodiacSign | null
+	): { keywords: string[]; description: string } | null {
 		if (!sign) return null;
 		const signKey = getSignKey(sign);
-		const planetData = planetsData.planetary_sign_details[planet as keyof typeof planetsData.planetary_sign_details];
+		const planetData =
+			planetsData.planetary_sign_details[planet as keyof typeof planetsData.planetary_sign_details];
 		if (!planetData || typeof planetData !== 'object') return null;
-		
+
 		// Handle different planet structures
 		if ('entries' in planetData) {
 			// Jupiter/Saturn format
@@ -167,9 +186,13 @@
 	}
 
 	// Get house placement description
-	function getHousePlacementDescription(planet: 'sun' | 'moon' | 'saturn', houseNumber: number): string {
+	function getHousePlacementDescription(
+		planet: 'sun' | 'moon' | 'saturn',
+		houseNumber: number
+	): string {
 		const houseKey = String(houseNumber);
-		const placementKey = `${planet}_in_house` as keyof typeof planetsData.house_placement_descriptions;
+		const placementKey =
+			`${planet}_in_house` as keyof typeof planetsData.house_placement_descriptions;
 		const placementData = planetsData.house_placement_descriptions[placementKey];
 		if (placementData && typeof placementData === 'object') {
 			return (placementData as Record<string, string>)[houseKey] || '';
@@ -263,7 +286,7 @@
 				// The user entered a date/time as local time in the birth place's timezone.
 				// We need to find the UTC timestamp that corresponds to that local time.
 				// This handles DST correctly since the timezone string includes DST rules.
-				
+
 				// Create a formatter for the target timezone
 				const formatter = new Intl.DateTimeFormat('en-CA', {
 					timeZone: timezone,
@@ -295,17 +318,17 @@
 					}
 
 					const parts = formatter.formatToParts(testDate);
-					const tzYear = parseInt(parts.find(p => p.type === 'year')?.value || '0');
-					const tzMonth = parseInt(parts.find(p => p.type === 'month')?.value || '0');
-					const tzDay = parseInt(parts.find(p => p.type === 'day')?.value || '0');
-					const tzHour = parseInt(parts.find(p => p.type === 'hour')?.value || '0');
-					const tzMinute = parseInt(parts.find(p => p.type === 'minute')?.value || '0');
+					const tzYear = parseInt(parts.find((p) => p.type === 'year')?.value || '0');
+					const tzMonth = parseInt(parts.find((p) => p.type === 'month')?.value || '0');
+					const tzDay = parseInt(parts.find((p) => p.type === 'day')?.value || '0');
+					const tzHour = parseInt(parts.find((p) => p.type === 'hour')?.value || '0');
+					const tzMinute = parseInt(parts.find((p) => p.type === 'minute')?.value || '0');
 
 					// Check if we've found a match (allow 1 hour tolerance for convergence)
 					if (tzYear === year && tzMonth === month && tzDay === day) {
 						const hourDiff = Math.abs(tzHour - hours);
 						const minuteDiff = Math.abs(tzMinute - minutes);
-						
+
 						if (hourDiff === 0 && minuteDiff <= 1) {
 							// Perfect match - extract UTC components
 							// Note: signMonth and signDay remain as the user entered them
@@ -316,7 +339,7 @@
 							utcMinute = testDate.getUTCMinutes();
 							break;
 						}
-						
+
 						// Adjust based on time difference
 						const totalDiffMinutes = (hours - tzHour) * 60 + (minutes - tzMinute);
 						testDate = new Date(testDate.getTime() + totalDiffMinutes * 60 * 1000);
@@ -325,7 +348,7 @@
 						const dayDiff = (year - tzYear) * 365 + (month - tzMonth) * 30 + (day - tzDay);
 						testDate = new Date(testDate.getTime() + dayDiff * 24 * 60 * 60 * 1000);
 					}
-					
+
 					// Safety check - extract UTC components
 					// Note: signMonth and signDay remain as the user entered them
 					if (i === 19) {
@@ -348,14 +371,15 @@
 			}
 
 			sunSign = calculateSunSign(signMonth, signDay, utcYear);
-			
+
 			// Calculate ascendant and moon sign using UTC time and location coordinates
-			ascendant = calculateAscendant(utcYear, utcMonth, utcDay, utcHour, utcMinute, lat, lon);
+			// Using Swiss Ephemeris for maximum accuracy
+			ascendant = await calculateAscendantSwissEph(utcYear, utcMonth, utcDay, utcHour, utcMinute, lat, lon);
 			moonSign = calculateMoonSign(utcYear, utcMonth, utcDay, utcHour, utcMinute);
-			
-			// Calculate houses using UTC time and location coordinates
-			houses = calculateHouses(utcYear, utcMonth, utcDay, utcHour, utcMinute, lat, lon);
-			
+
+			// Calculate houses using UTC time and location coordinates (Swiss Ephemeris)
+			houses = await calculateHousesSwissEph(utcYear, utcMonth, utcDay, utcHour, utcMinute, lat, lon);
+
 			// Calculate all planet positions using exact birth time
 			planets = calculateAllPlanets(utcYear, utcMonth, utcDay, utcHour, utcMinute);
 
@@ -363,7 +387,7 @@
 			// The time the user entered is already in the birth place's timezone
 			normalizedTime = formatTime12Hour(hours, minutes);
 			timezoneName = timezone || 'Local Time';
-			
+
 			// Detect if DST was in effect at the birth time
 			if (timezone) {
 				// Create a date object for the birth time (in UTC)
@@ -388,15 +412,16 @@
 					const birthParts = birthFormatter.formatToParts(birthDateUTC);
 					const janParts = janFormatter.formatToParts(janDateUTC);
 
-					const birthTZAbbr = birthParts.find(p => p.type === 'timeZoneName')?.value || '';
-					const janTZAbbr = janParts.find(p => p.type === 'timeZoneName')?.value || '';
+					const birthTZAbbr = birthParts.find((p) => p.type === 'timeZoneName')?.value || '';
+					const janTZAbbr = janParts.find((p) => p.type === 'timeZoneName')?.value || '';
 
 					// DST is typically indicated by:
 					// 1. Timezone abbreviation containing 'D' (Daylight) - e.g., PDT, EDT, CDT
 					// 2. Different abbreviation from January (standard time)
-					isDST = birthTZAbbr.includes('DT') ||
-					        (birthTZAbbr.length >= 3 && birthTZAbbr[1] === 'D') || // e.g., PDT, EDT, CDT
-					        (birthTZAbbr !== janTZAbbr && birthTZAbbr.length > 0 && janTZAbbr.length > 0);
+					isDST =
+						birthTZAbbr.includes('DT') ||
+						(birthTZAbbr.length >= 3 && birthTZAbbr[1] === 'D') || // e.g., PDT, EDT, CDT
+						(birthTZAbbr !== janTZAbbr && birthTZAbbr.length > 0 && janTZAbbr.length > 0);
 				} else {
 					isDST = null;
 				}
@@ -423,7 +448,15 @@
 				if (planets) {
 					const planetsWithHouses: Record<string, { sign: string; house?: number }> = {};
 					for (const [planetName, planetSign] of Object.entries(planets)) {
-						const planetLon = getPlanetLongitude(planetSign, utcYear, utcMonth, utcDay, planetName.charAt(0).toUpperCase() + planetName.slice(1), utcHour, utcMinute);
+						const planetLon = getPlanetLongitude(
+							planetSign,
+							utcYear,
+							utcMonth,
+							utcDay,
+							planetName.charAt(0).toUpperCase() + planetName.slice(1),
+							utcHour,
+							utcMinute
+						);
 						const houseNumber = getPlanetHouse(planetLon, houses);
 						planetsWithHouses[planetName] = {
 							sign: planetSign,
@@ -451,7 +484,8 @@
 				console.warn('Error saving zodiac result:', saveError);
 			}
 		} catch (err: unknown) {
-			error = err instanceof Error ? err.message : 'An error occurred while calculating your sun sign.';
+			error =
+				err instanceof Error ? err.message : 'An error occurred while calculating your sun sign.';
 			console.error('Calculation error:', err);
 		} finally {
 			isLoading = false;
@@ -484,7 +518,7 @@
 				}
 
 				// Still pending or processing, wait and try again
-				await new Promise(resolve => setTimeout(resolve, 2500));
+				await new Promise((resolve) => setTimeout(resolve, 2500));
 				attempts++;
 			} catch (err) {
 				throw err;
@@ -570,7 +604,7 @@
 
 			// Poll for job status
 			const jobId = result.jobId;
-			await pollJobStatus(jobId)
+			await pollJobStatus(jobId);
 		} catch (err: unknown) {
 			console.error('Error generating analysis:', err);
 			analysisError = err instanceof Error ? err.message : 'Failed to generate analysis.';
@@ -613,7 +647,7 @@
 			const pageWidth = doc.internal.pageSize.getWidth();
 			const pageHeight = doc.internal.pageSize.getHeight();
 			const margin = 20;
-			const maxWidth = pageWidth - (margin * 2);
+			const maxWidth = pageWidth - margin * 2;
 			let yPos = margin;
 
 			// Color palette - Mystical celestial theme
@@ -665,7 +699,13 @@
 			};
 
 			// Helper function to add text with wrapping
-			const addText = (text: string, fontSize: number = 11, isBold: boolean = false, color: [number, number, number] = colors.darkText, font: string = 'times') => {
+			const addText = (
+				text: string,
+				fontSize: number = 11,
+				isBold: boolean = false,
+				color: [number, number, number] = colors.darkText,
+				font: string = 'times'
+			) => {
 				if (!text) return;
 
 				doc.setFontSize(fontSize);
@@ -757,7 +797,12 @@
 				addText(`${fullName}`, 13, false, colors.navy);
 			}
 			addText(`Born: ${birthDate}`, 11, false, colors.darkText);
-			addText(`Time: ${normalizedTime || birthTime}${timezoneName ? ` (${timezoneName}${isDST !== null ? ', ' + (isDST ? 'DST' : 'Standard') : ''})` : ''}`, 11, false, colors.darkText);
+			addText(
+				`Time: ${normalizedTime || birthTime}${timezoneName ? ` (${timezoneName}${isDST !== null ? ', ' + (isDST ? 'DST' : 'Standard') : ''})` : ''}`,
+				11,
+				false,
+				colors.darkText
+			);
 			addText(`Location: ${selectedPlace.display_name}`, 11, false, colors.darkText);
 			if (lifeTrajectory) {
 				addText(`Life Path: ${lifeTrajectory}`, 11, true, colors.accent);
@@ -833,7 +878,12 @@
 			addText(`SUN - ${sunSign}`, 13, true, colors.gold);
 			if (sunSignData) {
 				doc.setFont('times', 'italic');
-				addText(`${sunSignData.element} • ${sunSignData.modality} • Ruled by ${sunSignData.ruler}`, 10, false, colors.silver);
+				addText(
+					`${sunSignData.element} • ${sunSignData.modality} • Ruled by ${sunSignData.ruler}`,
+					10,
+					false,
+					colors.silver
+				);
 				addText(getSignDescription(sunSign, 'sun'), 10, false, colors.darkText);
 			}
 			yPos += 5;
@@ -843,7 +893,12 @@
 			addText(`MOON - ${moonSign}`, 13, true, colors.mysticPurple);
 			if (moonSignData) {
 				doc.setFont('times', 'italic');
-				addText(`${moonSignData.element} • ${moonSignData.modality} • Ruled by ${moonSignData.ruler}`, 10, false, colors.silver);
+				addText(
+					`${moonSignData.element} • ${moonSignData.modality} • Ruled by ${moonSignData.ruler}`,
+					10,
+					false,
+					colors.silver
+				);
 				addText(getSignDescription(moonSign, 'moon'), 10, false, colors.darkText);
 			}
 			yPos += 5;
@@ -853,7 +908,12 @@
 			addText(`ASCENDANT (Rising) - ${ascendant}`, 13, true, colors.navy);
 			if (ascendantSignData) {
 				doc.setFont('times', 'italic');
-				addText(`${ascendantSignData.element} • ${ascendantSignData.modality} • Ruled by ${ascendantSignData.ruler}`, 10, false, colors.silver);
+				addText(
+					`${ascendantSignData.element} • ${ascendantSignData.modality} • Ruled by ${ascendantSignData.ruler}`,
+					10,
+					false,
+					colors.silver
+				);
 				addText(getSignDescription(ascendant, 'ascendant'), 10, false, colors.darkText);
 			}
 			yPos += 8;
@@ -863,16 +923,38 @@
 			if (planets) {
 				addSectionHeader('Planetary Positions');
 
-				const planetOrder = ['mercury', 'venus', 'mars', 'jupiter', 'saturn', 'uranus', 'neptune', 'pluto'];
+				const planetOrder = [
+					'mercury',
+					'venus',
+					'mars',
+					'jupiter',
+					'saturn',
+					'uranus',
+					'neptune',
+					'pluto'
+				];
 				for (const planetName of planetOrder) {
 					if (planets[planetName as keyof typeof planets]) {
 						const planetSign = planets[planetName as keyof typeof planets];
-						const planetLon = getPlanetLongitude(planetSign!, utcYear, utcMonth, utcDay, planetName.charAt(0).toUpperCase() + planetName.slice(1), utcHour, utcMinute);
+						const planetLon = getPlanetLongitude(
+							planetSign!,
+							utcYear,
+							utcMonth,
+							utcDay,
+							planetName.charAt(0).toUpperCase() + planetName.slice(1),
+							utcHour,
+							utcMinute
+						);
 						const planetHouse = getPlanetHouse(planetLon, houses);
 
 						doc.setFont('times', 'bold');
 						const planetDisplayName = planetName.charAt(0).toUpperCase() + planetName.slice(1);
-						addText(`${planetDisplayName.toUpperCase()} in ${planetSign}${planetHouse ? ` • House ${planetHouse}` : ''}`, 11, true, colors.navy);
+						addText(
+							`${planetDisplayName.toUpperCase()} in ${planetSign}${planetHouse ? ` • House ${planetHouse}` : ''}`,
+							11,
+							true,
+							colors.navy
+						);
 
 						const planetDesc = getPlanetDescription(planetName, planetSign!);
 						if (planetDesc?.description) {
@@ -893,7 +975,12 @@
 					const houseInfo = getHouseInfo(house.number);
 					if (houseInfo) {
 						doc.setFont('times', 'bold');
-						addText(`House ${house.number} • ${houseInfo.alias} in ${house.sign}`, 11, true, colors.accent);
+						addText(
+							`House ${house.number} • ${houseInfo.alias} in ${house.sign}`,
+							11,
+							true,
+							colors.accent
+						);
 						addText(houseInfo.description, 10, false, colors.darkText);
 						yPos += 4;
 					}
@@ -937,7 +1024,6 @@
 				? `${fullName.replace(/\s+/g, '_')}_Astrology_Chart.pdf`
 				: `Astrology_Chart_${birthDate}.pdf`;
 			doc.save(fileName);
-
 		} catch (err: unknown) {
 			error = err instanceof Error ? err.message : 'An error occurred while generating the PDF.';
 			console.error('PDF generation error:', err);
@@ -961,7 +1047,7 @@
 	<meta name="description" content={data.seo.description} />
 	<meta name="keywords" content={data.seo.keywords} />
 	<meta name="author" content={data.seo.author} />
-	
+
 	<!-- Open Graph / Facebook -->
 	<meta property="og:type" content={data.seo.type} />
 	<meta property="og:url" content={data.seo.url} />
@@ -969,14 +1055,14 @@
 	<meta property="og:description" content={data.seo.description} />
 	<meta property="og:image" content={data.seo.image} />
 	<meta property="og:site_name" content="Zodiac Chart Calculator" />
-	
+
 	<!-- Twitter -->
 	<meta name="twitter:card" content="summary_large_image" />
 	<meta name="twitter:url" content={data.seo.url} />
 	<meta name="twitter:title" content={data.seo.title} />
 	<meta name="twitter:description" content={data.seo.description} />
 	<meta name="twitter:image" content={data.seo.image} />
-	
+
 	<!-- Additional SEO -->
 	<link rel="canonical" href={data.seo.url} />
 	<meta name="robots" content="index, follow" />
@@ -999,7 +1085,13 @@
 		>
 			<div class="form-group">
 				<label for="fullname">Full Name (optional)</label>
-				<input type="text" id="fullname" bind:value={fullName} class="input" placeholder="Enter your full name" />
+				<input
+					type="text"
+					id="fullname"
+					bind:value={fullName}
+					class="input"
+					placeholder="Enter your full name"
+				/>
 			</div>
 
 			<div class="form-group">
@@ -1080,10 +1172,12 @@
 				{#if normalizedTime}
 					<div class="birth-info">
 						<div class="birth-info-item">
-							<strong>Birth Date:</strong> {birthDate}
+							<strong>Birth Date:</strong>
+							{birthDate}
 						</div>
 						<div class="birth-info-item">
-							<strong>Birth Time:</strong> {normalizedTime}
+							<strong>Birth Time:</strong>
+							{normalizedTime}
 							{#if timezoneName}
 								<span class="timezone-info">
 									({timezoneName}
@@ -1095,7 +1189,8 @@
 						</div>
 						{#if selectedPlace}
 							<div class="birth-info-item">
-								<strong>Birth Place:</strong> {selectedPlace.display_name}
+								<strong>Birth Place:</strong>
+								{selectedPlace.display_name}
 							</div>
 						{/if}
 					</div>
@@ -1141,7 +1236,15 @@
 										</div>
 									{/if}
 									{#if houses.length > 0}
-										{@const sunLon = getPlanetLongitude(sunSign, utcYear, utcMonth, utcDay, 'Sun', utcHour, utcMinute)}
+										{@const sunLon = getPlanetLongitude(
+											sunSign,
+											utcYear,
+											utcMonth,
+											utcDay,
+											'Sun',
+											utcHour,
+											utcMinute
+										)}
 										{@const sunHouse = getPlanetHouse(sunLon, houses)}
 										{#if sunHouse}
 											{@const housePlacement = getHousePlacementDescription('sun', sunHouse)}
@@ -1197,7 +1300,15 @@
 										</div>
 									{/if}
 									{#if houses.length > 0}
-										{@const moonLon = getPlanetLongitude(moonSign, utcYear, utcMonth, utcDay, 'Moon', utcHour, utcMinute)}
+										{@const moonLon = getPlanetLongitude(
+											moonSign,
+											utcYear,
+											utcMonth,
+											utcDay,
+											'Moon',
+											utcHour,
+											utcMinute
+										)}
 										{@const moonHouse = getPlanetHouse(moonLon, houses)}
 										{#if moonHouse}
 											{@const housePlacement = getHousePlacementDescription('moon', moonHouse)}
@@ -1263,11 +1374,11 @@
 		{/if}
 
 		{#if sunSign && ascendant && moonSign && houses.length > 0}
-			<Chart 
-				{sunSign} 
-				{ascendant} 
-				{moonSign} 
-				{houses} 
+			<Chart
+				{sunSign}
+				{ascendant}
+				{moonSign}
+				{houses}
 				{planets}
 				{utcYear}
 				{utcMonth}
@@ -1316,7 +1427,15 @@
 						<div class="planets-list">
 							{#if planets.mercury}
 								{@const planetDesc = getPlanetDescription('mercury', planets.mercury)}
-								{@const mercuryLon = getPlanetLongitude(planets.mercury, utcYear, utcMonth, utcDay, 'Mercury', utcHour, utcMinute)}
+								{@const mercuryLon = getPlanetLongitude(
+									planets.mercury,
+									utcYear,
+									utcMonth,
+									utcDay,
+									'Mercury',
+									utcHour,
+									utcMinute
+								)}
 								{@const planetHouse = getPlanetHouse(mercuryLon, houses)}
 								<div class="planet-item">
 									<div class="planet-header">
@@ -1341,7 +1460,15 @@
 							{/if}
 							{#if planets.venus}
 								{@const planetDesc = getPlanetDescription('venus', planets.venus)}
-								{@const venusLon = getPlanetLongitude(planets.venus, utcYear, utcMonth, utcDay, 'Venus', utcHour, utcMinute)}
+								{@const venusLon = getPlanetLongitude(
+									planets.venus,
+									utcYear,
+									utcMonth,
+									utcDay,
+									'Venus',
+									utcHour,
+									utcMinute
+								)}
 								{@const planetHouse = getPlanetHouse(venusLon, houses)}
 								<div class="planet-item">
 									<div class="planet-header">
@@ -1366,7 +1493,15 @@
 							{/if}
 							{#if planets.mars}
 								{@const planetDesc = getPlanetDescription('mars', planets.mars)}
-								{@const marsLon = getPlanetLongitude(planets.mars, utcYear, utcMonth, utcDay, 'Mars', utcHour, utcMinute)}
+								{@const marsLon = getPlanetLongitude(
+									planets.mars,
+									utcYear,
+									utcMonth,
+									utcDay,
+									'Mars',
+									utcHour,
+									utcMinute
+								)}
 								{@const planetHouse = getPlanetHouse(marsLon, houses)}
 								<div class="planet-item">
 									<div class="planet-header">
@@ -1398,7 +1533,15 @@
 						<div class="planets-list">
 							{#if planets.jupiter}
 								{@const planetDesc = getPlanetDescription('jupiter', planets.jupiter)}
-								{@const jupiterLon = getPlanetLongitude(planets.jupiter, utcYear, utcMonth, utcDay, 'Jupiter', utcHour, utcMinute)}
+								{@const jupiterLon = getPlanetLongitude(
+									planets.jupiter,
+									utcYear,
+									utcMonth,
+									utcDay,
+									'Jupiter',
+									utcHour,
+									utcMinute
+								)}
 								{@const planetHouse = getPlanetHouse(jupiterLon, houses)}
 								<div class="planet-item">
 									<div class="planet-header">
@@ -1415,7 +1558,15 @@
 							{/if}
 							{#if planets.saturn}
 								{@const planetDesc = getPlanetDescription('saturn', planets.saturn)}
-								{@const saturnLon = getPlanetLongitude(planets.saturn, utcYear, utcMonth, utcDay, 'Saturn', utcHour, utcMinute)}
+								{@const saturnLon = getPlanetLongitude(
+									planets.saturn,
+									utcYear,
+									utcMonth,
+									utcDay,
+									'Saturn',
+									utcHour,
+									utcMinute
+								)}
 								{@const planetHouse = getPlanetHouse(saturnLon, houses)}
 								<div class="planet-item">
 									<div class="planet-header">
@@ -1447,7 +1598,15 @@
 						<h3>Generational Planets</h3>
 						<div class="planets-list">
 							{#if planets.uranus}
-								{@const uranusLon = getPlanetLongitude(planets.uranus, utcYear, utcMonth, utcDay, 'Uranus', utcHour, utcMinute)}
+								{@const uranusLon = getPlanetLongitude(
+									planets.uranus,
+									utcYear,
+									utcMonth,
+									utcDay,
+									'Uranus',
+									utcHour,
+									utcMinute
+								)}
 								{@const planetHouse = getPlanetHouse(uranusLon, houses)}
 								<div class="planet-item">
 									<div class="planet-header">
@@ -1463,7 +1622,15 @@
 								</div>
 							{/if}
 							{#if planets.neptune}
-								{@const neptuneLon = getPlanetLongitude(planets.neptune, utcYear, utcMonth, utcDay, 'Neptune', utcHour, utcMinute)}
+								{@const neptuneLon = getPlanetLongitude(
+									planets.neptune,
+									utcYear,
+									utcMonth,
+									utcDay,
+									'Neptune',
+									utcHour,
+									utcMinute
+								)}
 								{@const planetHouse = getPlanetHouse(neptuneLon, houses)}
 								<div class="planet-item">
 									<div class="planet-header">
@@ -1479,7 +1646,15 @@
 								</div>
 							{/if}
 							{#if planets.pluto}
-								{@const plutoLon = getPlanetLongitude(planets.pluto, utcYear, utcMonth, utcDay, 'Pluto', utcHour, utcMinute)}
+								{@const plutoLon = getPlanetLongitude(
+									planets.pluto,
+									utcYear,
+									utcMonth,
+									utcDay,
+									'Pluto',
+									utcHour,
+									utcMinute
+								)}
 								{@const planetHouse = getPlanetHouse(plutoLon, houses)}
 								<div class="planet-item">
 									<div class="planet-header">
@@ -1507,13 +1682,9 @@
 				<p class="analysis-description">
 					Get a deeper interpretation of this chart with an analysis of planets and houses.
 				</p>
-				
+
 				{#if !aiAnalysis && !isGeneratingAnalysis}
-					<button 
-						type="button" 
-						class="analyze-button"
-						onclick={generateAnalysis}
-					>
+					<button type="button" class="analyze-button" onclick={generateAnalysis}>
 						✨ Get Analysis Results
 					</button>
 				{/if}
@@ -1530,7 +1701,8 @@
 						<p>{analysisError}</p>
 						{#if analysisError.includes('PERPLEXITY_API_KEY')}
 							<p class="env-hint">
-								To enable AI analysis, create a <code>.env</code> file in the project root and add:<br>
+								To enable AI analysis, create a <code>.env</code> file in the project root and add:<br
+								/>
 								<code>PERPLEXITY_API_KEY=your_api_key_here</code>
 							</p>
 						{/if}
@@ -1546,11 +1718,7 @@
 								{/if}
 							{/each}
 						</div>
-						<button 
-							type="button" 
-							class="regenerate-button"
-							onclick={generateAnalysis}
-						>
+						<button type="button" class="regenerate-button" onclick={generateAnalysis}>
 							🔄 Regenerate Analysis
 						</button>
 					</div>

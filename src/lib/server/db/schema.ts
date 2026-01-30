@@ -2,14 +2,14 @@
 
 import { relations } from 'drizzle-orm';
 import {
-    boolean,
-    integer,
-    jsonb,
-    pgTable,
-    real,
-    serial,
-    text,
-    timestamp
+	boolean,
+	integer,
+	jsonb,
+	pgTable,
+	real,
+	serial,
+	text,
+	timestamp
 } from 'drizzle-orm/pg-core';
 
 export const user = pgTable('user', {
@@ -75,7 +75,9 @@ export const zodiacResults = pgTable('zodiac_results', {
 export const analysisRecords = pgTable('analysis_records', {
 	id: serial('id').primaryKey(),
 	// Foreign key to zodiac_results
-	zodiacResultId: integer('zodiac_result_id').references(() => zodiacResults.id, { onDelete: 'cascade' }).notNull(),
+	zodiacResultId: integer('zodiac_result_id')
+		.references(() => zodiacResults.id, { onDelete: 'cascade' })
+		.notNull(),
 	// The complete analysis text
 	analysisText: text('analysis_text').notNull(),
 	// The full prompt sent to AI service

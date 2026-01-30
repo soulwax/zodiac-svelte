@@ -1,6 +1,7 @@
 # Security Vulnerability Scan
 
 Scan for:
+
 - Exposed secrets or credentials
 - SQL injection vulnerabilities
 - Cross-site scripting (XSS) risks

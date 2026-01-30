@@ -67,7 +67,8 @@ export const actions = {
 		cookies.set('sverdle', game.toString(), { path: '/' });
 
 		// Check if game is complete and save result
-		const isComplete = game.answers.length >= 6 || game.answers[game.answers.length - 1] === 'xxxxx';
+		const isComplete =
+			game.answers.length >= 6 || game.answers[game.answers.length - 1] === 'xxxxx';
 		if (isComplete) {
 			try {
 				// Get session ID from cookies (or generate one)
