@@ -10,7 +10,10 @@ export default defineConfig({
 	server: {
 		port: Number(process.env.PORT) || 4332,
 		host: true,
-		allowedHosts: ['127.0.0.1', 'localhost', 'stars.soulwax.dev', '*.soulwax.dev']
+		allowedHosts: ['127.0.0.1', 'localhost', 'stars.soulwax.dev', '*.soulwax.dev'],
+		fs: {
+			allow: ['..']
+		}
 	},
 	preview: {
 		port: Number(process.env.PORT) || 4332,
@@ -23,5 +26,9 @@ export default defineConfig({
 			'starseek.vercel.app',
 			'www.starseek.vercel.app'
 		]
-	}
+	},
+	optimizeDeps: {
+		exclude: ['swisseph-wasm']
+	},
+	assetsInclude: ['**/*.wasm']
 });

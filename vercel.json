@@ -2,11 +2,28 @@
 	"framework": "sveltekit",
 	"headers": [
 		{
-			"source": "/(.*).wasm",
+			"source": "/(.*)\\.wasm",
 			"headers": [
 				{
 					"key": "Content-Type",
 					"value": "application/wasm"
+				},
+				{
+					"key": "Cache-Control",
+					"value": "public, max-age=31536000, immutable"
+				}
+			]
+		},
+		{
+			"source": "/_app/immutable/(.*)\\.wasm",
+			"headers": [
+				{
+					"key": "Content-Type",
+					"value": "application/wasm"
+				},
+				{
+					"key": "Cache-Control",
+					"value": "public, max-age=31536000, immutable"
 				}
 			]
 		}
