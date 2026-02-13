@@ -6,7 +6,22 @@ import { defineConfig } from 'vite';
 import devtoolsJson from 'vite-plugin-devtools-json';
 
 export default defineConfig({
-	plugins: [tailwindcss(), sveltekit(), devtoolsJson()],
+	plugins: [
+		tailwindcss(),
+		sveltekit(),
+		devtoolsJson(),
+		{
+			name: 'wasm-content-type',
+			configureServer(server) {
+				server.middlewares.use((req, res, next) => {
+					if (req.url?.endsWith('.wasm')) {
+						res.setHeader('Content-Type', 'application/wasm');
+					}
+					next();
+				});
+			}
+		}
+	],
 	server: {
 		port: Number(process.env.PORT) || 4332,
 		host: true,
@@ -30,5 +45,5 @@ export default defineConfig({
 	optimizeDeps: {
 		exclude: ['swisseph-wasm']
 	},
-	assetsInclude: ['**/*.wasm']
+	assetsInclude: ['**/*.wasm', '**/*.data']
 });
