@@ -39,7 +39,9 @@ export default defineConfig({
 			'stars.soulwax.dev',
 			'*.soulwax.dev',
 			'starseek.vercel.app',
-			'www.starseek.vercel.app'
+			'www.starseek.vercel.app',
+			'starpeek.vercel.app',
+			'www.starpeek.vercel.app'
 		]
 	},
 	optimizeDeps: {
