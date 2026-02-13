@@ -16,7 +16,18 @@ export async function initSwissEph(): Promise<void> {
 	if (initPromise) return initPromise; // Initialization in progress
 
 	initPromise = (async () => {
-		sweInstance = new SwissEph();
+		// Create instance with custom module configuration
+		// This tells the WASM loader to find files in /wasm/ static directory
+		sweInstance = new SwissEph({
+			locateFile: (path: string, prefix: string) => {
+				if (path.endsWith('.wasm') || path.endsWith('.data')) {
+					// Load from static /wasm/ directory instead of node_modules
+					return `/wasm/${path}`;
+				}
+				return prefix + path;
+			}
+		});
+
 		await sweInstance.initSwissEph();
 	})();
 
