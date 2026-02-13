@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.0.4] - 2026-02-13
+
+### Changed
+
+- Cleaned up `.env.example` to only include actually used environment variables
+- Removed unused Next.js (`NEXT_PUBLIC_*`, `STACK_*`) and Prisma (`POSTGRES_PRISMA_URL`) variables
+- Removed duplicate PostgreSQL connection parameters (`POSTGRES_USER`, `POSTGRES_HOST`, etc.)
+- Simplified from 17 environment variables to 4 essential ones: `PORT`, `DATABASE_URL`, `DATABASE_URL_UNPOOLED`, `PERPLEXITY_API_KEY`
+- Added helpful documentation comments in `.env.example` explaining each variable's purpose
+
 ## [0.0.3] - 2026-01-30
 
 ### Added
