@@ -16,17 +16,37 @@ export async function initSwissEph(): Promise<void> {
 	if (initPromise) return initPromise; // Initialization in progress
 
 	initPromise = (async () => {
-		// Create instance with custom module configuration
-		// This tells the WASM loader to find files in /wasm/ static directory
-		sweInstance = new SwissEph({
-			locateFile: (path: string, prefix: string) => {
-				if (path.endsWith('.wasm') || path.endsWith('.data')) {
-					// Load from static /wasm/ directory instead of node_modules
-					return `/wasm/${path}`;
+		sweInstance = new SwissEph();
+
+		// Monkey-patch the initSwissEph method to inject our custom locateFile
+		const originalInit = sweInstance.initSwissEph.bind(sweInstance);
+
+		// Override the method to inject custom module config
+		(sweInstance as any).initSwissEph = async function(this: any) {
+			// Import the WASM module loader
+			const WasamSwissEph = (await import('swisseph-wasm/wsam/swisseph.js')).default;
+
+			// Configure to load from /wasm/ static directory
+			const moduleConfig = {
+				locateFile: (path: string, prefix: string) => {
+					if (path.endsWith('.wasm') || path.endsWith('.data')) {
+						console.log(`SwissEph loading: ${path} from /wasm/`);
+						return `/wasm/${path}`;
+					}
+					return prefix + path;
 				}
-				return prefix + path;
+			};
+
+			// Initialize the WASM module with our config
+			this.SweModule = await WasamSwissEph(moduleConfig);
+
+			// Ensure HEAP32 is available
+			if (!this.SweModule.HEAP32) {
+				throw new Error('WASM module initialization failed: HEAP32 not available');
 			}
-		});
+
+			console.log('SwissEph initialized successfully');
+		};
 
 		await sweInstance.initSwissEph();
 	})();
