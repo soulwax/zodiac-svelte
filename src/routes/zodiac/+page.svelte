@@ -1,10 +1,11 @@
 <!-- File: src/routes/zodiac/+page.svelte -->
 
 <script lang="ts">
-	import { onMount } from 'svelte';
 	import { getTimezoneFromCoords, searchPlaces, type Place } from '$lib/geocoding';
 	import {
 		calculateAllPlanets,
+		calculateAscendant,
+		calculateHouses,
 		calculateMoonSign,
 		calculateSunSign,
 		getPlanetHouse,
@@ -13,11 +14,6 @@
 		type PlanetPositions,
 		type ZodiacSign
 	} from '$lib/zodiac';
-	import {
-		calculateAscendantSwissEph,
-		calculateHousesSwissEph,
-		initSwissEph
-	} from '$lib/swisseph';
 	import generalData from '../../data/general.json';
 	import planetsData from '../../data/planets.json';
 	import type { PageData } from './$types';
@@ -25,17 +21,6 @@
 	import { jsPDF } from 'jspdf';
 
 	let { data }: { data: PageData } = $props();
-
-	// Initialize Swiss Ephemeris WASM on component mount
-	onMount(async () => {
-		try {
-			await initSwissEph();
-			sweInitialized = true;
-		} catch (err) {
-			console.error('Failed to initialize Swiss Ephemeris:', err);
-			error = 'Failed to initialize astronomical calculator. Please refresh the page.';
-		}
-	});
 
 	// Type definitions for planet data structures
 	type PlanetSignData = {
@@ -128,7 +113,6 @@
 	let houses = $state<House[]>([]);
 	let planets = $state<PlanetPositions | null>(null);
 	let isLoading = $state(false);
-	let sweInitialized = $state(false);
 	let error = $state<string | null>(null);
 	let normalizedTime = $state<string | null>(null);
 	let isDST = $state<boolean | null>(null);
@@ -380,12 +364,12 @@
 			sunSign = calculateSunSign(signMonth, signDay, utcYear);
 
 			// Calculate ascendant and moon sign using UTC time and location coordinates
-			// Using Swiss Ephemeris for maximum accuracy
-			ascendant = await calculateAscendantSwissEph(utcYear, utcMonth, utcDay, utcHour, utcMinute, lat, lon);
+			// Using astronomy-engine for reliable, accurate calculations
+			ascendant = calculateAscendant(utcYear, utcMonth, utcDay, utcHour, utcMinute, lat, lon);
 			moonSign = calculateMoonSign(utcYear, utcMonth, utcDay, utcHour, utcMinute);
 
-			// Calculate houses using UTC time and location coordinates (Swiss Ephemeris)
-			houses = await calculateHousesSwissEph(utcYear, utcMonth, utcDay, utcHour, utcMinute, lat, lon);
+			// Calculate houses using UTC time and location coordinates
+			houses = calculateHouses(utcYear, utcMonth, utcDay, utcHour, utcMinute, lat, lon);
 
 			// Calculate all planet positions using exact birth time
 			planets = calculateAllPlanets(utcYear, utcMonth, utcDay, utcHour, utcMinute);
@@ -1144,8 +1128,8 @@
 				{/if}
 			</div>
 
-			<button type="submit" disabled={isLoading || !sweInitialized} class="button">
-				{!sweInitialized ? 'Initializing...' : isLoading ? 'Calculating...' : 'Calculate Chart'}
+			<button type="submit" disabled={isLoading} class="button">
+				{isLoading ? 'Calculating...' : 'Calculate Chart'}
 			</button>
 
 			{#if sunSign && ascendant && moonSign}

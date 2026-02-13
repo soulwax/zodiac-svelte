@@ -5,8 +5,7 @@
 	"type": "module",
 	"scripts": {
 		"dev": "vite dev",
-		"build": "npm run build:copy-wasm && vite build",
-		"build:copy-wasm": "mkdir -p static/wasm && cp node_modules/.pnpm/swisseph-wasm@0.0.4/node_modules/swisseph-wasm/wsam/swisseph.wasm static/wasm/ && cp node_modules/.pnpm/swisseph-wasm@0.0.4/node_modules/swisseph-wasm/wsam/swisseph.data static/wasm/",
+		"build": "vite build",
 		"preview": "vite preview",
 		"test:zodiac": "tsx src/lib/zodiac.test.ts",
 		"prepare": "svelte-kit sync || echo ''",
@@ -55,7 +54,6 @@
 		"@neondatabase/serverless": "^0.10.4",
 		"astronomy-engine": "^2.1.19",
 		"jspdf": "^3.0.4",
-		"openai": "^6.15.0",
-		"swisseph-wasm": "^0.0.4"
+		"openai": "^6.15.0"
 	}
 }
