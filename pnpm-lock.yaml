@@ -20,9 +20,6 @@ importers:
       openai:
         specifier: ^6.15.0
         version: 6.15.0
-      swisseph-wasm:
-        specifier: ^0.0.4
-        version: 0.0.4
     devDependencies:
       '@eslint/compat':
         specifier: ^1.4.1
@@ -1885,10 +1882,6 @@ packages:
     resolution: {integrity: sha512-qsjeeq5YjBZ5eMdFuUa4ZosMLxgr5RZ+F+Y1OrDhuOCEInRMA3x74XdBtggJcj9kOeInz0WE+LgCPDkZFlBYJw==}
     engines: {node: '>=12.0.0'}
 
-  swisseph-wasm@0.0.4:
-    resolution: {integrity: sha512-OPyQQCiQ59apjav9CE1Wz90m3WRTADUwc7prXg8okNped6vOK/JzIoKBGpFPONNgzp1U19/u3NdaM/LP0WzuAQ==}
-    engines: {node: '>=14.0.0'}
-
   tailwindcss@4.1.18:
     resolution: {integrity: sha512-4+Z+0yiYyEtUVCScyfHCxOYP06L5Ne+JiHhY2IjR2KWMIWhJOYZKLSGZaP5HkZ8+bY0cxfzwDE5uOmzFXyIwxw==}
 
@@ -3429,8 +3422,6 @@ snapshots:
 
   svg-pathdata@6.0.3:
     optional: true
-
-  swisseph-wasm@0.0.4: {}
 
   tailwindcss@4.1.18: {}
 
