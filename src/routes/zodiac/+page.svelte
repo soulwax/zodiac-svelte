@@ -99,6 +99,17 @@
 		return generalData.info.houses[houseKey as keyof typeof generalData.info.houses];
 	}
 
+	function stripCitationMarkers(text: string): string {
+		return text
+			.replace(/【\d+†[^】]+】/g, '')
+			.replace(/\[(?:\d+(?:\s*[-,]\s*\d+)*)\]/g, '')
+			.split('\n')
+			.map((line) => line.replace(/[ \t]{2,}/g, ' ').trimEnd())
+			.join('\n')
+			.replace(/\n{3,}/g, '\n\n')
+			.trim();
+	}
+
 	let fullName = $state('');
 	let lifeTrajectory = $state<'down' | 'slightly down' | 'neutral' | 'slightly up' | 'up' | ''>('');
 	let birthDate = $state('');
@@ -130,6 +141,7 @@
 	let aiAnalysis = $state<string | null>(null);
 	let isGeneratingAnalysis = $state(false);
 	let analysisError = $state<string | null>(null);
+	const cleanedAiAnalysis = $derived(aiAnalysis ? stripCitationMarkers(aiAnalysis) : null);
 
 	// Computed sign data for type safety
 	const sunSignData = $derived(sunSign ? getSignData(sunSign) : null);
@@ -498,7 +510,7 @@
 
 			if (data.status === 'completed') {
 				if (data.result) {
-					aiAnalysis = data.result;
+					aiAnalysis = stripCitationMarkers(data.result);
 				} else {
 					throw new Error('Analysis completed but no result returned');
 				}
@@ -618,16 +630,16 @@
 
 		try {
 			// Generate AI analysis if not already available
-			if (!aiAnalysis) {
+			if (!cleanedAiAnalysis) {
 				await generateAnalysis();
 
 				// Check if analysis generation failed
-				if (!aiAnalysis) {
+				if (!cleanedAiAnalysis) {
 					throw new Error(analysisError || 'Failed to generate AI analysis. Please try again.');
 				}
 			}
 
-			const analysis = aiAnalysis;
+			const analysis = cleanedAiAnalysis || '';
 
 			// Create PDF
 			const doc = new jsPDF();
@@ -636,16 +648,17 @@
 			const margin = 20;
 			const maxWidth = pageWidth - margin * 2;
 			let yPos = margin;
+			const centerX = pageWidth / 2;
 
-			// Color palette - Mystical celestial theme
+			// Color palette - professional certificate theme
 			const colors = {
-				deepPurple: [45, 20, 70] as [number, number, number],
-				gold: [184, 134, 11] as [number, number, number],
-				navy: [25, 25, 112] as [number, number, number],
-				silver: [192, 192, 192] as [number, number, number],
-				mysticPurple: [75, 0, 130] as [number, number, number],
-				darkText: [20, 20, 40] as [number, number, number],
-				accent: [138, 43, 226] as [number, number, number]
+				deepPurple: [20, 35, 59] as [number, number, number],
+				gold: [166, 124, 58] as [number, number, number],
+				navy: [32, 51, 84] as [number, number, number],
+				silver: [114, 128, 150] as [number, number, number],
+				mysticPurple: [58, 77, 110] as [number, number, number],
+				darkText: [28, 36, 52] as [number, number, number],
+				accent: [109, 85, 45] as [number, number, number]
 			};
 
 			// Helper function to draw decorative border on page
@@ -747,33 +760,108 @@
 				yPos += 15;
 			};
 
-			// Draw first page border
-			drawPageBorder();
-			yPos = margin + 10;
+			const addAnalysisNarrative = (text: string) => {
+				for (const rawLine of text.split('\n')) {
+					const line = rawLine.trim();
+					if (!line) {
+						yPos += 3;
+						continue;
+					}
 
-			// Title with elegant decoration
-			const centerX = pageWidth / 2;
-			doc.setFontSize(26);
+					const markdownHeading = line.match(/^#{1,6}\s*(.+)$/);
+					if (markdownHeading) {
+						addSectionHeader(markdownHeading[1], false);
+						continue;
+					}
+
+					if (/^chapter\s+[ivx0-9]+/i.test(line)) {
+						addSectionHeader(line, false);
+						continue;
+					}
+
+					if (/^[-*]\s+/.test(line)) {
+						addText(`• ${line.replace(/^[-*]\s+/, '')}`, 10, false, colors.darkText);
+						continue;
+					}
+
+					addText(line, 10, false, colors.darkText);
+				}
+			};
+
+			// Cover page
+			drawPageBorder();
+			yPos = margin + 12;
+
+			doc.setFillColor(...colors.deepPurple);
+			doc.roundedRect(margin, yPos - 8, maxWidth, 14, 2, 2, 'F');
+			doc.setFontSize(10);
+			doc.setFont('helvetica', 'bold');
+			doc.setTextColor(255, 255, 255);
+			doc.text('STARSEEK ASTROLOGICAL SOCIETY', centerX, yPos, { align: 'center' });
+			yPos += 18;
+
+			doc.setFontSize(24);
 			doc.setFont('times', 'bold');
 			doc.setTextColor(...colors.deepPurple);
-			doc.text('Astrological Chart', centerX, yPos, { align: 'center' });
+			doc.text('Certificate of Natal Chart Interpretation', centerX, yPos, { align: 'center' });
 			yPos += 10;
 
-			doc.setFontSize(16);
-			doc.setFont('times', 'italic');
-			doc.setTextColor(...colors.mysticPurple);
-			doc.text('Celestial Blueprint', centerX, yPos, { align: 'center' });
+			doc.setDrawColor(...colors.gold);
+			doc.setLineWidth(0.6);
+			doc.line(margin + 18, yPos, pageWidth - margin - 18, yPos);
+			yPos += 10;
+
+			const certificateIntro = doc.splitTextToSize(
+				'This document certifies that the following celestial profile has been calculated and interpreted from the provided birth coordinates.',
+				maxWidth - 16
+			);
+			doc.setFontSize(11);
+			doc.setFont('helvetica', 'normal');
+			doc.setTextColor(...colors.silver);
+			for (const line of certificateIntro) {
+				doc.text(line, centerX, yPos, { align: 'center' });
+				yPos += 6;
+			}
+
 			yPos += 8;
+			doc.setFontSize(28);
+			doc.setFont('times', 'italic');
+			doc.setTextColor(...colors.navy);
+			doc.text(fullName || 'The Seeker', centerX, yPos, { align: 'center' });
+			yPos += 9;
 
-			// Decorative circles under title
-			doc.setFillColor(...colors.gold);
-			doc.circle(centerX - 6, yPos, 0.6, 'F');
-			doc.circle(centerX - 3, yPos, 0.8, 'F');
-			doc.circle(centerX, yPos, 1, 'F');
-			doc.circle(centerX + 3, yPos, 0.8, 'F');
-			doc.circle(centerX + 6, yPos, 0.6, 'F');
+			doc.setFontSize(11);
+			doc.setFont('helvetica', 'normal');
+			doc.setTextColor(...colors.darkText);
+			doc.text(`Born ${birthDate} • ${normalizedTime || birthTime}`, centerX, yPos, { align: 'center' });
+			yPos += 6;
+			doc.text(`${selectedPlace.display_name}`, centerX, yPos, { align: 'center' });
+
+			const issuedOn = new Date().toLocaleDateString('en-US', {
+				month: 'long',
+				day: 'numeric',
+				year: 'numeric'
+			});
+			const signatureY = pageHeight - margin - 24;
+			doc.setDrawColor(...colors.silver);
+			doc.setLineWidth(0.3);
+			doc.line(margin + 8, signatureY, centerX - 12, signatureY);
+			doc.line(centerX + 12, signatureY, pageWidth - margin - 8, signatureY);
+			doc.setFontSize(10);
+			doc.setFont('helvetica', 'normal');
+			doc.setTextColor(...colors.silver);
+			doc.text('Certified Celestial Archivist', margin + 8, signatureY + 5);
+			doc.text(`Issued ${issuedOn}`, pageWidth - margin - 8, signatureY + 5, { align: 'right' });
+
+			// Start detailed dossier on a fresh page
+			doc.addPage();
+			drawPageBorder();
+			yPos = margin + 12;
+			doc.setFontSize(20);
+			doc.setFont('times', 'bold');
+			doc.setTextColor(...colors.deepPurple);
+			doc.text('Astrological Dossier', centerX, yPos, { align: 'center' });
 			yPos += 10;
-
 			addDivider();
 
 			// Birth Information
@@ -974,22 +1062,24 @@
 				}
 			}
 
-			// AI Assessment - New decorated page
+			// AI Assessment - dedicated narrative chapter section
 			doc.addPage();
 			drawPageBorder();
 			yPos = margin + 15;
 
-			// Mystical header
+			// Narrative header
 			doc.setFontSize(22);
 			doc.setFont('times', 'bold');
 			doc.setTextColor(...colors.deepPurple);
-			doc.text('Mystical Analysis', centerX, yPos, { align: 'center' });
+			doc.text('Origin Story & Mystical Analysis', centerX, yPos, { align: 'center' });
 			yPos += 10;
 
 			doc.setFontSize(14);
 			doc.setFont('times', 'italic');
 			doc.setTextColor(...colors.mysticPurple);
-			doc.text('An Interpretation of Your Celestial Blueprint', centerX, yPos, { align: 'center' });
+			doc.text('A chaptered interpretation of your celestial blueprint', centerX, yPos, {
+				align: 'center'
+			});
 			yPos += 8;
 
 			// Decorative circles
@@ -1004,7 +1094,7 @@
 			addDivider();
 			yPos += 5;
 
-			addText(analysis, 10, false, colors.darkText);
+			addAnalysisNarrative(analysis);
 
 			// Save the PDF
 			const fileName = fullName
@@ -1696,10 +1786,10 @@
 					</div>
 				{/if}
 
-				{#if aiAnalysis}
+				{#if cleanedAiAnalysis}
 					<div class="analysis-result">
 						<div class="analysis-content">
-							{#each aiAnalysis.split('\n') as paragraph, index (index)}
+							{#each cleanedAiAnalysis.split('\n') as paragraph, index (index)}
 								{#if paragraph.trim()}
 									<p>{paragraph}</p>
 								{/if}

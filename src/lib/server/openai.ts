@@ -63,6 +63,17 @@ export interface AnalysisMetadata {
 	responseId?: string;
 }
 
+function stripCitationMarkers(text: string): string {
+	return text
+		.replace(/【\d+†[^】]+】/g, '')
+		.replace(/\[(?:\d+(?:\s*[-,]\s*\d+)*)\]/g, '')
+		.split('\n')
+		.map((line) => line.replace(/[ \t]{2,}/g, ' ').trimEnd())
+		.join('\n')
+		.replace(/\n{3,}/g, '\n\n')
+		.trim();
+}
+
 export async function generateMysticalAnalysis(chartData: ChartData): Promise<string> {
 	const result = await generateMysticalAnalysisDetailed(chartData);
 	return result.analysisText;
@@ -152,7 +163,21 @@ Your analysis should:
 - Be comprehensive and complete, typically 1500-2500 words in length, ensuring no important aspects are left unexplored
 - Use metaphors, imagery, and cosmic language that stirs the soul
 
-Begin with an opening that acknowledges the sacred moment of their birth, then guide them through the mysteries revealed in their chart. End with a blessing or cosmic insight that offers hope and direction.
+Use this chapter structure:
+1. Opening Invocation (short, poetic opening)
+2. Chapter I - The Land of First Breath (required as the first full chapter):
+   - Dedicate this chapter to the birthplace: ${chartData.placeName}
+   - Write a vivid historical and cultural origin story of that place and its spirit
+   - Connect that place-memory to the seeker's temperament and early soul imprint
+3. Chapter II - The Celestial Triad (Sun, Moon, Ascendant synthesis)
+4. Chapter III - Planetary Council and House Activations
+5. Chapter IV - Turning Points, Shadows, and Gifts
+6. Closing Blessing
+
+Formatting requirements:
+- Include clear chapter headings exactly in the flow above
+- Do not include references, source lists, URLs, or citation markers like [1], [2], or 【1†source】
+- Return only clean narrative text
 
 Write this analysis as if you are channeling the wisdom of the stars themselves.`;
 
@@ -192,7 +217,7 @@ Write this analysis as if you are channeling the wisdom of the stars themselves.
 	}
 
 	const systemMessage =
-		'You are a wise, mystical astrologer with deep knowledge of the cosmos and the human soul. You speak with poetic grace, profound insight, and a touch of ancient wisdom. Your readings are deeply personal, transformative, and written as if you are channeling the stars themselves.';
+		'You are a wise, mystical astrologer with deep knowledge of the cosmos and the human soul. You speak with poetic grace, profound insight, and a touch of ancient wisdom. Your readings are deeply personal, transformative, and written as if you are channeling the stars themselves. Never include bracketed citations, source markers, or URLs in the reading.';
 	const model = 'sonar-pro'; // Perplexity model - advanced search model with 200k token context
 	const temperature = 0.8;
 	const maxTokens = 8000;
@@ -218,13 +243,14 @@ Write this analysis as if you are channeling the wisdom of the stars themselves.
 		if (!analysis) {
 			throw new Error('No analysis generated from Perplexity');
 		}
+		const cleanedAnalysis = stripCitationMarkers(analysis);
 
 		// Extract detailed metadata
 		const usage = completion.usage;
 		const choice = completion.choices[0];
 
 		return {
-			analysisText: analysis,
+			analysisText: cleanedAnalysis,
 			fullPrompt: prompt,
 			systemMessage,
 			model,
