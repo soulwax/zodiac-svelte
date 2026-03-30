@@ -14,7 +14,7 @@ const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
 const outputPath = path.join(outputDir, `pdf-generation-${timestamp}.pdf`);
 const model = 'gemini-3-flash-preview';
 const temperature = 0.9;
-const maxOutputTokens = 4096;
+const maxOutputTokens = 15000;
 const fallbackAnalysis = `Opening Invocation
 
 You arrived beneath a restless morning sky, carrying the bright curiosity of Gemini, the poised inner weather of Libra, and the warm entrance of Leo. This reading stands in for the live AI response when the Gemini key is unavailable, but it still exercises the PDF generation path with realistic narrative content.

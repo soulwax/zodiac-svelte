@@ -38,7 +38,7 @@ interface GeminiGenerateContentResponse {
 
 const MODEL_NAME = 'gemini-3-flash-preview';
 const TEMPERATURE = 0.9;
-const MAX_OUTPUT_TOKENS = 4096;
+const MAX_OUTPUT_TOKENS = 15000;
 const GEMINI_GENERATE_CONTENT_URL = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL_NAME}:generateContent`;
 
 function getGeminiApiKey(): string {
