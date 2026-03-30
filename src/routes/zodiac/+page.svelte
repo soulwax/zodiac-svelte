@@ -548,7 +548,29 @@
 			formData.append('moonSign', moonSign);
 			formData.append('ascendant', ascendant);
 			formData.append('houses', JSON.stringify(houses));
-			formData.append('planets', JSON.stringify(planets));
+			const planetsWithHouses: Record<string, { sign: string; house?: number }> = {
+				sun: { sign: sunSign },
+				moon: { sign: moonSign }
+			};
+
+			for (const [planetName, planetSign] of Object.entries(planets)) {
+				const planetLon = getPlanetLongitude(
+					planetSign,
+					utcYear,
+					utcMonth,
+					utcDay,
+					planetName.charAt(0).toUpperCase() + planetName.slice(1),
+					utcHour,
+					utcMinute
+				);
+				const houseNumber = getPlanetHouse(planetLon, houses);
+				planetsWithHouses[planetName] = {
+					sign: planetSign,
+					house: houseNumber
+				};
+			}
+
+			formData.append('planets', JSON.stringify(planetsWithHouses));
 			formData.append('utcYear', String(utcYear));
 			formData.append('utcMonth', String(utcMonth));
 			formData.append('utcDay', String(utcDay));

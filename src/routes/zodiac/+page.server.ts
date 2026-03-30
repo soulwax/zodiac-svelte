@@ -2,7 +2,7 @@
 
 import { db } from '$lib/server/db';
 import { zodiacResults } from '$lib/server/db/schema';
-import { desc, eq } from 'drizzle-orm';
+import { eq } from 'drizzle-orm';
 import type { Actions } from './$types';
 
 export const actions = {
@@ -10,7 +10,6 @@ export const actions = {
 		try {
 			const data = await request.formData();
 
-			// Get all the form data
 			const fullName = data.get('fullName') as string | null;
 			const lifeTrajectory = data.get('lifeTrajectory') as string | null;
 			const birthDate = data.get('birthDate') as string;
@@ -30,19 +29,14 @@ export const actions = {
 			const utcHour = parseInt(data.get('utcHour') as string);
 			const utcMinute = parseInt(data.get('utcMinute') as string);
 
-			// Parse houses JSON
 			const houses = JSON.parse(housesJson);
-
-			// Parse planets JSON (with default empty object if not provided)
 			const planets = planetsJson ? JSON.parse(planetsJson) : {};
 
-			// Get session ID from cookies (or generate one)
 			const sessionId = cookies.get('sessionId') || crypto.randomUUID();
 			if (!cookies.get('sessionId')) {
 				cookies.set('sessionId', sessionId, { path: '/' });
 			}
 
-			// Save to database
 			await db.insert(zodiacResults).values({
 				fullName: fullName || null,
 				lifeTrajectory: lifeTrajectory || null,
@@ -71,15 +65,28 @@ export const actions = {
 			return { success: false, error: 'Failed to save result' };
 		}
 	},
-	analyze: async ({ request, cookies, fetch }) => {
+	analyze: async ({ request, fetch }) => {
 		try {
 			const data = await request.formData();
 			const resultId = data.get('resultId') as string | null;
 
-			let chartData;
+			let chartData:
+				| {
+						resultId?: string;
+						fullName: string | null;
+						lifeTrajectory: string | null;
+						birthDate: string;
+						birthTime: string;
+						placeName: string;
+						sunSign: string;
+						ascendant: string;
+						moonSign: string;
+						planets: Record<string, { sign: string; house?: number }>;
+						houses: Array<{ number: number; sign: string }>;
+				  }
+				| undefined;
 
 			if (resultId) {
-				// Fetch existing chart from database
 				const result = await db
 					.select()
 					.from(zodiacResults)
@@ -93,37 +100,14 @@ export const actions = {
 				const record = result[0];
 				const planets = (record.planets as Record<string, { sign: string; house?: number }>) || {};
 				const houses = (record.houses as Array<{ number: number; sign: string }>) || [];
-
-				// Ensure Sun and Moon are included in planets
 				const planetsWithHouses: Record<string, { sign: string; house?: number }> = { ...planets };
+
 				if (record.sunSign && !planetsWithHouses.sun) {
-					// Import functions to calculate planet houses
-					const { getPlanetLongitude, getPlanetHouse } = await import('$lib/zodiac');
-					const sunLon = getPlanetLongitude(
-						record.sunSign,
-						record.utcYear,
-						record.utcMonth,
-						record.utcDay,
-						'Sun',
-						record.utcHour,
-						record.utcMinute
-					);
-					const sunHouse = getPlanetHouse(sunLon, houses);
-					planetsWithHouses.sun = { sign: record.sunSign, house: sunHouse };
+					planetsWithHouses.sun = { sign: record.sunSign };
 				}
+
 				if (record.moonSign && !planetsWithHouses.moon) {
-					const { getPlanetLongitude, getPlanetHouse } = await import('$lib/zodiac');
-					const moonLon = getPlanetLongitude(
-						record.moonSign,
-						record.utcYear,
-						record.utcMonth,
-						record.utcDay,
-						'Moon',
-						record.utcHour,
-						record.utcMinute
-					);
-					const moonHouse = getPlanetHouse(moonLon, houses);
-					planetsWithHouses.moon = { sign: record.moonSign, house: moonHouse };
+					planetsWithHouses.moon = { sign: record.moonSign };
 				}
 
 				chartData = {
@@ -140,7 +124,6 @@ export const actions = {
 					houses
 				};
 			} else {
-				// Get chart data from form
 				const fullName = data.get('fullName') as string | null;
 				const lifeTrajectory = data.get('lifeTrajectory') as string | null;
 				const birthDate = data.get('birthDate') as string;
@@ -151,13 +134,7 @@ export const actions = {
 				const moonSign = (data.get('moonSign') as string)?.trim() || null;
 				const housesJson = data.get('houses') as string;
 				const planetsJson = data.get('planets') as string;
-				const utcYear = parseInt(data.get('utcYear') as string);
-				const utcMonth = parseInt(data.get('utcMonth') as string);
-				const utcDay = parseInt(data.get('utcDay') as string);
-				const utcHour = parseInt(data.get('utcHour') as string);
-				const utcMinute = parseInt(data.get('utcMinute') as string);
 
-				// Validate required fields
 				if (!sunSign || !moonSign || !ascendant) {
 					return {
 						success: false,
@@ -166,67 +143,14 @@ export const actions = {
 					};
 				}
 
-				// Parse planets and houses
-				const planets = planetsJson ? JSON.parse(planetsJson) : {};
-				const houses = housesJson ? JSON.parse(housesJson) : [];
-
-				// Import functions to calculate planet houses
-				const { getPlanetLongitude, getPlanetHouse } = await import('$lib/zodiac');
-
-				// Add Sun and Moon to planets with their house positions
+				const planets = planetsJson
+					? (JSON.parse(planetsJson) as Record<string, { sign: string; house?: number }>)
+					: {};
+				const houses = housesJson ? (JSON.parse(housesJson) as Array<{ number: number; sign: string }>) : [];
 				const planetsWithHouses: Record<string, { sign: string; house?: number }> = { ...planets };
 
-				// Calculate Sun house
-				if (sunSign) {
-					const sunLon = getPlanetLongitude(
-						sunSign,
-						utcYear,
-						utcMonth,
-						utcDay,
-						'Sun',
-						utcHour,
-						utcMinute
-					);
-					const sunHouse = getPlanetHouse(sunLon, houses);
-					planetsWithHouses.sun = { sign: sunSign, house: sunHouse };
-				}
-
-				// Calculate Moon house
-				if (moonSign) {
-					const moonLon = getPlanetLongitude(
-						moonSign,
-						utcYear,
-						utcMonth,
-						utcDay,
-						'Moon',
-						utcHour,
-						utcMinute
-					);
-					const moonHouse = getPlanetHouse(moonLon, houses);
-					planetsWithHouses.moon = { sign: moonSign, house: moonHouse };
-				}
-
-				// Calculate houses for other planets if not already set
-				for (const [planet, position] of Object.entries(planets)) {
-					if (
-						position &&
-						typeof position === 'object' &&
-						'sign' in position &&
-						!('house' in position)
-					) {
-						const planetLon = getPlanetLongitude(
-							position.sign,
-							utcYear,
-							utcMonth,
-							utcDay,
-							planet.charAt(0).toUpperCase() + planet.slice(1),
-							utcHour,
-							utcMinute
-						);
-						const planetHouse = getPlanetHouse(planetLon, houses);
-						planetsWithHouses[planet] = { ...position, house: planetHouse };
-					}
-				}
+				planetsWithHouses.sun ??= { sign: sunSign };
+				planetsWithHouses.moon ??= { sign: moonSign };
 
 				chartData = {
 					fullName: fullName || null,
@@ -242,7 +166,6 @@ export const actions = {
 				};
 			}
 
-			// Validate required chart data
 			if (!chartData.sunSign || !chartData.moonSign || !chartData.ascendant) {
 				return {
 					success: false,
@@ -251,7 +174,6 @@ export const actions = {
 				};
 			}
 
-			// Call the analyze API endpoint to create an async job
 			const response = await fetch('/api/analyze', {
 				method: 'POST',
 				headers: {
@@ -270,7 +192,6 @@ export const actions = {
 				};
 			}
 
-			// Return the job ID to the client for polling
 			return {
 				success: true,
 				jobId: result.jobId
