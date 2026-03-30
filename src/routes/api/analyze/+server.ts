@@ -64,71 +64,82 @@ async function processAnalysisAsync(jobId: string, chartData: any, cookies: any)
 
 		// Determine the zodiac result ID
 		let finalResultId: number | null = null;
+		const sessionId = cookies.get('sessionId') || null;
 
 		if (chartData.resultId) {
 			finalResultId = parseInt(chartData.resultId);
-			// Update existing record's aiAnalysis field (for backward compatibility)
-			await db
-				.update(zodiacResults)
-				.set({ aiAnalysis: analysis })
-				.where(eq(zodiacResults.id, finalResultId));
-		} else {
-			// Get session ID from cookies
-			const sessionId = cookies.get('sessionId');
-			if (sessionId) {
+			try {
+				// Update existing record's aiAnalysis field (for backward compatibility)
+				await db
+					.update(zodiacResults)
+					.set({ aiAnalysis: analysis })
+					.where(eq(zodiacResults.id, finalResultId));
+			} catch (error) {
+				console.error('Failed to persist aiAnalysis for explicit resultId:', error);
+			}
+		} else if (sessionId) {
+			try {
 				// Try to find the most recent record for this session
 				const recentResult = await db
 					.select()
 					.from(zodiacResults)
-					.where(eq(zodiacResults.sessionId, sessionId))
+					.where(eq(zodiacResults.sessionId, sessionId!))
 					.orderBy(desc(zodiacResults.createdAt))
 					.limit(1);
 
 				if (recentResult.length > 0) {
 					finalResultId = recentResult[0].id;
-					// Update existing record's aiAnalysis field (for backward compatibility)
-					await db
-						.update(zodiacResults)
-						.set({ aiAnalysis: analysis })
-						.where(eq(zodiacResults.id, finalResultId));
+					try {
+						// Update existing record's aiAnalysis field (for backward compatibility)
+						await db
+							.update(zodiacResults)
+							.set({ aiAnalysis: analysis })
+							.where(eq(zodiacResults.id, finalResultId));
+					} catch (error) {
+						console.error('Failed to persist aiAnalysis for session result:', error);
+					}
 				}
+			} catch (error) {
+				console.error('Failed to look up recent zodiac result for session:', error);
 			}
 		}
 
 		// Save detailed analysis record if we have a result ID
 		if (finalResultId) {
-			const sessionId = cookies.get('sessionId') || null;
-
-			await db.insert(analysisRecords).values({
-				zodiacResultId: finalResultId,
-				analysisText: analysisMetadata.analysisText,
-				fullPrompt: analysisMetadata.fullPrompt,
-				systemMessage: analysisMetadata.systemMessage,
-				model: analysisMetadata.model,
-				temperature: analysisMetadata.temperature,
-				maxTokens: analysisMetadata.maxTokens,
-				promptTokens: analysisMetadata.promptTokens || null,
-				completionTokens: analysisMetadata.completionTokens || null,
-				totalTokens: analysisMetadata.totalTokens || null,
-				finishReason: analysisMetadata.finishReason || null,
-				responseId: analysisMetadata.responseId || null,
-				chartDataSnapshot: {
-					fullName: chartData.fullName,
-					lifeTrajectory: chartData.lifeTrajectory,
-					birthDate: chartData.birthDate,
-					birthTime: chartData.birthTime,
-					placeName: chartData.placeName,
-					sunSign: chartData.sunSign,
-					ascendant: chartData.ascendant,
-					moonSign: chartData.moonSign,
-					planets: chartData.planets,
-					houses: chartData.houses
-				},
-				analysisType: 'mystical',
-				analysisVersion: '1.0',
-				completedAt: new Date(),
-				sessionId
-			});
+			try {
+				await db.insert(analysisRecords).values({
+					zodiacResultId: finalResultId,
+					analysisText: analysisMetadata.analysisText,
+					fullPrompt: analysisMetadata.fullPrompt,
+					systemMessage: analysisMetadata.systemMessage,
+					model: analysisMetadata.model,
+					temperature: analysisMetadata.temperature,
+					maxTokens: analysisMetadata.maxTokens,
+					promptTokens: analysisMetadata.promptTokens || null,
+					completionTokens: analysisMetadata.completionTokens || null,
+					totalTokens: analysisMetadata.totalTokens || null,
+					finishReason: analysisMetadata.finishReason || null,
+					responseId: analysisMetadata.responseId || null,
+					chartDataSnapshot: {
+						fullName: chartData.fullName,
+						lifeTrajectory: chartData.lifeTrajectory,
+						birthDate: chartData.birthDate,
+						birthTime: chartData.birthTime,
+						placeName: chartData.placeName,
+						sunSign: chartData.sunSign,
+						ascendant: chartData.ascendant,
+						moonSign: chartData.moonSign,
+						planets: chartData.planets,
+						houses: chartData.houses
+					},
+					analysisType: 'mystical',
+					analysisVersion: '1.0',
+					completedAt: new Date(),
+					sessionId
+				});
+			} catch (error) {
+				console.error('Failed to persist analysis record:', error);
+			}
 		}
 
 		// Update job with completed status

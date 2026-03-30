@@ -6,8 +6,8 @@ import dotenv from 'dotenv';
 import { jsPDF } from 'jspdf';
 import { buildMysticalAnalysisPrompt } from './src/lib/server/ai/prompts/mystical-analysis.ts';
 
-dotenv.config({ path: '.env.local' });
-dotenv.config();
+dotenv.config({ path: '.env.local', override: true });
+dotenv.config({ override: true });
 
 const outputDir = path.resolve('tmp');
 const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
