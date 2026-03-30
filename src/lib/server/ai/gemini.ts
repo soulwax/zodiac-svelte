@@ -18,7 +18,7 @@ export interface AnalysisMetadata {
 
 const MODEL_NAME = 'gemini-2.5-flash';
 const TEMPERATURE = 0.9;
-const MAX_OUTPUT_TOKENS = 4096;
+const MAX_OUTPUT_TOKENS = 8192;
 
 let geminiClient: GoogleGenAI | null = null;
 

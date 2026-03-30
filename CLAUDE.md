@@ -96,7 +96,7 @@ Server Actions (+page.server.ts)
     ↓
 API Routes (Serverless Functions)
     ├→ POST /api/analyze: Start AI analysis job
-    │  └─ src/lib/server/openai.ts (Perplexity API)
+    │  └─ src/lib/server/ai/gemini.ts (Gemini API)
     │  └─ Updates job status in memory
     └→ GET /api/analyze/status/[jobId]: Check job status
         └─ src/lib/server/jobs.ts (in-memory job tracking)
@@ -140,13 +140,12 @@ Three main tables:
 - Automatically manages connections with instant cold-start performance
 - Supports both `DATABASE_URL` (Neon standard) and `POSTGRES_URL` (Vercel compatibility)
 
-### AI Integration (`src/lib/server/openai.ts`)
+### AI Integration (`src/lib/server/ai/`)
 
-- Perplexity API client initialized with sonar-pro model
-- `generateMysticalAnalysisDetailed()`: Generates 1500-2500 word poetic analyses
-- Max 8000 tokens, temperature 0.8
-- Integrates sign descriptions from `src/data/general.json`
-- Tracks token usage and stores full prompts in analysisRecords
+- `gemini.ts`: Gemini API client using `gemini-2.5-flash`, temperature 0.9, max 8192 output tokens
+- `prompts/mystical-analysis.ts`: Prompt builder — constructs system instruction and user prompt from chart data, pulls sign/planet descriptions from `src/data/general.json` and `src/data/planets.json`
+- `generateMysticalAnalysisDetailed()`: Generates 2500-3200 word personal horoscope readings with extended birthplace narrative
+- Tracks token usage and stores full prompts in `analysisRecords`
 - **Async Job Pattern**: Analysis runs as background job to avoid serverless timeout (10s on Hobby plan)
 
 ### Main UI (`src/routes/zodiac/+page.svelte` - 2507 lines)
@@ -174,7 +173,7 @@ Three main tables:
 
 Set these in Vercel project settings (Settings → Environment Variables):
 
-- **PERPLEXITY_API_KEY**: API key for Perplexity AI (get from https://docs.perplexity.ai/)
+- **GEMINI_API_KEY**: API key for Google Gemini (get from [Google AI Studio](https://aistudio.google.com/apikey))
 - **DATABASE_URL**: Neon database connection string (pooled)
   - Format: `postgresql://user:password@ep-xxx.region.aws.neon.tech/dbname?sslmode=require`
   - Get from Neon dashboard → Connection Details → Connection string (Pooled)
@@ -185,7 +184,7 @@ Set these in Vercel project settings (Settings → Environment Variables):
 
 Create a `.env` file (see `.env.example`):
 
-- **PERPLEXITY_API_KEY**: Same as above
+- **GEMINI_API_KEY**: Same as above
 - **DATABASE_URL**: Neon connection string (same as production)
   - Or use local PostgreSQL: `postgres://user:pass@localhost:5432/dbname`
 
@@ -212,7 +211,7 @@ The application supports both naming conventions:
 
 3. **Configure Environment Variables**
    - Vercel Project Settings → Environment Variables
-   - Add `PERPLEXITY_API_KEY` (from https://docs.perplexity.ai/)
+   - Add `GEMINI_API_KEY` (from [Google AI Studio](https://aistudio.google.com/apikey))
    - Add `DATABASE_URL` (Neon pooled connection string)
    - Optional: Add `DATABASE_URL_UNPOOLED` (for migrations)
 
