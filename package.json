@@ -1,7 +1,7 @@
 {
 	"name": "stars-ssr-svelte",
 	"private": true,
-	"version": "0.0.4",
+	"version": "0.1.0",
 	"type": "module",
 	"scripts": {
 		"dev": "vite dev",
@@ -51,9 +51,9 @@
 		"vite-plugin-devtools-json": "^1.0.0"
 	},
 	"dependencies": {
+		"@google/genai": "^1.47.0",
 		"@neondatabase/serverless": "^0.10.4",
 		"astronomy-engine": "^2.1.19",
-		"jspdf": "^3.0.4",
-		"openai": "^6.15.0"
+		"jspdf": "^3.0.4"
 	}
 }

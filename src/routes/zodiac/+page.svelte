@@ -833,7 +833,9 @@
 			doc.setFontSize(11);
 			doc.setFont('helvetica', 'normal');
 			doc.setTextColor(...colors.darkText);
-			doc.text(`Born ${birthDate} • ${normalizedTime || birthTime}`, centerX, yPos, { align: 'center' });
+			doc.text(`Born ${birthDate} • ${normalizedTime || birthTime}`, centerX, yPos, {
+				align: 'center'
+			});
 			yPos += 6;
 			doc.text(`${selectedPlace.display_name}`, centerX, yPos, { align: 'center' });
 
@@ -1776,11 +1778,11 @@
 				{#if analysisError}
 					<div class="analysis-error">
 						<p>{analysisError}</p>
-						{#if analysisError.includes('PERPLEXITY_API_KEY')}
+						{#if analysisError.includes('GEMINI_API_KEY')}
 							<p class="env-hint">
-								To enable AI analysis, create a <code>.env</code> file in the project root and add:<br
-								/>
-								<code>PERPLEXITY_API_KEY=your_api_key_here</code>
+								To enable AI analysis, create a <code>.env</code> or <code>.env.local</code>
+								file in the project root and add:<br />
+								<code>GEMINI_API_KEY=your_api_key_here</code>
 							</p>
 						{/if}
 					</div>

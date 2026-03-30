@@ -85,7 +85,7 @@ export const analysisRecords = pgTable('analysis_records', {
 	// System message used
 	systemMessage: text('system_message'),
 	// AI API details
-	model: text('model').notNull(), // e.g., 'sonar-pro'
+	model: text('model').notNull(), // e.g., 'gemini-2.5-flash'
 	temperature: real('temperature'), // Temperature setting used
 	maxTokens: integer('max_tokens'), // Max tokens setting
 	// Token usage statistics

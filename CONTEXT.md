@@ -9,7 +9,7 @@ Zodiac Svelte is a full-stack SvelteKit app that calculates astrological birth c
 - Framework: SvelteKit (Svelte 5, Vite 7)
 - Styling: Tailwind CSS via `@tailwindcss/vite` and `layout.css`
 - Astronomy: `astronomy-engine`
-- AI: Perplexity API via `openai` SDK (base URL `https://api.perplexity.ai`)
+- AI: Gemini API via `@google/genai`
 - PDF: `jspdf` (client-side)
 - DB: Postgres + Drizzle ORM (schema in `src/lib/server/db/schema.ts`)
 - Hosting: adapter-node output (for Node/PM2), plus Vercel config
@@ -91,10 +91,10 @@ Zodiac Svelte is a full-stack SvelteKit app that calculates astrological birth c
 
 ### AI integration
 
-- `src/lib/server/openai.ts`:
-  - Uses `OpenAI` SDK with Perplexity base URL and `PERPLEXITY_API_KEY`.
+- `src/lib/server/ai/gemini.ts`:
+  - Uses `@google/genai` with `GEMINI_API_KEY`.
   - `generateMysticalAnalysisDetailed()` builds a long-form prompt from chart data and static descriptions.
-  - Records token usage metadata when available.
+  - Records Gemini token usage metadata when available.
 
 ### DB + schema
 
@@ -110,7 +110,7 @@ Zodiac Svelte is a full-stack SvelteKit app that calculates astrological birth c
   - `PORT` (default 4332)
   - Postgres URLs (`DATABASE_URL`, `POSTGRES_URL`, etc.)
   - Neon auth keys (for Next.js templates)
-- **Required for AI**: `PERPLEXITY_API_KEY` (used in `src/lib/server/openai.ts`).
+- **Required for AI**: `GEMINI_API_KEY` (used in `src/lib/server/ai/gemini.ts`).
 - `drizzle.config.ts` throws if `DATABASE_URL` is missing.
 
 ## Scripts (package.json)
@@ -139,4 +139,4 @@ Zodiac Svelte is a full-stack SvelteKit app that calculates astrological birth c
 - `src/lib/server/db/index.ts` imports `@neondatabase/serverless`, but this package is not listed in `package.json` deps; ensure it is installed if DB code is used in runtime.
 - AI jobs are stored in-memory; results are lost on cold starts or serverless restarts.
 - `getTimezoneFromCoords()` can return `null`; calculations fall back to treating input as UTC when timezone lookup fails.
-- `.env.example` does not mention `PERPLEXITY_API_KEY`, but AI features require it.
+- `.env.example` includes `GEMINI_API_KEY` for the AI analysis flow.

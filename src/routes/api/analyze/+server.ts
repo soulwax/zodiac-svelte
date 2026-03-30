@@ -3,7 +3,7 @@
 import { json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { createJob, updateJob } from '$lib/server/jobs';
-import { generateMysticalAnalysisDetailed } from '$lib/server/openai';
+import { generateMysticalAnalysisDetailed } from '$lib/server/ai/gemini';
 import { db } from '$lib/server/db';
 import { analysisRecords, zodiacResults } from '$lib/server/db/schema';
 import { eq, desc } from 'drizzle-orm';

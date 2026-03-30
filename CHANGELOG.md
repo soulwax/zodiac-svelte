@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.1.0] - 2026-03-30
+
+### Changed
+
+- Replaced the horoscope analysis provider with Gemini using the server-only `GEMINI_API_KEY` environment variable.
+- Switched mystical story generation to `gemini-2.5-flash` with a higher-creativity temperature and Gemini-specific failure handling.
+- Refactored AI prompt construction into dedicated server-side prompt and provider modules for cleaner separation of concerns.
+- Updated the birthplace instructions so the generated horoscope story explicitly revolves around the creator's birthtown.
+
+### Removed
+
+- Removed the app's dependency on the previous AI provider key and its provider-specific wiring.
+
 ## [0.0.4] - 2026-02-13
 
 ### Changed
@@ -9,7 +22,7 @@ All notable changes to this project will be documented in this file.
 - Cleaned up `.env.example` to only include actually used environment variables
 - Removed unused Next.js (`NEXT_PUBLIC_*`, `STACK_*`) and Prisma (`POSTGRES_PRISMA_URL`) variables
 - Removed duplicate PostgreSQL connection parameters (`POSTGRES_USER`, `POSTGRES_HOST`, etc.)
-- Simplified from 17 environment variables to 4 essential ones: `PORT`, `DATABASE_URL`, `DATABASE_URL_UNPOOLED`, `PERPLEXITY_API_KEY`
+- Simplified from 17 environment variables to 4 essential ones: `PORT`, `DATABASE_URL`, `DATABASE_URL_UNPOOLED`, and the active AI provider key
 - Added helpful documentation comments in `.env.example` explaining each variable's purpose
 
 ## [0.0.3] - 2026-01-30
@@ -66,7 +79,7 @@ All notable changes to this project will be documented in this file.
 
 - SvelteKit app for calculating natal charts (sun, moon, ascendant, houses, planets).
 - Interactive SVG chart renderer with aspects.
-- AI-powered mystical analysis via Perplexity API with async job polling.
+- AI-powered mystical analysis via an external model provider with async job polling.
 - Client-side PDF export with chart and analysis.
 - PostgreSQL persistence via Drizzle ORM (zodiac results, analysis history, sverdle results).
 - Sverdle (Wordle-style) game module.

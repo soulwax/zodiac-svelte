@@ -30,7 +30,7 @@ See [FINAL_TEST_RESULTS.md](FINAL_TEST_RESULTS.md) for detailed analysis.
 ## Features
 
 - 🌟 **Precise Astronomical Calculations**: Uses the `astronomy-engine` library for accurate celestial positions
-- 🤖 **AI-Powered Analysis**: Generates detailed mystical interpretations using Perplexity API (sonar-pro model)
+- 🤖 **AI-Powered Analysis**: Generates detailed mystical interpretations using Gemini (`gemini-2.5-flash`)
 - 💾 **Database Storage**: Save birth charts to PostgreSQL database (Neon serverless)
 - 📄 **PDF Export**: Export complete charts with analysis as PDF documents
 - 🌍 **Location Autocomplete**: OpenStreetMap geocoding for accurate location lookup
@@ -53,7 +53,7 @@ For each birth chart, the application calculates:
 - **Frontend**: Svelte 5.46.1, SvelteKit 2.49.2, Tailwind CSS 4.1.18
 - **Backend**: SvelteKit server-side actions, Drizzle ORM
 - **Database**: Neon Postgres (serverless-optimized)
-- **AI**: Perplexity API (sonar-pro model)
+- **AI**: Gemini API (`gemini-2.5-flash`)
 - **Build**: Vite 7.3.0, TypeScript 5.9.3
 - **Deployment**: Vercel serverless with adapter-auto
 
@@ -64,7 +64,7 @@ For each birth chart, the application calculates:
 - Node.js (v18 or higher)
 - npm or pnpm
 - PostgreSQL database (Neon recommended) or local PostgreSQL
-- Perplexity API key (for AI analysis)
+- Gemini API key (for AI analysis)
 
 ### Installation
 
@@ -90,7 +90,7 @@ cp .env.example .env
 Edit `.env` and add:
 
 - `DATABASE_URL`: Your PostgreSQL connection string
-- `PERPLEXITY_API_KEY`: Your Perplexity API key
+- `GEMINI_API_KEY`: Your Gemini API key
 
 4. Initialize the database:
 
@@ -223,8 +223,11 @@ src/
 │   ├── geocoding.ts         # Location/timezone lookup
 │   ├── symbols.ts           # Astrological symbols
 │   └── server/
+│       ├── ai/
+│       │   ├── gemini.ts    # Gemini API integration
+│       │   └── prompts/
+│       │       └── mystical-analysis.ts
 │       ├── db/              # Database schema and connection
-│       ├── openai.ts        # Perplexity API integration
 │       └── jobs.ts          # Background job tracking
 └── data/
     ├── general.json         # Sign descriptions, house meanings
@@ -273,7 +276,7 @@ To avoid serverless timeouts (10s on Vercel Hobby plan), AI analysis runs as a b
 1. Push to GitHub
 2. Import project in Vercel
 3. Set environment variables:
-   - `PERPLEXITY_API_KEY`
+   - `GEMINI_API_KEY`
    - `DATABASE_URL`
 4. Deploy!
 
@@ -306,5 +309,5 @@ When adding new features:
 - [Swiss Ephemeris WASM](https://github.com/prolaxu/swisseph-wasm) - Gold-standard astronomical calculations for Ascendants and Houses
 - [astronomy-engine](https://github.com/cosinekitty/astronomy) - Precise astronomical calculations
 - [Astro-Databank](https://www.astro.com/astro-databank/) - Verified celebrity birth data
-- [Perplexity AI](https://www.perplexity.ai/) - Mystical analysis generation
+- [Gemini API](https://ai.google.dev/) - Mystical analysis generation
 - [Neon](https://neon.tech/) - Serverless PostgreSQL database
