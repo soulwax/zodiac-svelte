@@ -1,0 +1,13 @@
+
+> stars-ssr-svelte@0.1.0 build D:\Workspace\Web\Svelte\zodiac-svelte
+> vite build
+
+[36mvite v7.3.0 [32mbuilding ssr environment for production...[36m[39m
+transforming...
+[32m✓[39m 244 modules transformed.
+rendering chunks...
+[36mvite v7.3.0 [32mbuilding client environment for production...[36m[39m
+transforming...
+src/lib/zodiac.ts (7:34): "default" is not exported by "node_modules/.pnpm/astronomy-engine@2.1.19/node_modules/astronomy-engine/esm/astronomy.js", imported by "src/lib/zodiac.ts".
+[32m✓[39m 439 modules transformed.
+rendering chunks...
