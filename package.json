@@ -51,7 +51,6 @@
 		"vite-plugin-devtools-json": "^1.0.0"
 	},
 	"dependencies": {
-		"@google/genai": "^1.47.0",
 		"@neondatabase/serverless": "^0.10.4",
 		"astronomy-engine": "^2.1.19",
 		"jspdf": "^3.0.4"

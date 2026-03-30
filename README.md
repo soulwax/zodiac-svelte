@@ -224,7 +224,7 @@ src/
 │   ├── symbols.ts           # Astrological symbols
 │   └── server/
 │       ├── ai/
-│       │   ├── gemini.ts    # Gemini API integration
+│       │   ├── gemini.ts    # Gemini REST API integration
 │       │   └── prompts/
 │       │       └── mystical-analysis.ts
 │       ├── db/              # Database schema and connection

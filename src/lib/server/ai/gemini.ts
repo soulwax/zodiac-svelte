@@ -1,5 +1,4 @@
 import { env } from '$env/dynamic/private';
-import { ApiError, GoogleGenAI } from '@google/genai';
 import { buildMysticalAnalysisPrompt, type ChartData } from './prompts/mystical-analysis';
 
 export interface AnalysisMetadata {
@@ -16,24 +15,40 @@ export interface AnalysisMetadata {
 	responseId?: string;
 }
 
+interface GeminiGenerateContentResponse {
+	candidates?: Array<{
+		content?: {
+			parts?: Array<{
+				text?: string;
+			}>;
+		};
+		finishReason?: string;
+	}>;
+	usageMetadata?: {
+		promptTokenCount?: number;
+		candidatesTokenCount?: number;
+		totalTokenCount?: number;
+	};
+	error?: {
+		code?: number;
+		message?: string;
+		status?: string;
+	};
+}
+
 const MODEL_NAME = 'gemini-2.5-flash';
 const TEMPERATURE = 0.9;
-const MAX_OUTPUT_TOKENS = 8192;
+const MAX_OUTPUT_TOKENS = 4096;
+const GEMINI_GENERATE_CONTENT_URL = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL_NAME}:generateContent`;
 
-let geminiClient: GoogleGenAI | null = null;
-
-function getGeminiClient(): GoogleGenAI {
+function getGeminiApiKey(): string {
 	const apiKey = env.GEMINI_API_KEY?.trim();
 
 	if (!apiKey) {
 		throw new Error('GEMINI_API_KEY is not set. Please add it to your server environment.');
 	}
 
-	if (!geminiClient) {
-		geminiClient = new GoogleGenAI({ apiKey });
-	}
-
-	return geminiClient;
+	return apiKey;
 }
 
 function stripCitationMarkers(text: string): string {
@@ -47,36 +62,51 @@ function stripCitationMarkers(text: string): string {
 		.trim();
 }
 
-function mapGeminiError(error: unknown): Error {
-	if (error instanceof ApiError) {
-		if (error.status === 400) {
-			return new Error(
-				'Gemini rejected the analysis request. Please review the submitted chart data.'
-			);
-		}
+function extractText(response: GeminiGenerateContentResponse): string | null {
+	const parts = response.candidates?.[0]?.content?.parts ?? [];
+	const text = parts
+		.map((part) => part.text?.trim())
+		.filter((value): value is string => Boolean(value))
+		.join('\n\n')
+		.trim();
 
-		if (error.status === 401 || error.status === 403) {
-			return new Error('Invalid GEMINI_API_KEY. Please check your Gemini API key.');
-		}
+	return text || null;
+}
 
-		if (error.status === 429) {
-			return new Error('Gemini rate limit exceeded. Please try again in a moment.');
-		}
-
-		if (error.status >= 500) {
-			return new Error('Gemini is temporarily unavailable. Please try again later.');
-		}
+function mapGeminiHttpError(status: number, message: string): Error {
+	if (status === 400) {
+		return new Error(
+			'Gemini rejected the analysis request. Please review the submitted chart data.'
+		);
 	}
 
+	if (status === 401 || status === 403) {
+		return new Error('Invalid GEMINI_API_KEY. Please check your Gemini API key.');
+	}
+
+	if (status === 429) {
+		return new Error('Gemini rate limit exceeded. Please try again in a moment.');
+	}
+
+	if (status >= 500) {
+		return new Error('Gemini is temporarily unavailable. Please try again later.');
+	}
+
+	return new Error(message || 'Gemini request failed.');
+}
+
+function mapGeminiError(error: unknown): Error {
 	if (error instanceof Error) {
 		const message = error.message.toLowerCase();
 
 		if (message.includes('fetch') || message.includes('network') || message.includes('econn')) {
 			return new Error('Network error while contacting Gemini. Please try again.');
 		}
+
+		return error;
 	}
 
-	return error instanceof Error ? error : new Error(String(error));
+	return new Error(String(error));
 }
 
 export async function generateMysticalAnalysis(chartData: ChartData): Promise<string> {
@@ -88,26 +118,46 @@ export async function generateMysticalAnalysisDetailed(
 	chartData: ChartData
 ): Promise<AnalysisMetadata> {
 	const { systemInstruction, userPrompt } = buildMysticalAnalysisPrompt(chartData);
-	const client = getGeminiClient();
+	const apiKey = getGeminiApiKey();
 
 	try {
-		const response = await client.models.generateContent({
-			model: MODEL_NAME,
-			contents: userPrompt,
-			config: {
-				systemInstruction,
-				temperature: TEMPERATURE,
-				maxOutputTokens: MAX_OUTPUT_TOKENS
-			}
+		const response = await fetch(GEMINI_GENERATE_CONTENT_URL, {
+			method: 'POST',
+			headers: {
+				'content-type': 'application/json',
+				'x-goog-api-key': apiKey
+			},
+			body: JSON.stringify({
+				system_instruction: {
+					parts: [{ text: systemInstruction }]
+				},
+				contents: [
+					{
+						role: 'user',
+						parts: [{ text: userPrompt }]
+					}
+				],
+				generationConfig: {
+					temperature: TEMPERATURE,
+					maxOutputTokens: MAX_OUTPUT_TOKENS,
+					responseMimeType: 'text/plain'
+				}
+			})
 		});
 
-		const analysis = response.text;
+		const payload = (await response.json()) as GeminiGenerateContentResponse;
+
+		if (!response.ok) {
+			throw mapGeminiHttpError(
+				response.status,
+				payload.error?.message || `Gemini request failed with status ${response.status}.`
+			);
+		}
+
+		const analysis = extractText(payload);
 		if (!analysis) {
 			throw new Error('No analysis generated from Gemini.');
 		}
-
-		const usage = response.usageMetadata;
-		const firstCandidate = response.candidates?.[0];
 
 		return {
 			analysisText: stripCitationMarkers(analysis),
@@ -116,10 +166,10 @@ export async function generateMysticalAnalysisDetailed(
 			model: MODEL_NAME,
 			temperature: TEMPERATURE,
 			maxTokens: MAX_OUTPUT_TOKENS,
-			promptTokens: usage?.promptTokenCount,
-			completionTokens: usage?.candidatesTokenCount,
-			totalTokens: usage?.totalTokenCount,
-			finishReason: firstCandidate?.finishReason,
+			promptTokens: payload.usageMetadata?.promptTokenCount,
+			completionTokens: payload.usageMetadata?.candidatesTokenCount,
+			totalTokens: payload.usageMetadata?.totalTokenCount,
+			finishReason: payload.candidates?.[0]?.finishReason,
 			responseId: undefined
 		};
 	} catch (error) {

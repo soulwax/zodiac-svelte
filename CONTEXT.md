@@ -9,7 +9,7 @@ Zodiac Svelte is a full-stack SvelteKit app that calculates astrological birth c
 - Framework: SvelteKit (Svelte 5, Vite 7)
 - Styling: Tailwind CSS via `@tailwindcss/vite` and `layout.css`
 - Astronomy: `astronomy-engine`
-- AI: Gemini API via `@google/genai`
+- AI: Gemini API via server-side REST calls
 - PDF: `jspdf` (client-side)
 - DB: Postgres + Drizzle ORM (schema in `src/lib/server/db/schema.ts`)
 - Hosting: adapter-node output (for Node/PM2), plus Vercel config
