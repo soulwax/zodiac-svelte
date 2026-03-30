@@ -12,7 +12,7 @@ dotenv.config({ override: true });
 const outputDir = path.resolve('tmp');
 const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
 const outputPath = path.join(outputDir, `pdf-generation-${timestamp}.pdf`);
-const model = 'gemini-2.5-flash';
+const model = 'gemini-3-flash-preview';
 const temperature = 0.9;
 const maxOutputTokens = 4096;
 const fallbackAnalysis = `Opening Invocation

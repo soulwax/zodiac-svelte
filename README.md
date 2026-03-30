@@ -30,7 +30,7 @@ See [FINAL_TEST_RESULTS.md](FINAL_TEST_RESULTS.md) for detailed analysis.
 ## Features
 
 - 🌟 **Precise Astronomical Calculations**: Uses the `astronomy-engine` library for accurate celestial positions
-- 🤖 **AI-Powered Analysis**: Generates detailed mystical interpretations using Gemini (`gemini-2.5-flash`)
+- 🤖 **AI-Powered Analysis**: Generates detailed mystical interpretations using Gemini (`gemini-3-flash-preview`)
 - 💾 **Database Storage**: Save birth charts to PostgreSQL database (Neon serverless)
 - 📄 **PDF Export**: Export complete charts with analysis as PDF documents
 - 🌍 **Location Autocomplete**: OpenStreetMap geocoding for accurate location lookup
@@ -53,7 +53,7 @@ For each birth chart, the application calculates:
 - **Frontend**: Svelte 5.46.1, SvelteKit 2.49.2, Tailwind CSS 4.1.18
 - **Backend**: SvelteKit server-side actions, Drizzle ORM
 - **Database**: Neon Postgres (serverless-optimized)
-- **AI**: Gemini API (`gemini-2.5-flash`)
+- **AI**: Gemini API (`gemini-3-flash-preview`)
 - **Build**: Vite 7.3.0, TypeScript 5.9.3
 - **Deployment**: Vercel serverless with adapter-auto
 
